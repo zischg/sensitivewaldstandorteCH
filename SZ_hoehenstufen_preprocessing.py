@@ -11,7 +11,7 @@ myworkspace="D:/CCW24sensi"
 codespace="C:/DATA/develops/sensitivewaldstandorteCH"
 hoehenstufendict={"collin":"co","submontan":"sm","untermontan":"um","obermontan":"om","hochmontan":"hm","subalpin":"sa","obersubalpin":"osa"}
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
-
+hoehenstufenlistshort=["co","sm","um","om","hm","sa","osa"]
 #read geodata SZ
 sz_gdf=gpd.read_file("S:/backup_az/CCWSZ/GIS/Modellergebnisse/szstandortstypenjoined.gpkg")
 #sz_gdf=joblib.load("S:/backup_az/CCWSZ/GIS/Modellergebnisse/sz_rcp45_baumartenempfehlungen.sav")
@@ -39,12 +39,12 @@ sz_gdf.to_file(myworkspace+"/SZ"+"/SZ_standortstypen_hs.gpkg", layer="SZ_standor
 for index, row in sz_unique.iterrows():
     tahs_listshort = []
     naistyp=row["NaiS_LFI"]
-    tempsel=sz_gdf[sz_hs_gdf["NaiS_LFI"]==naistyp]
+    tempsel=sz_hs_gdf[sz_hs_gdf["NaiS_LFI"]==naistyp]
     tahs_list=tempsel["tahs"].unique().tolist()
     for item in tahs_list:
-        if item in hoehenstufendict and item not in tahs_listshort:
+        if item in hoehenstufenlistshort and item not in tahs_listshort:
             tahs_listshort.append(item)
-    sz_unique.loc[((sz_unique["NaiS_LFI"] == naistyp)), "tahs"] = str(tahs_listshort).replace("[","").replace("]","").replace("'","").replace("]","")
+    sz_unique.loc[((sz_unique["NaiS_LFI"] == naistyp)), "tahs"] = str(tahs_listshort).replace("[","").replace("]","").replace("'","").replace(",","")
 
 sz_unique.to_excel(codespace+"/SZ_nais_einheiten_unique.xlsx")
 
