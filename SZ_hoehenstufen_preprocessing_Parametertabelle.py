@@ -14,22 +14,32 @@ hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","
 hoehenstufenlistshort=["co","sm","um","om","hm","sa","osa"]
 
 #read Parametertabelle OW
-parameterdf=pd.read_excel('C:/DATA/develops/ccwow/OW-Parametertabelle_20240907.xlsx', dtype="str", engine='openpyxl')
+parameterdf=pd.read_excel('C:/DATA/develops/ccwsz/WASZ-Höhenstufen-huf-20221202-20240103.xlsx', dtype="str", engine='openpyxl')
 parameterdf.columns
-parameterdf=parameterdf[['Einheit Obwalden','NaiS_LFI','SM', 'UM', 'OM', 'HM', 'SA']]
-ow_unique=parameterdf[['Einheit Obwalden','NaiS_LFI']].drop_duplicates()
-ow_unique["tahs"]=''
-len(ow_unique)
+parameterdf=parameterdf[['SZ Einheit','NaiS_LFI','CO', 'SM', 'UM', 'OM', 'HM', 'SA']]
+sz_unique=parameterdf[['SZ Einheit','NaiS_LFI']].drop_duplicates()
+sz_unique["tahs"]=''
+len(sz_unique)
 
-for index, row in ow_unique.iterrows():
+for index, row in sz_unique.iterrows():
     tahs_list=[]
     nais=row['NaiS_LFI']
     tempsel=parameterdf[parameterdf["NaiS_LFI"]==nais]
+    co=False
     sm=False
     um=False
     om=False
     hm=False
     sa=False
+    osa=False
+    if 'x' in tempsel['CO'].unique().tolist():
+        co=True
+    if 'y' in tempsel['CO'].unique().tolist():
+        co=True
+    if 'o' in tempsel['CO'].unique().tolist():
+        co=True
+    if co == True:
+        tahs_list.append('co')
     if 'x' in tempsel['SM'].unique().tolist():
         sm=True
     if 'y' in tempsel['SM'].unique().tolist():
@@ -70,7 +80,8 @@ for index, row in ow_unique.iterrows():
         sa=True
     if sa == True:
         tahs_list.append('sa')
-    ow_unique.loc[index, "tahs"] = str(tahs_list).replace("[","").replace("]","").replace("'","").replace("]","").replace(",","")
+    sz_unique.loc[index, "tahs"] = str(tahs_list).replace("[","").replace("]","").replace("'","").replace("]","").replace(",","")
 
-ow_unique.to_excel(codespace+"/OW_nais_einheiten_unique.xlsx")
+
+sz_unique.to_excel(codespace+"/SZ_nais_einheiten_unique.xlsx")
 
