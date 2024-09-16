@@ -13,7 +13,7 @@ hoehenstufendict={"collin":"co","submontan":"sm","untermontan":"um","obermontan"
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 hoehenstufenlistshort=["co","sm","um","om","hm","sa","osa"]
 
-#read geodata BE
+#read geodata SO
 so_gdf=gpd.read_file(myworkspace+"/geops_treeapp/forest_types_so/forest_types_so.shp")
 len(so_gdf)
 so_gdf.columns
