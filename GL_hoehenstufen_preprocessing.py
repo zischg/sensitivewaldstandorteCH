@@ -14,7 +14,7 @@ hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","
 hoehenstufenlistshort=["co","sm","um","om","hm","sa","osa"]
 
 
-#read geodata NE
+#read geodata GL
 gl_gdf=gpd.read_file(myworkspace+"/GL/waldgesellschaften/esri_shapefile/pub_gl_waldgesellschaften/waldgesellschaften.shp")
 len(gl_gdf)
 gl_gdf.columns
