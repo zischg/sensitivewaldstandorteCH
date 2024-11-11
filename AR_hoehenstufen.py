@@ -145,7 +145,7 @@ del stok_gdfstoreg
 #mean slope in percent
 stok_gdf["meanslopeprc"]=0
 #zonstatslope=zonal_stats(stok_gdf, referenceraster,stats="count min mean max median")
-zonstatslope=zonal_stats(stok_gdf, referenceraster,stats="mean")
+zonstatslope=zonal_stats(stok_gdf, sloperaster,stats="mean")
 i=0
 while i < len(stok_gdf):
     stok_gdf.loc[i,"meanslopeprc"]=zonstatslope[i]["mean"]
@@ -217,8 +217,8 @@ for index, row in naiseinheitenunique.iterrows():
         stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
     else:
         if "(" in row['hs']:
-            stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "tahs"] = hslist[0]
-            stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "tahsue"] = hslist[1]
+            stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+            stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "tahsue"] = hoehenstufendictabkuerzungen[hslist[1]]
         else:
             for index2, row2 in stok_gdf[stok_gdf["DTWGEINHEI"]==kantonseinheit].iterrows():
                 if row2['hs1975']>0:
@@ -235,83 +235,17 @@ for index, row in naiseinheitenunique.iterrows():
                         stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[0]]
 stok_gdf.columns
 stok_gdf=stok_gdf[['joinid', 'DTWGEINHEI', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1', 'nais2','mo', 'ue', 'hs', 'tahs', 'tahsue','geometry']]
+
+#check empty values
+stok_gdf["tahs"].unique().tolist()
+stok_gdf["tahsue"].unique().tolist()
+checknohs=stok_gdf[stok_gdf["tahs"]==""][["DTWGEINHEI","nais",'hs1975']]
+#fill hoehenstufe for empty values
+for index, row in stok_gdf.iterrows():
+    if row["tahs"]=='' and row['hs1975']>0:
+        stok_gdf.loc[index, "tahs"] = hoehenstufendictabkuerzungen[hsmoddictkurz[int(row['hs1975'])]]
 stok_gdf.to_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
 #stok_gdf=gpd.read_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
 
 
 
-
-
-
-
-
-
-
-
-
-
-#check empty values
-stok_gdf["hs1"].unique().tolist()
-checknohs=stok_gdf[stok_gdf["hs1"]==""][["DTWGEINHEI","sg1","nais1", "hs1","hsmod"]]
-checknohs=stok_gdf[stok_gdf["hs1"]==""][["nais1","hsmod"]]
-len(checknohs)
-checknohsunique=checknohs.groupby(by=["nais1","hsmod"])
-len(checknohsunique)
-checknohs["nais1"].unique().tolist()
-checknohsunique["nais1"].unique().tolist()
-
-#hoehenstufe heute definitif
-stok_gdf["hsheudef"]=""
-stok_gdf.loc[stok_gdf["hs1"] == "co","hsheudef"]="collin"
-stok_gdf.loc[stok_gdf["hs1"] == "sm","hsheudef"]="submontan"
-stok_gdf.loc[stok_gdf["hs1"] == "um","hsheudef"]="untermontan"
-stok_gdf.loc[stok_gdf["hs1"] == "om","hsheudef"]="obermontan"
-stok_gdf.loc[stok_gdf["hs1"] == "hm","hsheudef"]="hochmontan"
-stok_gdf.loc[stok_gdf["hs1"] == "sa","hsheudef"]="subalpin"
-stok_gdf.loc[stok_gdf["hs1"] == "osa","hsheudef"]="obersubalpin"
-
-
-
-##Lage
-##kuppen
-#kuppen=gpd.read_file(projectspace+"/GIS/sgkuppen.shp")
-#kuppen.crs
-#kuppen.columns
-#stok_gdf["lage"]=0
-#stok_gdflage=gpd.sjoin(stok_gdf,kuppen, how='left', op="within")
-#len(stok_gdflage)
-#stok_gdflage.loc[stok_gdflage["gridcode"]!=4,["gridcode"]]=0
-#stok_gdf.loc[stok_gdflage["gridcode"]==4,["lage"]]=4
-##ebene
-#stok_gdf.loc[stok_gdf["meanslopeprc"]<10.0,"lage"]=1
-##mulden
-#mulden=gpd.read_file(projectspace+"/GIS/sgmuldenLV95.shp")
-#mulden.crs
-##mulden.set_crs(2056, inplace=True)
-#mulden.columns
-#mulden.plot()
-#stok_gdflage=gpd.sjoin(stok_gdf,mulden, how='left', op="within")
-#len(stok_gdflage)
-#np.max(stok_gdflage["gridcode"])
-#stok_gdf.loc[stok_gdflage["gridcode"]==2,["lage"]]=2
-##hang
-#stok_gdf.loc[stok_gdf["lage"]==0,"lage"]=3
-#np.min(stok_gdf["lage"])
-#del stok_gdflage
-
-
-
-#export for monika to refine
-stok_gdf.columns
-stok_gdf.to_postgis(name="sg_stok_gdf", con=engine)
-sqlstatement='SELECT "DTWGEINHEI",mosaic,uebergang,sg1,sgue,sgmosaic,nais1,naisue,naismosaic, hs1,hsue, hsmo FROM public.sg_stok_gdf GROUP BY "DTWGEINHEI",mosaic,uebergang,sg1,sgue,sgmosaic,nais1,naisue,naismosaic, hs1,hsue, hsmo;'
-checkallunique=pd.read_sql_query(sqlstatement,con=engine)
-len(checkallunique)
-checkallunique.to_excel(projectspace+"/export/checkallunique.xlsx")
-checkallunique_reduced=checkallunique[((checkallunique["uebergang"]==1) | (checkallunique["mosaic"]==1))]
-checkallunique_reduced["tocheck"]=0
-checkallunique_reduced.loc[((checkallunique_reduced["uebergang"]==1) & (checkallunique_reduced["hs1"]!=checkallunique_reduced["hsue"])),"tocheck"]=1
-checkallunique_reduced.loc[((checkallunique_reduced["mosaic"]==1) & (checkallunique_reduced["hs1"]!=checkallunique_reduced["hsmo"])),"tocheck"]=1
-checkallunique_reduced=checkallunique_reduced[checkallunique_reduced["tocheck"]==1]
-len(checkallunique_reduced)
-checkallunique_reduced.to_excel(projectspace+"/export/checkallunique_reduced.xlsx")
