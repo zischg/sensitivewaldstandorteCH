@@ -181,41 +181,60 @@ while i < len(stok_gdf):
     stok_gdf.loc[i,"hs1975"]=zonstaths[i]["majority"]
     i+=1
 stok_gdf.columns
+stok_gdf.dtypes
+#stok_gdf=stok_gdf.astype({'hs1975': 'int'})#.dtypes
 stok_gdf.to_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
 del zonstaths
 
 #uebersetzung von Kantonseinheit in NAIS
-len(naiseinheitenunique)
+
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['NaiS'].isnull() == False]
+len(naiseinheitenunique)
 stok_gdf['nais']=''
+stok_gdf['nais1']=''
+stok_gdf['nais2']=''
+stok_gdf['mo']=0
+stok_gdf['ue']=0
 #stok_gdf['hsmod']=0
 stok_gdf['hs']=''
 stok_gdf['tahs']=''
+stok_gdf['tahsue']=''
 for index, row in naiseinheitenunique.iterrows():
     kantonseinheit=row["DTWGEINHEI"]
     nais=row["NaiS"]
-    hslist=row['hs'].replace('(',' ').replace(')','').strip().split()
+    hslist=row['hs'].replace('/',' ').replace('(',' ').replace(')','').strip().split()
     stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "nais"] = nais
     stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "hs"] =row['hs']
+    if '(' in row['hs']:
+        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "nais1"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').strip().split()[0]
+        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "nais2"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').strip().split()[1]
+        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "ue"] = 1
+    if '/' in row['hs']:
+        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "nais1"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').strip().split()[0]
+        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "nais2"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').strip().split()[1]
+        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "mo"] = 1
     if len(hslist)==1:
-        hoehenstufendictabkuerzungen
         stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
     else:
-        for index2, row2 in stok_gdf[stok_gdf["DTWGEINHEI"]==kantonseinheit].iterrows():
-            if row2['hs1975']>0:
-                hsmod=hsmoddictkurz[int(row2['hs1975'])]
-            else:
-                hsmod = 'nan'
-            if hsmod in row2['hs'].strip().split():
-                stok_gdf.loc[index2,'tahs']=hoehenstufendictabkuerzungen[hsmod]
-            else:
-                test=hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[0]]
-                if len(row2['hs'].replace('(',' ').replace(')','').strip().split()) >1 and test == 'collin':
-                    stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[1]]
+        if "(" in row['hs']:
+            stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "tahs"] = hslist[0]
+            stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "tahsue"] = hslist[1]
+        else:
+            for index2, row2 in stok_gdf[stok_gdf["DTWGEINHEI"]==kantonseinheit].iterrows():
+                if row2['hs1975']>0:
+                    hsmod=hsmoddictkurz[int(row2['hs1975'])]
                 else:
-                    stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[0]]
+                    hsmod = 'nan'
+                if hsmod in row2['hs'].strip().split():
+                    stok_gdf.loc[index2,'tahs']=hoehenstufendictabkuerzungen[hsmod]
+                else:
+                    test=hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[0]]
+                    if len(row2['hs'].replace('(',' ').replace(')','').strip().split()) >1 and test == 'collin':
+                        stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
+                    else:
+                        stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[0]]
 stok_gdf.columns
-stok_gdf=stok_gdf[['DTWGEINHEI', 'taheute', 'geometry', 'joinid', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'hs','tahs']]
+stok_gdf=stok_gdf[['joinid', 'DTWGEINHEI', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1', 'nais2','mo', 'ue', 'hs', 'tahs', 'tahsue','geometry']]
 stok_gdf.to_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
 #stok_gdf=gpd.read_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
 
