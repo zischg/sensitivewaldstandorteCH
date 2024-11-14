@@ -213,7 +213,7 @@ for index, row in naiseinheitenunique.iterrows():
         stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "nais2"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').strip().split()[1]
         stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "mo"] = 1
 
-    if row['Bedingung Hangneigung'] in ['<60%', '>60%'] :
+    if row['Bedingung Hangneigung'] in ['<60%', '>60%']:
         if row['Bedingung Hangneigung'] == '<60%' and len(hslist)==1:
             stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['meanslopeprc']<60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
         elif row['Bedingung Hangneigung'] == '>60%' and len(hslist)==1:
@@ -261,7 +261,7 @@ for index, row in naiseinheitenunique.iterrows():
                                 row2['hs'].replace('(', ' ').replace(')', '').strip().split()[-1]]
                         else:
                             stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[
-                                row2['hs'].replace('(', ' ').replace(')', '').strip().split()[0]]
+                                row2['hs'].replace('(', ' ').replace(')', '').strip().split()[-1]]
     else:
         if len(hslist)==1:
             stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
@@ -282,7 +282,7 @@ for index, row in naiseinheitenunique.iterrows():
                         if len(row2['hs'].replace('(',' ').replace(')','').strip().split()) >1 and test == 'collin':
                             stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
                         else:
-                            stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[0]]
+                            stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
 
 #Gebüschwald
 stok_gdf.loc[((stok_gdf['nais']=='AV')&(stok_gdf['hs1975']==-1)), 'tahs'] = 'subalpin'

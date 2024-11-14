@@ -232,7 +232,7 @@ for index, row in naiseinheitenunique.iterrows():
                     if len(row2['hs'].replace('(',' ').replace(')','').strip().split()) >1 and test == 'collin':
                         stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
                     else:
-                        stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[0]]
+                        stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
 stok_gdf.columns
 stok_gdf=stok_gdf[['joinid', 'DTWGEINHEI', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1', 'nais2','mo', 'ue', 'hs', 'tahs', 'tahsue','geometry']]
 
