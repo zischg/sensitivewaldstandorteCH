@@ -58,7 +58,7 @@ for col in treetypeslist:
             combi.loc[index, col]=2
             combi.loc[index, col+"Fall"] = 9
         #gefaehrdet 3
-        if row['ue_1'] == 0 and row[col + 'heu1_1'] in ['a', 'b','c'] and row[col + 'zuk1_1'] in ['c'] and row[col + 'zuk1_2']  not in ['a', 'b','c']:
+        if row['ue_1'] == 0 and row[col + 'heu1_1'] in ['a', 'b','c'] and row[col + 'zuk1_1'] in ['c'] and row[col + 'zuk1_2'] not in ['a', 'b','c']:
             combi.loc[index, col]=3
             combi.loc[index, col+"Fall"] = 15
         if row['ue_1'] == 0 and row[col + 'heu1_1'] in ['a', 'b','c'] and row[col + 'zuk1_1'] not in ['a', 'b','c'] and row[col + 'zuk1_2'] in ['c']:
@@ -130,8 +130,7 @@ for col in treetypeslist:
                 col + 'zukUE_2'] not in ['a', 'b', 'c']:
                 combi.loc[index, col] = 2
                 combi.loc[index, col + "Fall"] = 8
-            if row['ue_1'] ==1 and row[col + 'heuUE_1'] in ['a', 'b', 'c'] and row[col + 'zukUE_1'] not in ['a', 'b',
-                                                                                                           'c'] and row[
+            if row['ue_1'] ==1 and row[col + 'heuUE_1'] in ['a', 'b', 'c'] and row[col + 'zukUE_1'] not in ['a', 'b','c'] and row[
                 col + 'zukUE_2'] in ['a', 'b']:
                 combi.loc[index, col] = 2
                 combi.loc[index, col + "Fall"] = 9
@@ -140,13 +139,10 @@ for col in treetypeslist:
                 col + 'zukUE_2'] not in ['a', 'b', 'c']:
                 combi.loc[index, col] = 3
                 combi.loc[index, col + "Fall"] = 15
-            if row['ue_1'] ==1 and row[col + 'heuUE_1'] in ['a', 'b', 'c'] and row[col + 'zukUE_1'] not in ['a', 'b',
-                                                                                                           'c'] and row[
-                col + 'zukUE_2'] in ['c']:
+            if row['ue_1'] ==1 and row[col + 'heuUE_1'] in ['a', 'b', 'c'] and row[col + 'zukUE_1'] not in ['a', 'b','c'] and row[col + 'zukUE_2'] in ['c']:
                 combi.loc[index, col] = 3
                 combi.loc[index, col + "Fall"] = 16
-            if row['ue_1'] ==1 and row[col + 'heuUE_1'] in ['a', 'b', 'c'] and row[col + 'zukUE_1'] not in ['a', 'b',
-                                                                                                           'c'] and row[
+            if row['ue_1'] ==1 and row[col + 'heuUE_1'] in ['a', 'b', 'c'] and row[col + 'zukUE_1'] not in ['a', 'b','c'] and row[
                 col + 'zukUE_2'] not in ['a', 'b', 'c']:
                 combi.loc[index, col] = 3
                 combi.loc[index, col + "Fall"] = 17
