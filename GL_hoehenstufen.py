@@ -208,10 +208,12 @@ for index, row in naiseinheitenunique.iterrows():
         stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "nais1"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').strip().split()[0]
         stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "nais2"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').strip().split()[1]
         stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "ue"] = 1
-    if '/' in row['hs']:
+    elif '/' in row['hs']:
         stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "nais1"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').strip().split()[0]
         stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "nais2"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').strip().split()[1]
         stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "mo"] = 1
+    else:
+        stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "nais1"] = row['NaiS'].replace('/', ' ').replace('(', ' ').replace(')', '').strip().split()[0]
 
     if row['Bedingung Hangneigung'] in ['<60%', '>60%']:
         if row['Bedingung Hangneigung'] == '<60%' and len(hslist)==1:
