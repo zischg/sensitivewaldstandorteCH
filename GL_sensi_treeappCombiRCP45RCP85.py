@@ -225,5 +225,23 @@ for column in combi.columns.tolist():
         combi.drop(columns=column, axis=1, inplace=True)
 
 combi.columns
-combi.to_file(projectspace+"/GL"+"/GL_baumartenempfehlungen_combi.gpkg", layer="GL_GL_baumartenempfehlungen_combi", driver="GPKG")
+combi.to_file(projectspace+"/GL"+"/GL_baumartenempfehlungen_combi.gpkg", layer="GL_baumartenempfehlungen_combi", driver="GPKG")
+print('all done')
 
+#unique pathways
+combi=gpd.overlay(baumartenbedeutungenrcp45, baumartenbedeutungenrcp85, how='intersection', make_valid=True, keep_geom_type=True)
+colist=combi.columns.tolist()
+combi=combi[['nais_1','hs1975_1','naiszuk1_1', 'naiszuk2_1','hszukcor_1','naiszuk1_2', 'naiszuk2_2','hszukcor_2']]
+combi.rename(columns={'nais_1':'nais_heute', 'hs1975_1':'hs_heute','naiszuk1_1':'nais1_rcp45', 'naiszuk2_1':'nais2_rcp45','hszukcor_1':'hs_rcp45','naiszuk1_2':'nais1_rcp85', 'naiszuk2_2':'nais2_rcp85','hszukcor_2':'hs_rcp85'}, inplace=True)
+combi.columns
+combi_unique=combi.drop_duplicates()
+combi_unique.loc[combi_unique['hs_heute']==10,'hs_heute']='obersubalpin'
+combi_unique.loc[combi_unique['hs_heute']==9,'hs_heute']='subalpin'
+combi_unique.loc[combi_unique['hs_heute']==8,'hs_heute']='hochmontan'
+combi_unique.loc[combi_unique['hs_heute']==6,'hs_heute']='obermontan'
+combi_unique.loc[combi_unique['hs_heute']==5,'hs_heute']='untermontan'
+combi_unique.loc[combi_unique['hs_heute']==4,'hs_heute']='submontah'
+combi_unique.loc[combi_unique['hs_heute']==2,'hs_heute']='collin'
+len(combi_unique)
+combi_unique=combi_unique[combi_unique['hs_heute'].isin(['obersubalpin','subalpin','hochmontan','obermontan','untermontan','submontan','collin'])]
+combi_unique.to_excel(projectspace+'/GL/'+"/GL_Projektionspfade_unique.xlsx")

@@ -13,6 +13,7 @@ import openpyxl
 from rasterstats import zonal_stats
 import joblib
 from osgeo import osr, gdal
+#import gdal
 drv = gdal.GetDriverByName('GTiff')
 srs = osr.SpatialReference()
 srs.ImportFromEPSG(2056) #LV95
@@ -51,12 +52,12 @@ hsmoddictkurz={3:"co",4:"sm",5:"um",6:"om",8:"hm",9:"sa",10:"osa"}
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 
 #read excel files
-naiseinheitenunique=pd.read_excel(codespace+"/GL_nais_einheiten_unique_joined_mf_Version26112024.xlsx", dtype="str", engine='openpyxl')
+naiseinheitenunique=pd.read_excel(codespace+"/OW_nais_einheiten_unique_bh_20241128_mf.xlsx", dtype="str", engine='openpyxl')
 
 #read the rasters
 #reference tif raster
 print("read reference raster")
-referenceraster=myworkspace+"/GL/dem10m.tif"
+referenceraster='C:/DATA/projects/CCWOW/GIS/ow_dem10m.tif'
 referencetifraster=gdal.Open(referenceraster)
 referencetifrasterband=referencetifraster.GetRasterBand(1)
 referencerasterProjection=referencetifraster.GetProjection()
@@ -67,13 +68,14 @@ indatatype=referencetifrasterband.DataType
 #dhmarr=convert_tif_to_array("D:/CCW20/GIS/dhm25.tif")
 NODATA_value=-9999
 
-sloperaster=myworkspace+"/GL/slope10mprz.tif"
+sloperaster=myworkspace+'C:/DATA/projects/CCWOW/GIS/ow_slopeprz10m.tif'
 radiationraster=myworkspace+"/GL/globradyw.tif"
-hoehenstufenraster=myworkspace+"/GL/hs1975.tif"
+#hoehenstufenraster=myworkspace+"/GL/hs1975.tif"
 #hsheute=gpd.read_file(myworkspace+"/GL/vegetationshoehenstufen19611990clipSGAIAR.shp")
 
 #read shapefile
-stok_gdf=gpd.read_file(myworkspace+"/GL/waldgesellschaften/esri_shapefile/pub_gl_waldgesellschaften/waldgesellschaften.shp")
+stok_gdf=gpd.read_file(myworkspace+'/OW/OW_standortstypen_hs.gpkg')
+#stok_gdf=joblib.load(myworkspace+'/OW/OW_standortstypen.sav')
 taheute=gpd.read_file(myworkspace+"/Tannenareale.shp")
 storeg=gpd.read_file(myworkspace+"/Waldstandortsregionen.shp")
 len(stok_gdf)
