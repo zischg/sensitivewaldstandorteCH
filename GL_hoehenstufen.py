@@ -51,7 +51,7 @@ hsmoddictkurz={3:"co",4:"sm",5:"um",6:"om",8:"hm",9:"sa",10:"osa"}
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 
 #read excel files
-naiseinheitenunique=pd.read_excel(codespace+"/GL_nais_einheiten_unique_joined_mf.xlsx", dtype="str", engine='openpyxl')
+naiseinheitenunique=pd.read_excel(codespace+"/GL_nais_einheiten_unique_joined_mf_Version26112024.xlsx", dtype="str", engine='openpyxl')
 
 #read the rasters
 #reference tif raster
