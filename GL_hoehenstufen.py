@@ -5,14 +5,15 @@ import fiona
 import geopandas as gpd
 import os
 import shapely
-from osgeo import ogr
-import sqlalchemy
-from sqlalchemy import create_engine
+#from osgeo import ogr
+#import sqlalchemy
+#from sqlalchemy import create_engine
 import xlrd
 import openpyxl
+import rasterstats
 from rasterstats import zonal_stats
-import joblib
-from osgeo import osr, gdal
+#from osgeo import osr, gdal
+import gdal
 drv = gdal.GetDriverByName('GTiff')
 srs = osr.SpatialReference()
 srs.ImportFromEPSG(2056) #LV95
