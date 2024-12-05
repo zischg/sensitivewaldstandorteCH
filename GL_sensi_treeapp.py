@@ -4,16 +4,12 @@ import joblib
 import fiona
 import geopandas as gpd
 import os
-#import shapefile
 import shapely
-#import pyshp
 from osgeo import ogr
-#import psycopg2
-#import sqlalchemy
-#import geoalchemy2
-#from sqlalchemy import create_engine
 import xlrd
 import openpyxl
+import warnings
+warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 
 #*************************************
@@ -1462,7 +1458,8 @@ naismatrixdf=pd.read_excel(codeworkspace+"/"+"Matrix_Baum_inkl_collin_20210412_m
 projectionswegedf=pd.read_excel(codeworkspace+"/"+"L_Projektionswege_im_Klimawandel_18022020_export.xlsx", dtype="str", engine='openpyxl')
 #gr_tree_abbreviations_df=pd.read_excel(codeworkspace+"/"+"Baumarten_LFI_export.xls", dtype=str)
 #gr_tree_abbreviations_extract_df=gr_tree_abbreviations_df[gr_tree_abbreviations_df["Abkürzung_BK"].notnull()]
-climatescenario="rcp85"
+climatescenarios=['rcp45','rcp85']
+#climatescenario="rcp85"
 #climatescenario="rcp45"
 #climatescenario="rcp26"
 
@@ -1607,283 +1604,1047 @@ for index, row in projectionswegedf.iterrows():
 #*******************************************
 #preprocessing
 #*******************************************
+treeapp=gpd.read_file(projectspace+"/GL/stok_gdf_attributed.gpkg", layer='stok_gdf_attributed')
+treeapp['lage']=3
+treeapp.loc[treeapp['meanslopeprc']<10, 'lage']=1
+for climatescenario in climatescenarios:
+    print(climatescenario)
+    ccgdf=gpd.read_file(projectspace+"/GL/vegetationshoehenstufen_"+climatescenario+".gpkg", layer='vegetationshoehenstufen_'+climatescenario)
+    combinations_df=treeapp.overlay(ccgdf, how='intersection')
+    #combinations_df['storeg']='1'
+    #Lage
+    #combinations_df['lage']=3
+    #combinations_df.loc[combinations_df['meanslopeprc']<10, 'lage']=1
+    len(combinations_df)
+    combinations_df.columns
+    combinations_df=combinations_df[['wg_haupt','wg_zusatz', 'nais', 'nais1', 'nais2', 'mo', 'ue','hs1975','taheute','storeg', 'tahs','tahsue', 'meanslopeprc', 'slpprzrec', 'lage','rad', 'radiation', 'HS_de', 'Code', 'Subcode','geometry']]
+    combinations_df.columns
+    combinations_df.rename(columns={"HS_de":"hs_de","Subcode":"subcode","Code":"code"}, inplace=True)
+    combinations_df.columns
+    combinations_df.loc[combinations_df["tahsue"].isna(),"tahsue"]="_"
+    #combinations_df=combinations_df[combinations_df['nais1']!="_"]
+    len(combinations_df)
+    combinations_df=combinations_df.astype({'storeg': 'str','subcode': int})
+    #combinations_df=combinations_df.astype({'mo': int,'ue': int})
+    #combinations_df=combinations_df.astype({'nais1': 'str','tahs': 'str', 'nais2':'str','tahsue':'str'})
+    combinations_df.dtypes
+    #add columns
+    combinations_df["naiszuk1"]=""
+    combinations_df["naiszuk2"]=""
+    combinations_df["hszukcor"]=""
+    combinations_df["storegco"]=""
+    combinations_df["tazuk"]=""
+    combinations_df=combinations_df.astype({'hszukcor': str,'storegco': str, 'tazuk':str,'naiszuk1':str,'naiszuk2':str})
+    combinations_df.dtypes
 
-combinations_df=gpd.read_file(projectspace+"/GL/stok_gdf_attributed_"+climatescenario+".gpkg", layer='stok_gdf_attributed_'+climatescenario)
-#combinations_df['storeg']='1'
-#Lage
-combinations_df['lage']=3
-combinations_df.loc[combinations_df['meanslopeprc']<10, 'lage']=1
-len(combinations_df)
-combinations_df.columns
-combinations_df=combinations_df[['wg_haupt','wg_zusatz', 'kantonseinheit', 'nais', 'nais1', 'nais2', 'mo', 'ue','hs1975','taheute','storeg', 'tahs','tahsue', 'meanslopeprc', 'slpprzrec', 'rad', 'radiation', 'HS_de', 'Code', 'Subcode','geometry']]
-combinations_df.columns
-combinations_df.rename(columns={"HS_de":"hs_de","Subcode":"subcode","Code":"code"}, inplace=True)
-combinations_df.columns
-combinations_df.loc[combinations_df["tahsue"].isna(),"tahsue"]="_"
-#combinations_df=combinations_df[combinations_df['nais1']!="_"]
-len(combinations_df)
-combinations_df=combinations_df.astype({'storeg': 'str','subcode': int})
-#combinations_df=combinations_df.astype({'mo': int,'ue': int})
-#combinations_df=combinations_df.astype({'nais1': 'str','tahs': 'str', 'nais2':'str','tahsue':'str'})
-combinations_df.dtypes
-#add columns
-combinations_df["naiszuk1"]=""
-combinations_df["naiszuk2"]=""
-combinations_df["hszukcor"]=""
-combinations_df["storegco"]=""
-combinations_df["tazuk"]=""
-combinations_df=combinations_df.astype({'hszukcor': str,'storegco': str, 'tazuk':str,'naiszuk1':str,'naiszuk2':str})
-combinations_df.dtypes
-
-for index, row in combinations_df.iterrows():
-    if '(' in row['nais']:# and row['nais1']=='':
-        combinations_df.loc[index, 'nais1']=row['nais'].replace('(',' ').replace(')','').replace('/',' ').strip().split()[0]
-        combinations_df.loc[index, 'nais2'] = row['nais'].replace('(', ' ').replace(')', '').replace('/', ' ').strip().split()[1]
-        combinations_df.loc[index, 'ue'] = 1
-    elif '/' in row['nais']:# and row['nais1']=='':
-        combinations_df.loc[index, 'nais1']=row['nais'].replace('(',' ').replace(')','').replace('/',' ').strip().split()[0]
-        combinations_df.loc[index, 'nais2'] = row['nais'].replace('(', ' ').replace(')', '').replace('/', ' ').strip().split()[1]
-        combinations_df.loc[index, 'mo'] = 1
-    else:
-        combinations_df.loc[index, 'nais1'] = row['nais']
-        combinations_df.loc[index, 'nais2'] = '_'
-
-#check for collin in tahsue
-test=combinations_df[combinations_df['tahsue']=='collin']
-combinations_df.loc[combinations_df["nais"]=='9a(29A)',"tahsue"]="submontan"
-combinations_df.loc[combinations_df["nais"]=='9a(29C)',"tahsue"]="submontan"
-combinations_df.loc[combinations_df["nais"]=='14(29C)',"tahsue"]="untermontan"
-
-#*******************************************
-#loop through pandas data frame and correct Standortstypen, Mosaik, Uebergang, Standortregion
-#*******************************************
-#correct unter-/obermontan
-combinations_df.loc[combinations_df["hs_de"]=="unter-/obermontan", "hs_de"] = "unter- & obermontan"
-#translate abbreviations
-combinations_df['tahs'].unique().tolist()
-combinations_df['tahsue'].unique().tolist()
-combinations_df.loc[combinations_df["tahsue"]=='', "tahsue"] = "_"
-#combinations_df=combinations_df[combinations_df["hs_de"]!='_']
-#combinations_df=combinations_df[combinations_df["hs_de"]!='-']
-len(combinations_df)
-
-
-#test if some nais types are not in the Projektionswege table
-print("NAIS Typen 1 nicht in Projektionspfade: ")
-for item in combinations_df['nais1'].unique().tolist():
-    if item not in standortstypen_projektionspfade_heute_list:
-        print(item)
-print("NAIS Typen 2 nicht in Projektionspfade: ")
-for item in combinations_df['nais2'].unique().tolist():
-    if item not in standortstypen_projektionspfade_heute_list:
-        print(item)
-print("NAIS Typen 1 nicht in NAIS-Matrix: ")
-for item in combinations_df['nais1'].unique().tolist():
-    if item not in nais_matrix_standorte_list:
-        print(item)
-print("NAIS Typen 2 nicht in NAIS-Matrix: ")
-for item in combinations_df['nais2'].unique().tolist():
-    if item not in nais_matrix_standorte_list:
-        print(item)
-
-#synchro uebergang vs mosaic
-combinations_df.loc[((combinations_df["mo"]==1)&(combinations_df["ue"]==0)),"ue"]=1
-
-#check empty values
-nohs1list=combinations_df[combinations_df["tahs"]==""]['nais1'].unique().tolist()
-len(nohs1list)
-nohs2list=combinations_df[((combinations_df["tahsue"]=="")&(combinations_df["ue"]==1))]['nais2'].unique().tolist()
-len(nohs2list)
-
-#check combination of forest type and altitudinal vegetation belt today
-region_foresttype_belt_inprojektionspfade=[]
-for index, row in projectionswegedf.iterrows():
-    if [row["Standortsregionen"],row["Standortstyp_heute"],row["Hoehenstufe_heute"]] not in region_foresttype_belt_inprojektionspfade:
-        region_foresttype_belt_inprojektionspfade.append([row["Standortsregionen"],row["Standortstyp_heute"],row["Hoehenstufe_heute"]])
-#correct Standortregion
-print("Korrigiere Standortregion ...")
-for index, row in combinations_df.iterrows():
-    #if index%10000==0:
-    #    print(index)
-    nais=row['nais1']
-    storeg=give_standortregionencombi_from_projektionspfade(row["storeg"])
-    #storeg = give_standortregionencombi_from_projektionspfade(row["Standortre"])
-    if nais in nais_matrix_standorte_list:
-        pathwaysquery=projectionswegedf[projectionswegedf["Standortstyp_heute"]==nais]
-        if storeg not in pathwaysquery["Standortsregionen"].unique().tolist() and len(pathwaysquery["Standortsregionen"].unique().tolist())>0:
-            combinations_df.loc[index, "storegco"] = pathwaysquery["Standortsregionen"].unique().tolist()[0]
+    for index, row in combinations_df.iterrows():
+        if '(' in row['nais']:# and row['nais1']=='':
+            combinations_df.loc[index, 'nais1']=row['nais'].replace('(',' ').replace(')','').replace('/',' ').strip().split()[0]
+            combinations_df.loc[index, 'nais2'] = row['nais'].replace('(', ' ').replace(')', '').replace('/', ' ').strip().split()[1]
+            combinations_df.loc[index, 'ue'] = 1
+        elif '/' in row['nais']:# and row['nais1']=='':
+            combinations_df.loc[index, 'nais1']=row['nais'].replace('(',' ').replace(')','').replace('/',' ').strip().split()[0]
+            combinations_df.loc[index, 'nais2'] = row['nais'].replace('(', ' ').replace(')', '').replace('/', ' ').strip().split()[1]
+            combinations_df.loc[index, 'mo'] = 1
         else:
-            combinations_df.loc[index, "storegco"] = storeg
-    else:
-        if nais!="_":
-            print(nais+" not in nais_matrix_standorte_list")
-#check empty storegco values
-combinations_df["storegco"].unique().tolist()
-combinations_df.loc[((combinations_df["storegco"]=="")&(combinations_df["storeg"]=="1")),"storegco"]='R, J, M, 1, 2, 3'
-combinations_df.loc[((combinations_df["storegco"]=="")&(combinations_df["storeg"]=="M")),"storegco"]='R, J, M, 1, 2, 3'
-combinations_df.loc[((combinations_df["storegco"]=="")&(combinations_df["storeg"]=="2a")),"storegco"]='R, J, M, 1, 2, 3'
-combinations_df.loc[((combinations_df["storegco"]=="")&(combinations_df["storeg"]=="2b")),"storegco"]='R, J, M, 1, 2, 3'
-combinations_df.loc[((combinations_df["storegco"]=="")&(combinations_df["storeg"]=="3")),"storegco"]='R, J, M, 1, 2, 3'
-#check=combinations_df[combinations_df["storegco"]==""]
-#combinations_df["storegco"].unique()
+            combinations_df.loc[index, 'nais1'] = row['nais']
+            combinations_df.loc[index, 'nais2'] = '_'
 
-#correct future altitudinal vegetation belts (divide belt and fir area)
-combinations_df["hszukcor"]=combinations_df["hs_de"]
-combinations_df.loc[combinations_df["hs_de"].isin(['hochmontan im Tannen-Hauptareal','hochmontan im Tannen-Nebenareal','hochmontan im Tannen-Reliktareal']), "hszukcor"]="hochmontan"
-combinations_df.loc[~combinations_df["hs_de"].isin(['hochmontan im Tannen-Hauptareal','hochmontan im Tannen-Nebenareal','hochmontan im Tannen-Reliktareal']), "hszukcor"]=combinations_df["hs_de"]
-combinations_df.loc[combinations_df["hs_de"]=='hochmontan im Tannen-Hauptareal',"tazuk"]="Hauptareal"
-combinations_df.loc[combinations_df["hs_de"]=='hochmontan im Tannen-Nebenareal',"tazuk"]="Nebenareal"
-combinations_df.loc[combinations_df["hs_de"]=='hochmontan im Tannen-Reliktareal',"tazuk"]="Reliktareal"
-combinations_df.loc[combinations_df["taheute"]==1,"tazuk"]="Hauptareal"
-#combinations_df.loc[((combinations_df["tazuk"]=='')&(combinations_df["taheute"]==1)),"tazuk"]="Hauptareal"
-#combinations_df.loc[((combinations_df["tazuk"]=='')&(combinations_df["taheute"]==2)),"tazuk"]="Nebenareal"
-#combinations_df.loc[((combinations_df["tazuk"]=='')&(combinations_df["taheute"]==3)),"tazuk"]="Reliktareal"
+    #check for collin in tahsue
+    test=combinations_df[combinations_df['tahsue']=='collin']
+    combinations_df.loc[combinations_df["nais"]=='9a(29A)',"tahsue"]="submontan"
+    combinations_df.loc[combinations_df["nais"]=='9a(29C)',"tahsue"]="submontan"
+    combinations_df.loc[combinations_df["nais"]=='14(29C)',"tahsue"]="untermontan"
 
-##correct altitudinal vegetation belts according projections pathways
-for index, row in combinations_df.iterrows():
-    if [row["storegco"],row['nais1'], row["tahs"]] not in region_foresttype_belt_inprojektionspfade:
-        listpotentialbelts=[]
-        for item in region_foresttype_belt_inprojektionspfade:
-            if item[0]==row["storegco"] and item[1]==row['nais1']:
-                listpotentialbelts.append(item[2])
-        if len(listpotentialbelts)>0:
-            combinations_df.loc[index, "tahs"] = listpotentialbelts[-1]
+    #*******************************************
+    #loop through pandas data frame and correct Standortstypen, Mosaik, Uebergang, Standortregion
+    #*******************************************
+    #correct unter-/obermontan
+    combinations_df.loc[combinations_df["hs_de"]=="unter-/obermontan", "hs_de"] = "unter- & obermontan"
+    #translate abbreviations
+    combinations_df['tahs'].unique().tolist()
+    combinations_df['tahsue'].unique().tolist()
+    combinations_df.loc[combinations_df["tahsue"]=='', "tahsue"] = "_"
+    #combinations_df=combinations_df[combinations_df["hs_de"]!='_']
+    #combinations_df=combinations_df[combinations_df["hs_de"]!='-']
+    len(combinations_df)
+
+
+    #test if some nais types are not in the Projektionswege table
+    print("NAIS Typen 1 nicht in Projektionspfade: ")
+    for item in combinations_df['nais1'].unique().tolist():
+        if item not in standortstypen_projektionspfade_heute_list:
+            print(item)
+    print("NAIS Typen 2 nicht in Projektionspfade: ")
+    for item in combinations_df['nais2'].unique().tolist():
+        if item not in standortstypen_projektionspfade_heute_list:
+            print(item)
+    print("NAIS Typen 1 nicht in NAIS-Matrix: ")
+    for item in combinations_df['nais1'].unique().tolist():
+        if item not in nais_matrix_standorte_list:
+            print(item)
+    print("NAIS Typen 2 nicht in NAIS-Matrix: ")
+    for item in combinations_df['nais2'].unique().tolist():
+        if item not in nais_matrix_standorte_list:
+            print(item)
+
+    #synchro uebergang vs mosaic
+    combinations_df.loc[((combinations_df["mo"]==1)&(combinations_df["ue"]==0)),"ue"]=1
+
+    #check empty values
+    nohs1list=combinations_df[combinations_df["tahs"]==""]['nais1'].unique().tolist()
+    len(nohs1list)
+    nohs2list=combinations_df[((combinations_df["tahsue"]=="")&(combinations_df["ue"]==1))]['nais2'].unique().tolist()
+    len(nohs2list)
+
+    #check combination of forest type and altitudinal vegetation belt today
+    region_foresttype_belt_inprojektionspfade=[]
+    for index, row in projectionswegedf.iterrows():
+        if [row["Standortsregionen"],row["Standortstyp_heute"],row["Hoehenstufe_heute"]] not in region_foresttype_belt_inprojektionspfade:
+            region_foresttype_belt_inprojektionspfade.append([row["Standortsregionen"],row["Standortstyp_heute"],row["Hoehenstufe_heute"]])
+    #correct Standortregion
+    print("Korrigiere Standortregion ...")
+    for index, row in combinations_df.iterrows():
+        #if index%10000==0:
+        #    print(index)
+        nais=row['nais1']
+        storeg=give_standortregionencombi_from_projektionspfade(row["storeg"])
+        #storeg = give_standortregionencombi_from_projektionspfade(row["Standortre"])
+        if nais in nais_matrix_standorte_list:
+            pathwaysquery=projectionswegedf[projectionswegedf["Standortstyp_heute"]==nais]
+            if storeg not in pathwaysquery["Standortsregionen"].unique().tolist() and len(pathwaysquery["Standortsregionen"].unique().tolist())>0:
+                combinations_df.loc[index, "storegco"] = pathwaysquery["Standortsregionen"].unique().tolist()[0]
+            else:
+                combinations_df.loc[index, "storegco"] = storeg
         else:
-            if [row["storegco"], row['nais1'],row["hs_de"]] in region_foresttype_belt_inprojektionspfade:
-                combinations_df.loc[index, "tahs"] = row['hs_de']
-    if row['nais2']!="" and [row["storegco"],row['nais1'], row["tahsue"]] not in region_foresttype_belt_inprojektionspfade:
-        listpotentialbelts=[]
-        for item in region_foresttype_belt_inprojektionspfade:
-            if item[0]==row["storegco"] and item[1]==row['nais2']:
-                listpotentialbelts.append(item[2])
-        if len(listpotentialbelts)>0:
-            combinations_df.loc[index, "tahsue"] = listpotentialbelts[-1]
+            if nais!="_":
+                print(nais+" not in nais_matrix_standorte_list")
+    #check empty storegco values
+    combinations_df["storegco"].unique().tolist()
+    combinations_df.loc[((combinations_df["storegco"]=="")&(combinations_df["storeg"]=="1")),"storegco"]='R, J, M, 1, 2, 3'
+    combinations_df.loc[((combinations_df["storegco"]=="")&(combinations_df["storeg"]=="M")),"storegco"]='R, J, M, 1, 2, 3'
+    combinations_df.loc[((combinations_df["storegco"]=="")&(combinations_df["storeg"]=="2a")),"storegco"]='R, J, M, 1, 2, 3'
+    combinations_df.loc[((combinations_df["storegco"]=="")&(combinations_df["storeg"]=="2b")),"storegco"]='R, J, M, 1, 2, 3'
+    combinations_df.loc[((combinations_df["storegco"]=="")&(combinations_df["storeg"]=="3")),"storegco"]='R, J, M, 1, 2, 3'
+    #check=combinations_df[combinations_df["storegco"]==""]
+    #combinations_df["storegco"].unique()
+
+    #correct future altitudinal vegetation belts (divide belt and fir area)
+    combinations_df["hszukcor"]=combinations_df["hs_de"]
+    combinations_df.loc[combinations_df["hs_de"].isin(['hochmontan im Tannen-Hauptareal','hochmontan im Tannen-Nebenareal','hochmontan im Tannen-Reliktareal']), "hszukcor"]="hochmontan"
+    combinations_df.loc[~combinations_df["hs_de"].isin(['hochmontan im Tannen-Hauptareal','hochmontan im Tannen-Nebenareal','hochmontan im Tannen-Reliktareal']), "hszukcor"]=combinations_df["hs_de"]
+    combinations_df.loc[combinations_df["hs_de"]=='hochmontan im Tannen-Hauptareal',"tazuk"]="Hauptareal"
+    combinations_df.loc[combinations_df["hs_de"]=='hochmontan im Tannen-Nebenareal',"tazuk"]="Nebenareal"
+    combinations_df.loc[combinations_df["hs_de"]=='hochmontan im Tannen-Reliktareal',"tazuk"]="Reliktareal"
+    combinations_df.loc[combinations_df["taheute"]==1,"tazuk"]="Hauptareal"
+    #combinations_df.loc[((combinations_df["tazuk"]=='')&(combinations_df["taheute"]==1)),"tazuk"]="Hauptareal"
+    #combinations_df.loc[((combinations_df["tazuk"]=='')&(combinations_df["taheute"]==2)),"tazuk"]="Nebenareal"
+    #combinations_df.loc[((combinations_df["tazuk"]=='')&(combinations_df["taheute"]==3)),"tazuk"]="Reliktareal"
+
+    ##correct altitudinal vegetation belts according projections pathways
+    for index, row in combinations_df.iterrows():
+        if [row["storegco"],row['nais1'], row["tahs"]] not in region_foresttype_belt_inprojektionspfade:
+            listpotentialbelts=[]
+            for item in region_foresttype_belt_inprojektionspfade:
+                if item[0]==row["storegco"] and item[1]==row['nais1']:
+                    listpotentialbelts.append(item[2])
+            if len(listpotentialbelts)>0:
+                combinations_df.loc[index, "tahs"] = listpotentialbelts[-1]
+            else:
+                if [row["storegco"], row['nais1'],row["hs_de"]] in region_foresttype_belt_inprojektionspfade:
+                    combinations_df.loc[index, "tahs"] = row['hs_de']
+        if row['nais2']!="" and [row["storegco"],row['nais1'], row["tahsue"]] not in region_foresttype_belt_inprojektionspfade:
+            listpotentialbelts=[]
+            for item in region_foresttype_belt_inprojektionspfade:
+                if item[0]==row["storegco"] and item[1]==row['nais2']:
+                    listpotentialbelts.append(item[2])
+            if len(listpotentialbelts)>0:
+                combinations_df.loc[index, "tahsue"] = listpotentialbelts[-1]
+            else:
+                if [row["storegco"], row['nais2'],row["hs_de"]] in region_foresttype_belt_inprojektionspfade:
+                    combinations_df.loc[index, "tahsue"] = row['hs_de']
+
+    ##correct special cases
+    #for index, row in combinations_df.iterrows():
+    #    if row ['nais1'] in ["3","4"] and row["storegco"]=="R, J, M, 1, 2, 3":
+    #        combinations_df.loc[index,"tahs"]="untermontan"
+    #    if row ['nais1'] in ["3","4"] and row["storegco"] in ["R 4", "R 5", "R Mendrisiotto"]:
+    #        combinations_df.loc[index,"tahs"]="unter- & obermontan"
+    #    if row ['nais1'] in ["19L","19LP"] and row["storegco"] in ["R 4", "R 5", "R Mendrisiotto"]:
+    #        combinations_df.loc[index,"tahs"]="unter- & obermontan"
+    #    if row ['nais1'] in ["19L"] and row["storegco"] =="R, J, M, 1, 2, 3":
+    #        combinations_df.loc[index,"tahs"]="obermontan"
+    #    if row ['nais1'] in ["25as", "25au"] and row["storeg"] in ["4", "3"]:
+    #        combinations_df.loc[index,"tahs"]="collin"
+    #    if row ['nais1'] in ["25as", "25au"] and row["storeg"] in ["5", "5a", "5b", "Me"]:
+    #        combinations_df.loc[index,"tahs"]="collin mit Buche"
+    #    if row ['nais1'] in ["19L", "19LP"] and row["tahs"] =="subalpin" and row["storegco"] =="R, J, M, 1, 2, 3":
+    #        combinations_df.loc[index,"tahs"]="obermontan"
+    #    if row ['nais1'] in ["19L", "19LP"] and row["tahs"] =="subalpin" and row["storegco"] in ["R 4", "R 5", "R Mendrisiotto"]:
+    #        combinations_df.loc[index,"tahs"]="unter- & obermontan"
+    #    if row ['nais1'] in ["19LP"] and row["tahs"] =="hochmontan" and row["storegco"] in ["R 4", "R 5", "R Mendrisiotto"]:
+    #        combinations_df.loc[index,"tahs"]="unter- & obermontan"
+    #    #if row ['nais1'] in ["33m", "42C", "42Q"] and row["tahs"] =="hochmontan" and row["storeg"] in ["4"]:
+    #    #    combinations_df.loc[index,"tahs"]="collin"
+    #    #if row ['nais1'] in ["33m", "42C", "42Q"] and row["tahs"] =="hochmontan" and row["storeg"] in ["5","5a","5b", "Me"]:
+    #    #    combinations_df.loc[index,"tahs"]="collin mit Buche"
+    #    if row ['nais1'] in ["59A", "59C", "59E"] and row["tahs"] =="hochmontan" and row["storegco"] =="R, J, M, 1, 2, 3":
+    #        combinations_df.loc[index,"tahs"]="obersubalpin"
+    #    if row ['nais1'] in ["59A", "59C", "59E"] and row["tahs"] =="hochmontan" and row["storegco"] =="R, J, M, 1, 2, 3":
+    #        combinations_df.loc[index,"tahs"]="obersubalpin"
+
+    #check if future altitudinal vegetation belt is not higher than present
+    combinations_df.loc[((combinations_df["tahs"] == "collin")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahs"] == "collin mit Buche")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahs"] == "hyperinsubrisch")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahs"] == "submontan")&(combinations_df["hszukcor"].isin(["untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahs"] == "untermontan")&(combinations_df["hszukcor"].isin(["obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahs"] == "obermontan")&(combinations_df["hszukcor"].isin(["hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahs"] == "unter- & obermontan")&(combinations_df["hszukcor"].isin(["hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahs"] == "hochmontan")&(combinations_df["hszukcor"].isin(["subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahs"] == "subalpin")&(combinations_df["hszukcor"].isin(["obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+
+    combinations_df.loc[((combinations_df["tahsue"] == "collin")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahsue"] == "collin mit Buche")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahsue"] == "hyperinsubrisch")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahsue"] == "submontan")&(combinations_df["hszukcor"].isin(["untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahsue"] == "untermontan")&(combinations_df["hszukcor"].isin(["obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahsue"] == "obermontan")&(combinations_df["hszukcor"].isin(["hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahsue"] == "unter- & obermontan")&(combinations_df["hszukcor"].isin(["hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahsue"] == "hochmontan")&(combinations_df["hszukcor"].isin(["subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["tahsue"] == "subalpin")&(combinations_df["hszukcor"].isin(["obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+
+    #check "obermontan", "untermontan" vs "unter- & obermontan"
+    combinations_df['hszukcor'].unique().tolist()
+    combinations_df['tahs'].unique().tolist()
+    combinations_df['tahsue'].unique().tolist()
+    #combinations_df.loc[combinations_df["hszukcor"]=="unter-/obermontan", "hszukcor"]="unter- & obermontan"
+    #combinations_df.loc[combinations_df["tahs"]=="unter-/obermontan", "hszukcor"]="unter- & obermontan"
+    #combinations_df.loc[combinations_df["tahsue"]=="unter-/obermontan", "hszukcor"]="unter- & obermontan"
+    #combinations_df.loc[((combinations_df["tahs"].isin(["untermontan", "obermontan"]))&(combinations_df["storegco"].isin(["R 4", "R 5", "R Mendrisiotto"]))), "tahs"]="unter- & obermontan"
+    #combinations_df.loc[((combinations_df["tahsue"].isin(["untermontan", "obermontan"]))&(combinations_df["storegco"].isin(["R 4", "R 5", "R Mendrisiotto"]))), "tahsue"]="unter- & obermontan"
+    #combinations_df.loc[((combinations_df["tahs"]=="unter- & obermontan")&(combinations_df["hszukcor"].isin(["untermontan", "obermontan"]))), "hszukcor"]="unter- & obermontan"
+    #combinations_df.loc[((combinations_df["tahs"].isin(["untermontan", "obermontan"]))&(combinations_df["hszukcor"]== "unter- & obermontan")), "hszukcor"]=combinations_df["tahs"]
+    #len(combinations_df[combinations_df["tahs"].isna()==True])
+    #len(combinations_df[combinations_df["hszukcor"].isna()==True])
+    #len(combinations_df[combinations_df["hszukcor"]=="_"])
+    ##combinations_df.loc[((combinations_df[combinations_df["tahs"].isna()==True])&(combinations_df[combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"])])), "tahs"]=combinations_df["hszukcor"]
+    #combinations_df.loc[((combinations_df["tahs"]=="_")&(combinations_df["hszukcor"]!="_")), "tahs"]=combinations_df["hszukcor"]
+    #combinations_df["tahs"].unique().tolist()
+    ##leere=combinations_df[combinations_df["tahs"].isna()==True]
+    #combinations_df=combinations_df[combinations_df["tahs"].isna()==False]
+
+    #correct altitudinal vegetation belts in input file
+    #pairs of changes in altitudinal vegetation belts
+    pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade=[]
+    for index, row in projectionswegedf.iterrows():
+        if [row["Standortsregionen"],row["Standortstyp_heute"],row["Hoehenstufe_heute"], row["Hoehenstufe_Zukunft"]] not in pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade:
+            pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade.append([row["Standortsregionen"],row["Standortstyp_heute"],row["Hoehenstufe_heute"],row["Hoehenstufe_Zukunft"]])
+    len(pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade)
+    combinations_df["hszukcor"].unique().tolist()
+    combinations_df.loc[((combinations_df["hszukcor"]=="-")&(combinations_df["tahs"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))),"hszukcor"]=combinations_df["tahs"]
+    combinations_df.loc[((combinations_df["hszukcor"]=="_")&(combinations_df["tahs"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))),"hszukcor"]=combinations_df["tahs"]
+    combinations_df["tahs"].unique().tolist()
+
+    #convert geopandas to pandas
+    #combinations_gdf=combinations_df.copy()
+    #combinations_gdf.columns
+    ##test=combinations_df.groupby(['NaiS_LFI', 'mo', 'ue', 'taheute', 'storeg','slpprzrec', 'radiation', 'lage', 'tahs', 'nais1','nais2', 'tahsue', 'hs_de', 'code', 'subcode'])
+    #test1=combinations_df[['mo', 'ue', 'taheute', 'storeg','slpprzrec', 'radiation', 'lage', 'tahs', 'nais1','nais2', 'tahsue', 'subcode','hszukcor','storegco','tazuk']]
+    #combinations_df=test1.drop_duplicates(['mo', 'ue', 'taheute', 'storeg','slpprzrec', 'radiation', 'lage', 'tahs', 'nais1','nais2', 'tahsue', 'subcode','hszukcor','storegco','tazuk'])[['mo', 'ue', 'taheute', 'storeg','slpprzrec', 'radiation', 'lage', 'tahs', 'nais1','nais2', 'tahsue', 'subcode','hszukcor','storegco','tazuk']]
+    #len(combinations_df)
+    #combinations_df["naiszuk1"]=""
+    #combinations_df["naiszuk2"]=""
+
+    #save pandas data frame
+    #combinations_df.to_csv(projectspace+"/combinations_df.csv")
+    joblib.dump(combinations_df, projectspace+"/GL/combinations_df"+climatescenario+".sav")
+    combinations_df.columns
+
+    #***********************************************************************
+    #iterate trough combinations dataframe and calculate future forest type
+    #***********************************************************************
+    #combinations_df["naiszuk1"]=""
+    #combinations_df["naiszuk2"]=""
+    extractprojektionswegestoreg2b3=projectionswegedf[projectionswegedf["Standortsregion"].isin(["2b","2b, 3","3"])]
+    extractprojektionswegestoreg2b3combinationslist=[]
+    extractprojektionswegestoreg2b=projectionswegedf[projectionswegedf["Standortsregion"].isin(["2b","2b, 3"])]
+    extractprojektionswegestoreg2bcombinationslist=[]
+    extractprojektionswegestoreg3=projectionswegedf[projectionswegedf["Standortsregion"].isin(["3","2b, 3"])]
+    extractprojektionswegestoreg3combinationslist=[]
+    for index, row in extractprojektionswegestoreg2b3.iterrows():
+        if [row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Standortsregion"],row["Hoehenstufe_Zukunft"]] not in extractprojektionswegestoreg2b3combinationslist:
+            extractprojektionswegestoreg2b3combinationslist.append([row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Standortsregion"],row["Hoehenstufe_Zukunft"]])
+    for index, row in extractprojektionswegestoreg2b.iterrows():
+        if [row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Hoehenstufe_Zukunft"]] not in extractprojektionswegestoreg2bcombinationslist and row["Standortsregion"] in ["2b","2b, 3"]:
+            extractprojektionswegestoreg2bcombinationslist.append([row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Hoehenstufe_Zukunft"]])
+    for index, row in extractprojektionswegestoreg3.iterrows():
+        if [row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Hoehenstufe_Zukunft"]] not in extractprojektionswegestoreg3combinationslist and row["Standortsregion"] in ["3","2b, 3"]:
+            extractprojektionswegestoreg3combinationslist.append([row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Hoehenstufe_Zukunft"]])
+    hochmontandirektzucollin=projectionswegedf[((projectionswegedf["Hoehenstufe_heute"]=="hochmontan")&(projectionswegedf["Hoehenstufe_Zukunft"]=="collin"))]
+    hochmontandirektzucollinlist=hochmontandirektzucollin["Standortstyp_heute"].unique().tolist()
+    len(hochmontandirektzucollinlist)
+
+    print("Berechne zukuenftige Standortstypen ...")
+    for index, row in combinations_df.iterrows():
+        # if index%10000==0:
+        #    print(index)
+        # lage=3
+        standortregion = combinations_df.loc[index, "storegco"]
+        standortregionplain = combinations_df.loc[index, "storeg"]
+        sto_heute1 = combinations_df.loc[index, 'nais1']
+        sto_heute2 = combinations_df.loc[index, 'nais2']
+        hs_heute1 = combinations_df.loc[index, "tahs"]
+        hs_heute2 = combinations_df.loc[index, "tahsue"]
+        hs_zukunft = combinations_df.loc[index, "hszukcor"]
+        tannenareal_heute = combinations_df.loc[index, "taheute"]
+        tannenareal_zukunft = combinations_df.loc[index, "subcode"]  # "tazuk"]
+        if tannenareal_zukunft == 0:
+            tannenareal_zukunft = tannenareal_heute
+        slope = combinations_df.loc[index, "slpprzrec"]
+        radiation = combinations_df.loc[index, "radiation"]
+        lage = combinations_df.loc[index, "lage"]
+        if hs_heute1 == hs_zukunft:
+            combinations_df.loc[index, "naiszuk1"] = sto_heute1
+        if hs_heute2 == hs_zukunft:
+            combinations_df.loc[index, "naiszuk2"] = sto_heute2
+        if hs_heute1 in ["obersubalpin", "subalpin", "hochmontan"] and hs_zukunft == "collin mit Buche":
+            if hs_heute1 in ["obersubalpin", "subalpin"]:
+                standortintermhochmontan = concatenate_pathways(sto_heute1, hs_heute1, "hochmontan", tannenareal_heute,
+                                                                tannenareal_zukunft, standortregion,
+                                                                standortregionplain, slope, lage, radiation)
+                if [standortregion, standortintermhochmontan, "hochmontan",
+                    hs_zukunft] in pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade:
+                    combinations_df.loc[index, "naiszuk1"] = give_future_foresttype_from_projectionspathways(
+                        standortintermhochmontan, "hochmontan", hs_zukunft, tannenareal_heute, tannenareal_zukunft,
+                        standortregion, standortregionplain, slope, lage, radiation)
+            else:
+                combinations_df.loc[index, "naiszuk1"] = give_future_foresttype_from_projectionspathways(sto_heute1,
+                                                                                                         hs_heute1,
+                                                                                                         hs_zukunft,
+                                                                                                         tannenareal_heute,
+                                                                                                         tannenareal_zukunft,
+                                                                                                         standortregion,
+                                                                                                         standortregionplain,
+                                                                                                         slope, lage,
+                                                                                                         radiation)
+        if sto_heute2 != '_' and hs_heute2 in ["obersubalpin", "subalpin",
+                                               "hochmontan"] and hs_zukunft == "collin mit Buche":
+            if hs_heute2 in ["obersubalpin", "subalpin"]:
+                standortintermhochmontan = concatenate_pathways(sto_heute2, hs_heute2, "hochmontan", tannenareal_heute,
+                                                                tannenareal_zukunft, standortregion,
+                                                                standortregionplain, slope, lage, radiation)
+                if [standortregion, standortintermhochmontan, "hochmontan",
+                    hs_zukunft] in pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade:
+                    combinations_df.loc[index, "naiszuk2"] = give_future_foresttype_from_projectionspathways(
+                        standortintermhochmontan, "hochmontan", hs_zukunft, tannenareal_heute, tannenareal_zukunft,
+                        standortregion, standortregionplain, slope, lage, radiation)
+            else:
+                combinations_df.loc[index, "naiszuk2"] = give_future_foresttype_from_projectionspathways(sto_heute2,
+                                                                                                         hs_heute2,
+                                                                                                         hs_zukunft,
+                                                                                                         tannenareal_heute,
+                                                                                                         tannenareal_zukunft,
+                                                                                                         standortregion,
+                                                                                                         standortregionplain,
+                                                                                                         slope, lage,
+                                                                                                         radiation)
+        if [standortregion, sto_heute1, hs_heute1,
+            hs_zukunft] in pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade:
+            # if count_changes_altitudinalvegetationbelts(hs_heute, hs_zukunft) == 1:
+            combinations_df.loc[index, "naiszuk1"] = give_future_foresttype_from_projectionspathways(sto_heute1,
+                                                                                                     hs_heute1,
+                                                                                                     hs_zukunft,
+                                                                                                     tannenareal_heute,
+                                                                                                     tannenareal_zukunft,
+                                                                                                     standortregion,
+                                                                                                     standortregionplain,
+                                                                                                     slope, lage,
+                                                                                                     radiation)
         else:
-            if [row["storegco"], row['nais2'],row["hs_de"]] in region_foresttype_belt_inprojektionspfade:
-                combinations_df.loc[index, "tahsue"] = row['hs_de']
+            # concatenate pathways
+            combinations_df.loc[index, "naiszuk1"] = concatenate_pathways(sto_heute1, hs_heute1, hs_zukunft,
+                                                                          tannenareal_heute, tannenareal_zukunft,
+                                                                          standortregion, standortregionplain, slope,
+                                                                          lage, radiation)
+        if sto_heute2 != '_' and [standortregion, sto_heute2, hs_heute2,
+                                  hs_zukunft] in pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade:
+            combinations_df.loc[index, "naiszuk2"] = give_future_foresttype_from_projectionspathways(sto_heute2,
+                                                                                                     hs_heute2,
+                                                                                                     hs_zukunft,
+                                                                                                     tannenareal_heute,
+                                                                                                     tannenareal_zukunft,
+                                                                                                     standortregion,
+                                                                                                     standortregionplain,
+                                                                                                     slope, lage,
+                                                                                                     radiation)
+        else:
+            if sto_heute2 != '_':
+                # concatenate pathways
+                combinations_df.loc[index, "naiszuk2"] = concatenate_pathways(sto_heute2, hs_heute2, hs_zukunft,
+                                                                              tannenareal_heute, tannenareal_zukunft,
+                                                                              standortregion, standortregionplain,
+                                                                              slope, lage, radiation)
+        # Region 2b 3
+        if standortregionplain in ["2b", "3"] and hs_heute1 in ["obersubalpin", "subalpin",
+                                                                "hochmontan"] and hs_zukunft == "collin":
+            # check if it is in extract
+            if standortregionplain == "2b":
+                if [hs_heute1, sto_heute1, hs_zukunft] in extractprojektionswegestoreg2bcombinationslist:
+                    combinations_df.loc[index, "naiszuk1"] = extractprojektionswegestoreg2b[(
+                                (extractprojektionswegestoreg2b["Hoehenstufe_heute"] == hs_heute1) & (
+                                    extractprojektionswegestoreg2b["Standortstyp_heute"] == sto_heute1) & (
+                                            extractprojektionswegestoreg2b["Hoehenstufe_Zukunft"] == hs_zukunft))][
+                        "Standortstyp_Zukunft"].values[0]
+                else:
+                    if hs_heute1 == "obersubalpin":
+                        interm1 = give_future_foresttype_from_projectionspathways(sto_heute1, "obersubalpin",
+                                                                                  "subalpin", tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        interm2 = give_future_foresttype_from_projectionspathways(interm1, "subalpin", "hochmontan",
+                                                                                  tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        if [hs_heute1, interm2, hs_zukunft] in extractprojektionswegestoreg2bcombinationslist:
+                            combinations_df.loc[index, "naiszuk1"] = extractprojektionswegestoreg2b[(
+                                        (extractprojektionswegestoreg2b["Hoehenstufe_heute"] == hs_heute1) & (
+                                            extractprojektionswegestoreg2b["Standortstyp_heute"] == interm2) & (
+                                                    extractprojektionswegestoreg2b[
+                                                        "Hoehenstufe_Zukunft"] == hs_zukunft))][
+                                "Standortstyp_Zukunft"].values[0]
+                        else:
+                            if [standortregion, interm2, "hochmontan",
+                                hs_zukunft] in pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade:
+                                combinations_df.loc[
+                                    index, "naiszuk1"] = give_future_foresttype_from_projectionspathways(interm2,
+                                                                                                         "hochmontan",
+                                                                                                         "collin",
+                                                                                                         tannenareal_heute,
+                                                                                                         tannenareal_zukunft,
+                                                                                                         standortregion,
+                                                                                                         standortregionplain,
+                                                                                                         slope, lage,
+                                                                                                         radiation)
+                    elif hs_heute1 == "subalpin":
+                        interm1 = give_future_foresttype_from_projectionspathways(sto_heute1, "subalpin", "hochmontan",
+                                                                                  tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        if [hs_heute1, interm1, hs_zukunft] in extractprojektionswegestoreg2bcombinationslist:
+                            combinations_df.loc[index, "naiszuk1"] = extractprojektionswegestoreg2b[(
+                                    (extractprojektionswegestoreg2b["Hoehenstufe_heute"] == hs_heute1) & (
+                                    extractprojektionswegestoreg2b["Standortstyp_heute"] == interm1) & (
+                                            extractprojektionswegestoreg2b["Hoehenstufe_Zukunft"] == hs_zukunft))][
+                                "Standortstyp_Zukunft"].values[0]
+            elif standortregionplain == "3":
+                if [hs_heute1, sto_heute1, hs_zukunft] in extractprojektionswegestoreg3combinationslist:
+                    combinations_df.loc[index, "naiszuk1"] = extractprojektionswegestoreg3[(
+                                (extractprojektionswegestoreg3["Hoehenstufe_heute"] == hs_heute1) & (
+                                    extractprojektionswegestoreg3["Standortstyp_heute"] == sto_heute1) & (
+                                            extractprojektionswegestoreg3["Hoehenstufe_Zukunft"] == hs_zukunft))][
+                        "Standortstyp_Zukunft"].values[0]
+                else:
+                    if hs_heute1 == "obersubalpin":
+                        interm1 = give_future_foresttype_from_projectionspathways(sto_heute1, "obersubalpin",
+                                                                                  "subalpin", tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        interm2 = give_future_foresttype_from_projectionspathways(interm1, "subalpin", "hochmontan",
+                                                                                  tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        if [hs_heute1, interm2, hs_zukunft] in extractprojektionswegestoreg3combinationslist:
+                            combinations_df.loc[index, "naiszuk1"] = extractprojektionswegestoreg3[(
+                                        (extractprojektionswegestoreg3["Hoehenstufe_heute"] == hs_heute1) & (
+                                            extractprojektionswegestoreg3["Standortstyp_heute"] == interm2) & (
+                                                    extractprojektionswegestoreg3[
+                                                        "Hoehenstufe_Zukunft"] == hs_zukunft))][
+                                "Standortstyp_Zukunft"].values[0]
+                        else:
+                            if [standortregion, interm2, "hochmontan",
+                                hs_zukunft] in pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade:
+                                combinations_df.loc[
+                                    index, "naiszuk1"] = give_future_foresttype_from_projectionspathways(interm2,
+                                                                                                         "hochmontan",
+                                                                                                         "collin",
+                                                                                                         tannenareal_heute,
+                                                                                                         tannenareal_zukunft,
+                                                                                                         standortregion,
+                                                                                                         standortregionplain,
+                                                                                                         slope, lage,
+                                                                                                         radiation)
+                    elif hs_heute1 == "subalpin":
+                        interm1 = give_future_foresttype_from_projectionspathways(sto_heute1, "subalpin", "hochmontan",
+                                                                                  tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        if [hs_heute1, interm1, hs_zukunft] in extractprojektionswegestoreg3combinationslist:
+                            combinations_df.loc[index, "naiszuk1"] = extractprojektionswegestoreg3[(
+                                    (extractprojektionswegestoreg3["Hoehenstufe_heute"] == hs_heute1) & (
+                                    extractprojektionswegestoreg3["Standortstyp_heute"] == interm1) & (
+                                            extractprojektionswegestoreg3["Hoehenstufe_Zukunft"] == hs_zukunft))][
+                                "Standortstyp_Zukunft"].values[0]
 
+        if sto_heute2 != '_' and standortregionplain in ["2b", "3"] and hs_heute2 in ["obersubalpin", "subalpin",
+                                                                                      "hochmontan"] and hs_zukunft == "collin":
+            # check if it is in extract
+            if standortregionplain == "2b":
+                if [hs_heute2, sto_heute2, hs_zukunft] in extractprojektionswegestoreg2bcombinationslist:
+                    combinations_df.loc[index, "naiszuk2"] = extractprojektionswegestoreg2b[(
+                            (extractprojektionswegestoreg2b["Hoehenstufe_heute"] == hs_heute2) & (
+                            extractprojektionswegestoreg2b["Standortstyp_heute"] == sto_heute2) & (
+                                    extractprojektionswegestoreg2b["Hoehenstufe_Zukunft"] == hs_zukunft))][
+                        "Standortstyp_Zukunft"].values[0]
+                else:
+                    if hs_heute2 == "obersubalpin":
+                        interm1 = give_future_foresttype_from_projectionspathways(sto_heute2, "obersubalpin",
+                                                                                  "subalpin", tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        interm2 = give_future_foresttype_from_projectionspathways(interm1, "subalpin", "hochmontan",
+                                                                                  tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        if [hs_heute2, interm2, hs_zukunft] in extractprojektionswegestoreg2bcombinationslist:
+                            combinations_df.loc[index, "naiszuk2"] = extractprojektionswegestoreg2b[(
+                                        (extractprojektionswegestoreg2b["Hoehenstufe_heute"] == hs_heute2) & (
+                                            extractprojektionswegestoreg2b["Standortstyp_heute"] == interm2) & (
+                                                    extractprojektionswegestoreg2b[
+                                                        "Hoehenstufe_Zukunft"] == hs_zukunft))][
+                                "Standortstyp_Zukunft"].values[0]
+                        else:
+                            if [standortregion, interm2, "hochmontan",
+                                hs_zukunft] in pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade:
+                                combinations_df.loc[
+                                    index, "naiszuk2"] = give_future_foresttype_from_projectionspathways(interm2,
+                                                                                                         "hochmontan",
+                                                                                                         "collin",
+                                                                                                         tannenareal_heute,
+                                                                                                         tannenareal_zukunft,
+                                                                                                         standortregion,
+                                                                                                         standortregionplain,
+                                                                                                         slope, lage,
+                                                                                                         radiation)
+                    elif hs_heute2 == "subalpin":
+                        interm1 = give_future_foresttype_from_projectionspathways(sto_heute2, "subalpin", "hochmontan",
+                                                                                  tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        if [hs_heute2, interm1, hs_zukunft] in extractprojektionswegestoreg2bcombinationslist:
+                            combinations_df.loc[index, "naiszuk2"] = extractprojektionswegestoreg2b[(
+                                    (extractprojektionswegestoreg2b["Hoehenstufe_heute"] == hs_heute2) & (
+                                    extractprojektionswegestoreg2b["Standortstyp_heute"] == interm1) & (
+                                            extractprojektionswegestoreg2b["Hoehenstufe_Zukunft"] == hs_zukunft))][
+                                "Standortstyp_Zukunft"].values[0]
+            elif standortregionplain == "3":
+                if [hs_heute2, sto_heute2, hs_zukunft] in extractprojektionswegestoreg3combinationslist:
+                    combinations_df.loc[index, "naiszuk2"] = extractprojektionswegestoreg3[(
+                            (extractprojektionswegestoreg3["Hoehenstufe_heute"] == hs_heute2) & (
+                            extractprojektionswegestoreg3["Standortstyp_heute"] == sto_heute2) & (
+                                    extractprojektionswegestoreg3["Hoehenstufe_Zukunft"] == hs_zukunft))][
+                        "Standortstyp_Zukunft"].values[0]
+                else:
+                    if hs_heute2 == "obersubalpin":
+                        interm1 = give_future_foresttype_from_projectionspathways(sto_heute2, "obersubalpin",
+                                                                                  "subalpin", tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        interm2 = give_future_foresttype_from_projectionspathways(interm1, "subalpin", "hochmontan",
+                                                                                  tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        if [hs_heute2, interm2, hs_zukunft] in extractprojektionswegestoreg3combinationslist:
+                            combinations_df.loc[index, "naiszuk2"] = extractprojektionswegestoreg3[(
+                                    (extractprojektionswegestoreg3["Hoehenstufe_heute"] == hs_heute2) & (
+                                    extractprojektionswegestoreg3["Standortstyp_heute"] == interm2) & (
+                                            extractprojektionswegestoreg3["Hoehenstufe_Zukunft"] == hs_zukunft))][
+                                "Standortstyp_Zukunft"].values[0]
+                        else:
+                            if [standortregion, interm2, "hochmontan",
+                                hs_zukunft] in pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade:
+                                combinations_df.loc[
+                                    index, "naiszuk2"] = give_future_foresttype_from_projectionspathways(interm2,
+                                                                                                         "hochmontan",
+                                                                                                         "collin",
+                                                                                                         tannenareal_heute,
+                                                                                                         tannenareal_zukunft,
+                                                                                                         standortregion,
+                                                                                                         standortregionplain,
+                                                                                                         slope, lage,
+                                                                                                         radiation)
+                    elif hs_heute2 == "subalpin":
+                        interm1 = give_future_foresttype_from_projectionspathways(sto_heute2, "subalpin", "hochmontan",
+                                                                                  tannenareal_heute,
+                                                                                  tannenareal_zukunft, standortregion,
+                                                                                  standortregionplain, slope, lage,
+                                                                                  radiation)
+                        if [hs_heute2, interm1, hs_zukunft] in extractprojektionswegestoreg3combinationslist:
+                            combinations_df.loc[index, "naiszuk2"] = extractprojektionswegestoreg3[(
+                                    (extractprojektionswegestoreg3["Hoehenstufe_heute"] == hs_heute2) & (
+                                    extractprojektionswegestoreg3["Standortstyp_heute"] == interm1) & (
+                                            extractprojektionswegestoreg3["Hoehenstufe_Zukunft"] == hs_zukunft))][
+                                "Standortstyp_Zukunft"].values[0]
+        if combinations_df.loc[index, "naiszuk1"] in ["nopath", "no path c", "", "no path"]:
+            combinations_df.loc[index, "naiszuk1"] = correct_nopaths_exemptions(standortregion, standortregionplain,
+                                                                                sto_heute1, hs_heute1, hs_zukunft,
+                                                                                tannenareal_heute, slope, lage,
+                                                                                radiation)
+        if combinations_df.loc[index, "ue"] == 1 and combinations_df.loc[index, "naiszuk2"] in ["nopath", "no path c",
+                                                                                                "", "no path"]:
+            combinations_df.loc[index, "naiszuk2"] = correct_nopaths_exemptions(standortregion, standortregionplain,
+                                                                                sto_heute2, hs_heute2, hs_zukunft,
+                                                                                tannenareal_heute, slope, lage,
+                                                                                radiation)
+    combinations_df.loc[(combinations_df["tahs"] == combinations_df["hszukcor"]), "naiszuk1"] = combinations_df['nais1']
+    combinations_df.loc[(combinations_df["tahsue"] == combinations_df["hszukcor"]), "naiszuk2"] = combinations_df[
+        'nais2']
+    combinations_df.loc[
+        ((combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "collin mit Buche")), "naiszuk1"] = \
+    combinations_df['nais1']
+    combinations_df.loc[((combinations_df["tahsue"] == "collin") & (combinations_df['nais2'] != "") & (
+                combinations_df["hszukcor"] == "collin mit Buche")), "naiszuk2"] = combinations_df['nais2']
+    # !!!!!!!!correct LI only!!!!!!!!!!!!!
+    # combinations_df.loc[((combinations_df['nais2']=="24*")&(combinations_df["tahsue"]=="obermontan")&(combinations_df["hszukcor"]=="hochmontan")), "naiszuk2"]="24*"
+    # combinations_df.loc[((combinations_df['nais2']=="24*")&(combinations_df["tahsue"]=="obermontan")&(combinations_df["hszukcor"]=="hochmontan")), "hszukcor"]="obermontan"
+    # combinations_df.loc[((combinations_df['nais2']=="48")&(combinations_df["tahsue"]=="untermontan")&(combinations_df["hszukcor"]=="obermontan")), "naiszuk2"]="48"
+    # combinations_df.loc[((combinations_df['nais2']=="48")&(combinations_df["tahsue"]=="untermontan")&(combinations_df["hszukcor"]=="obermontan")), "hszukcor"]="untermontan"
+    # combinations_df.loc[((combinations_df['nais2']=="60*")&(combinations_df["tahsue"]=="hochmontan")&(combinations_df["hszukcor"]=="subalpin")), "naiszuk2"]="60*"
+    # combinations_df.loc[((combinations_df['nais2']=="60*")&(combinations_df["tahsue"]=="hochmontan")&(combinations_df["hszukcor"]=="subalpin")), "hszukcor"]="hochmontan"
+    # combinations_df.loc[((combinations_df['nais2']=="65")&(combinations_df["tahsue"]=="submontan")&(combinations_df["hszukcor"]=="untermontan")), "naiszuk2"]="65"
+    # combinations_df.loc[((combinations_df['nais2']=="65")&(combinations_df["tahsue"]=="submontan")&(combinations_df["hszukcor"]=="untermontan")), "hszukcor"]="submontan"
 
+    ##!!!!!!!!correct SG only!!!!!!!!!!!!!
+    ##combinations_df.loc[((combinations_df['nais2']=="8a(12a)")&(combinations_df["tahsue"]=="untermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk2"]="8a(12a)"
+    # combinations_df.loc[((combinations_df['nais2']=="9a")&(combinations_df["tahsue"]=="untermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk2"]="9a"
+    # combinations_df.loc[((combinations_df["tahsue"] == "collin")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "naiszuk2"]=combinations_df['nais2']
+    # combinations_df.loc[((combinations_df["tahsue"] == "collin mit Buche")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "naiszuk2"]=combinations_df['nais2']
+    # combinations_df.loc[((combinations_df["tahsue"] == "hyperinsubrisch")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "naiszuk2"]=combinations_df['nais2']
+    # combinations_df.loc[((combinations_df["tahsue"] == "submontan")&(combinations_df["hszukcor"].isin(["untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "naiszuk2"]=combinations_df['nais2']
+    # combinations_df.loc[((combinations_df["tahsue"] == "untermontan")&(combinations_df["hszukcor"].isin(["obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "naiszuk2"]=combinations_df['nais2']
+    # combinations_df.loc[((combinations_df["tahsue"] == "obermontan")&(combinations_df["hszukcor"].isin(["hochmontan", "subalpin", "obersubalpin"]))), "naiszuk2"]=combinations_df['nais2']
+    # combinations_df.loc[((combinations_df["tahsue"] == "unter- & obermontan")&(combinations_df["hszukcor"].isin(["hochmontan", "subalpin", "obersubalpin"]))), "naiszuk2"]=combinations_df['nais2']
+    # combinations_df.loc[((combinations_df["tahsue"] == "hochmontan")&(combinations_df["hszukcor"].isin(["subalpin", "obersubalpin"]))), "naiszuk2"]=combinations_df['nais2']
+    # combinations_df.loc[((combinations_df["tahsue"] == "subalpin")&(combinations_df["hszukcor"].isin(["obersubalpin"]))), "naiszuk2"]=combinations_df['nais2']
+    #
+    # combinations_df.loc[((combinations_df['nais2']=="46*")&(combinations_df["tahsue"]=="untermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk2"]="7*"
+    # combinations_df.loc[((combinations_df['nais2']=="48G")&(combinations_df["tahsue"]=="obermontan")&(combinations_df["hszukcor"]=="untermontan")), "naiszuk2"]="22"
+    # combinations_df.loc[((combinations_df['nais2']=="53Ta")&(combinations_df["tahsue"]=="untermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk2"]="62"
+    # combinations_df.loc[((combinations_df['nais2']=="26h")&(combinations_df["tahsue"]=="untermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk2"]="26"
+    # combinations_df.loc[((combinations_df['nais2']=="48G")&(combinations_df["tahsue"]=="obermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk2"]="22"
 
+    ##correct SZ
+    # combinations_df.loc[((combinations_df['nais2']=="60*")&(combinations_df["tahsue"]=="obermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk2"]="17"
+    # combinations_df.loc[((combinations_df['nais2']=="60*")&(combinations_df["tahsue"]=="obermontan")&(combinations_df["hszukcor"]=="untermontan")), "naiszuk2"]="17"
+    # combinations_df.loc[((combinations_df['nais2']=="53")&(combinations_df["tahsue"]=="obermontan")&(combinations_df["hszukcor"]=="untermontan")), "naiszuk2"]="62"
+    # combinations_df.loc[((combinations_df['nais2']=="53")&(combinations_df["tahsue"]=="hochmontan")&(combinations_df["hszukcor"]=="untermontan")), "naiszuk2"]="62"
+    # combinations_df.loc[((combinations_df['nais2']=="53")&(combinations_df["tahsue"]=="hochmontan")&(combinations_df["hszukcor"]=="untermontan")), "naiszuk2"]="53Ta"
+    # combinations_df.loc[((combinations_df['nais2']=="53")&(combinations_df["tahsue"]=="hochmontan")&(combinations_df["hszukcor"]=="obermontan")), "naiszuk2"]="53Ta"
+    # combinations_df.loc[((combinations_df['nais2']=="53")&(combinations_df["tahsue"]=="hochmontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk2"]="62"
+    # combinations_df.loc[((combinations_df['nais2']=="48")&(combinations_df["tahsue"]=="subalpin")&(combinations_df["hszukcor"]=="obermontan")&(combinations_df["radiation"]==-1)), "naiszuk2"]="48"
+    # combinations_df.loc[((combinations_df['nais2']=="48")&(combinations_df["tahsue"]=="subalpin")&(combinations_df["hszukcor"]=="obermontan")&(combinations_df["radiation"]>=0)), "naiszuk2"]="22"
+    # combinations_df.loc[((combinations_df['nais2']=="48")&(combinations_df["tahsue"]=="subalpin")&(combinations_df["hszukcor"]=="untermontan")), "naiszuk2"]="22"
 
-##correct special cases
-#for index, row in combinations_df.iterrows():
-#    if row ['nais1'] in ["3","4"] and row["storegco"]=="R, J, M, 1, 2, 3":
-#        combinations_df.loc[index,"tahs"]="untermontan"
-#    if row ['nais1'] in ["3","4"] and row["storegco"] in ["R 4", "R 5", "R Mendrisiotto"]:
-#        combinations_df.loc[index,"tahs"]="unter- & obermontan"
-#    if row ['nais1'] in ["19L","19LP"] and row["storegco"] in ["R 4", "R 5", "R Mendrisiotto"]:
-#        combinations_df.loc[index,"tahs"]="unter- & obermontan"
-#    if row ['nais1'] in ["19L"] and row["storegco"] =="R, J, M, 1, 2, 3":
-#        combinations_df.loc[index,"tahs"]="obermontan"
-#    if row ['nais1'] in ["25as", "25au"] and row["storeg"] in ["4", "3"]:
-#        combinations_df.loc[index,"tahs"]="collin"
-#    if row ['nais1'] in ["25as", "25au"] and row["storeg"] in ["5", "5a", "5b", "Me"]:
-#        combinations_df.loc[index,"tahs"]="collin mit Buche"
-#    if row ['nais1'] in ["19L", "19LP"] and row["tahs"] =="subalpin" and row["storegco"] =="R, J, M, 1, 2, 3":
-#        combinations_df.loc[index,"tahs"]="obermontan"
-#    if row ['nais1'] in ["19L", "19LP"] and row["tahs"] =="subalpin" and row["storegco"] in ["R 4", "R 5", "R Mendrisiotto"]:
-#        combinations_df.loc[index,"tahs"]="unter- & obermontan"
-#    if row ['nais1'] in ["19LP"] and row["tahs"] =="hochmontan" and row["storegco"] in ["R 4", "R 5", "R Mendrisiotto"]:
-#        combinations_df.loc[index,"tahs"]="unter- & obermontan"
-#    #if row ['nais1'] in ["33m", "42C", "42Q"] and row["tahs"] =="hochmontan" and row["storeg"] in ["4"]:
-#    #    combinations_df.loc[index,"tahs"]="collin"
-#    #if row ['nais1'] in ["33m", "42C", "42Q"] and row["tahs"] =="hochmontan" and row["storeg"] in ["5","5a","5b", "Me"]:
-#    #    combinations_df.loc[index,"tahs"]="collin mit Buche"
-#    if row ['nais1'] in ["59A", "59C", "59E"] and row["tahs"] =="hochmontan" and row["storegco"] =="R, J, M, 1, 2, 3":
-#        combinations_df.loc[index,"tahs"]="obersubalpin"
-#    if row ['nais1'] in ["59A", "59C", "59E"] and row["tahs"] =="hochmontan" and row["storegco"] =="R, J, M, 1, 2, 3":
-#        combinations_df.loc[index,"tahs"]="obersubalpin"
+    # check no paths left
+    nopaths = combinations_df[combinations_df["naiszuk1"].isin(["nopath", "no path c", "", "no path"])]
+    len(nopaths)
+    # nopaths.columns
+    listofnopathcombinations = []
+    for index, row in nopaths[["storegco", 'nais1', "tahs", "hszukcor"]].iterrows():
+        if [row["storegco"], row['nais1'], row["tahs"], row["hszukcor"]] not in listofnopathcombinations:
+            listofnopathcombinations.append([row["storegco"], row['nais1'], row["tahs"], row["hszukcor"]])
+    len(listofnopathcombinations)
+    # listofnopathcombinations.sort()
+    nopaths2 = combinations_df[combinations_df["naiszuk2"].isin(["nopath", "no path c", "no path"])]
+    len(nopaths2)
+    listofnopathcombinations2 = []
+    for index, row in nopaths2[["storegco", 'nais2', "tahsue", "hszukcor"]].iterrows():
+        if row['nais2'] != "_" and [row["storegco"], row['nais2'], row["tahsue"],
+                                    row["hszukcor"]] not in listofnopathcombinations2:
+            listofnopathcombinations2.append([row["storegco"], row['nais2'], row["tahsue"], row["hszukcor"]])
+    len(listofnopathcombinations2)
+    # listofnopathcombinations2.sort()
+    # listofnopathcombinations
+    nopathoutfile = open(projectspace + "/GL/" + climatescenario.lower() + "_listofnopathcombinations.txt", "w")
+    nopathoutfile.write("standortregion;nais;hsheute;hszukunft\n")
+    for item in listofnopathcombinations:
+        nopathoutfile.write(str(item[0]) + ";" + str(item[1]) + ";" + str(item[2]) + ";" + str(item[3]) + "\n")
+    nopathoutfile.write("#nais2\n")
+    for item in listofnopathcombinations2:
+        nopathoutfile.write(str(item[0]) + ";" + str(item[1]) + ";" + str(item[2]) + ";" + str(item[3]) + "\n")
+    nopathoutfile.close()
+    joblib.dump(combinations_df, projectspace + "/GL" + "GL_" + climatescenario + "_combinations_df_futureSTO.sav")
+    combinations_df.to_file(projectspace + "/GL/" + "GL_" + climatescenario + "_zukuenftigestandorte.gpkg")
 
-#check if future altitudinal vegetation belt is not higher than present
-combinations_df.loc[((combinations_df["tahs"] == "collin")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahs"] == "collin mit Buche")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahs"] == "hyperinsubrisch")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahs"] == "submontan")&(combinations_df["hszukcor"].isin(["untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahs"] == "untermontan")&(combinations_df["hszukcor"].isin(["obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahs"] == "obermontan")&(combinations_df["hszukcor"].isin(["hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahs"] == "unter- & obermontan")&(combinations_df["hszukcor"].isin(["hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahs"] == "hochmontan")&(combinations_df["hszukcor"].isin(["subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahs"] == "subalpin")&(combinations_df["hszukcor"].isin(["obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    # ******************************************************************************************************
+    # Baumartenempfehlungen
+    # ******************************************************************************************************
+    grtreeid_list = naismatrixdf["Abkuerzung"].unique().tolist()
+    len(grtreeid_list)
+    grtreeid_list.sort()
+    gr_treetypes_LFI = grtreeid_list.copy()
+    for item in ["BUL", "FUL", "KA", ""]:  # "ES"
+        if item in gr_treetypes_LFI:
+            gr_treetypes_LFI.remove(item)
+    len(gr_treetypes_LFI)
+    joblib.dump(gr_treetypes_LFI, projectspace + "/GL/" + "treetypes_LFI.sav")
 
-combinations_df.loc[((combinations_df["tahsue"] == "collin")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahsue"] == "collin mit Buche")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahsue"] == "hyperinsubrisch")&(combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahsue"] == "submontan")&(combinations_df["hszukcor"].isin(["untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahsue"] == "untermontan")&(combinations_df["hszukcor"].isin(["obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahsue"] == "obermontan")&(combinations_df["hszukcor"].isin(["hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahsue"] == "unter- & obermontan")&(combinations_df["hszukcor"].isin(["hochmontan", "subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahsue"] == "hochmontan")&(combinations_df["hszukcor"].isin(["subalpin", "obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["tahsue"] == "subalpin")&(combinations_df["hszukcor"].isin(["obersubalpin"]))), "hszukcor"]=combinations_df["tahs"]
+    naismatrix_gr_df = naismatrixdf[naismatrixdf["Abkuerzung"].isin(gr_treetypes_LFI)]
+    len(naismatrix_gr_df)
+    joblib.dump(naismatrix_gr_df, projectspace + "/GL/" + "naismatrix_gr_df.sav")
+    ausnahmenausserhalbbuchenareal = ['21*', '23*', '25a', '25as', '25b', '25f', '25au', '26', '26h', '29A', '29C',
+                                      '33a', '33b', '33m', '34a', '34b', '35Q', '40Pt', '40PBlt', '42C', '42V', '42t',
+                                      '46', '46*', '47', '47D', '47M', '47*', '48', '91']
+    buchenarealstoreg = ['1', '2a', '5a', '5b', 'J', 'M', 'Me']
+    ausnahmenausserhalbbuchenarealstoreg = ['2b', '3', '4']
+    buchenausschlusshoehenstufenzukunft = ['collin', 'hochmontan', 'subalpin', 'obersubalpin']
+    naisstandortstypeninmatrixlist = naismatrix_gr_df.columns.tolist()[8:-1]
+    ausnahmentannenreliktareal = ['21*', '23', '24', '24*', '24*Fe', '25a', '25as', '25b', '25f', '25au', '26', '26h',
+                                  '26w', '27h', '27*', '33a', '33b', '33m', '34a', '34b', '35Q', '40P', '40PBl', '40Pt',
+                                  '40PBlt', '42V', '42t', '47H']
 
-#check "obermontan", "untermontan" vs "unter- & obermontan"
-combinations_df['hszukcor'].unique().tolist()
-combinations_df['tahs'].unique().tolist()
-combinations_df['tahsue'].unique().tolist()
-#combinations_df.loc[combinations_df["hszukcor"]=="unter-/obermontan", "hszukcor"]="unter- & obermontan"
-#combinations_df.loc[combinations_df["tahs"]=="unter-/obermontan", "hszukcor"]="unter- & obermontan"
-#combinations_df.loc[combinations_df["tahsue"]=="unter-/obermontan", "hszukcor"]="unter- & obermontan"
-#combinations_df.loc[((combinations_df["tahs"].isin(["untermontan", "obermontan"]))&(combinations_df["storegco"].isin(["R 4", "R 5", "R Mendrisiotto"]))), "tahs"]="unter- & obermontan"
-#combinations_df.loc[((combinations_df["tahsue"].isin(["untermontan", "obermontan"]))&(combinations_df["storegco"].isin(["R 4", "R 5", "R Mendrisiotto"]))), "tahsue"]="unter- & obermontan"
-#combinations_df.loc[((combinations_df["tahs"]=="unter- & obermontan")&(combinations_df["hszukcor"].isin(["untermontan", "obermontan"]))), "hszukcor"]="unter- & obermontan"
-#combinations_df.loc[((combinations_df["tahs"].isin(["untermontan", "obermontan"]))&(combinations_df["hszukcor"]== "unter- & obermontan")), "hszukcor"]=combinations_df["tahs"]
-#len(combinations_df[combinations_df["tahs"].isna()==True])
-#len(combinations_df[combinations_df["hszukcor"].isna()==True])
-#len(combinations_df[combinations_df["hszukcor"]=="_"])
-##combinations_df.loc[((combinations_df[combinations_df["tahs"].isna()==True])&(combinations_df[combinations_df["hszukcor"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"])])), "tahs"]=combinations_df["hszukcor"]
-#combinations_df.loc[((combinations_df["tahs"]=="_")&(combinations_df["hszukcor"]!="_")), "tahs"]=combinations_df["hszukcor"]
-#combinations_df["tahs"].unique().tolist()
-##leere=combinations_df[combinations_df["tahs"].isna()==True]
-#combinations_df=combinations_df[combinations_df["tahs"].isna()==False]
+    # Baumartenbedeutungen
+    print("Berechne Baumartenbedeutungen ...")
+    # create a copy of the combinations data frame
+    combinations_df_bedeutung = combinations_df.copy()
+    layercolumnslist = combinations_df_bedeutung.columns.tolist()
+    for col in gr_treetypes_LFI:
+        # print(col)
+        combinations_df_bedeutung[col + "heu1"] = ""
+        combinations_df_bedeutung[col + "heu2"] = ""
+    for col in gr_treetypes_LFI:
+        # print(col)
+        combinations_df_bedeutung[col + "zuk1"] = ""
+        combinations_df_bedeutung[col + "zuk2"] = ""
 
-#correct altitudinal vegetation belts in input file
-#pairs of changes in altitudinal vegetation belts
-pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade=[]
-for index, row in projectionswegedf.iterrows():
-    if [row["Standortsregionen"],row["Standortstyp_heute"],row["Hoehenstufe_heute"], row["Hoehenstufe_Zukunft"]] not in pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade:
-        pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade.append([row["Standortsregionen"],row["Standortstyp_heute"],row["Hoehenstufe_heute"],row["Hoehenstufe_Zukunft"]])
-len(pairsofforesttypesandaltitudinalvegetationbelts_inprojektionspfade)
-combinations_df["hszukcor"].unique().tolist()
-combinations_df.loc[((combinations_df["hszukcor"]=="-")&(combinations_df["tahs"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))),"hszukcor"]=combinations_df["tahs"]
-combinations_df.loc[((combinations_df["hszukcor"]=="_")&(combinations_df["tahs"].isin(["submontan", "untermontan", "obermontan", "unter- & obermontan", "hochmontan", "subalpin", "obersubalpin"]))),"hszukcor"]=combinations_df["tahs"]
-combinations_df["tahs"].unique().tolist()
+    # kein Uebergang
+    print("kein Uebergang ...")
+    for standorttyp in naisstandortstypeninmatrixlist:
+        # print(standorttyp)
+        for baumart in gr_treetypes_LFI:
+            baumartbedeutung = \
+            naismatrix_gr_df.loc[naismatrix_gr_df[naismatrix_gr_df["Abkuerzung"] == baumart].index, standorttyp].values[
+                0]
+            if baumartbedeutung in ["a", "b", "c"]:
+                combinations_df_bedeutung.loc[combinations_df_bedeutung[
+                    combinations_df_bedeutung['nais1'] == standorttyp].index, baumart + "heu1"] = baumartbedeutung
+                combinations_df_bedeutung.loc[combinations_df_bedeutung[
+                    combinations_df_bedeutung['nais2'] == standorttyp].index, baumart + "heu2"] = baumartbedeutung
+                combinations_df_bedeutung.loc[combinations_df_bedeutung[
+                    combinations_df_bedeutung["naiszuk1"] == standorttyp].index, baumart + "zuk1"] = baumartbedeutung
+                combinations_df_bedeutung.loc[combinations_df_bedeutung[
+                    combinations_df_bedeutung["naiszuk2"] == standorttyp].index, baumart + "zuk2"] = baumartbedeutung
+    # Uebergang
+    print("Uebergang ...")
+    for baumart in gr_treetypes_LFI:
+        # print(baumart)
+        combinations_df_bedeutung[baumart + "heuUE"] = ""
+    for baumart in gr_treetypes_LFI:
+        # print(baumart)
+        combinations_df_bedeutung[baumart + "zukUE"] = ""
+    for baumart in gr_treetypes_LFI:
+        # print(baumart)
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[((combinations_df_bedeutung["ue"] == 1) & (
+            combinations_df_bedeutung[baumart + "heu1"].isin(["a"])) & (
+                                                                     combinations_df_bedeutung[baumart + "heu2"].isin(
+                                                                         ["a", "b"])))].index, baumart + "heuUE"] = "a"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "zuk1"].isin(["a"])) & (
+                combinations_df_bedeutung[baumart + "zuk2"].isin(["a", "b"])))].index, baumart + "zukUE"] = "a"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "heu1"].isin(["a"])) & (
+                combinations_df_bedeutung[baumart + "heu2"].isin(["c"])))].index, baumart + "heuUE"] = "b"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "zuk1"].isin(["a"])) & (
+                combinations_df_bedeutung[baumart + "zuk2"].isin(["c"])))].index, baumart + "zukUE"] = "b"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "heu1"].isin(["a"])) & (
+                combinations_df_bedeutung[baumart + "heu2"].isin(["", "ex"])))].index, baumart + "heuUE"] = "c"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "zuk1"].isin(["a"])) & (
+                combinations_df_bedeutung[baumart + "zuk2"].isin(["", "ex"])))].index, baumart + "zukUE"] = "c"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "heu1"].isin(["b"])) & (
+                combinations_df_bedeutung[baumart + "heu2"].isin(["a", "b", "c"])))].index, baumart + "heuUE"] = "b"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "zuk1"].isin(["b"])) & (
+                combinations_df_bedeutung[baumart + "zuk2"].isin(["a", "b", "c"])))].index, baumart + "zukUE"] = "b"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "heu1"].isin(["b"])) & (
+                combinations_df_bedeutung[baumart + "heu2"].isin(["", "ex"])))].index, baumart + "heuUE"] = "c"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "zuk1"].isin(["b"])) & (
+                combinations_df_bedeutung[baumart + "zuk2"].isin(["", "ex"])))].index, baumart + "zukUE"] = "c"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "heu1"].isin(["c"])) & (
+                combinations_df_bedeutung[baumart + "heu2"].isin(["a"])))].index, baumart + "heuUE"] = "b"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "zuk1"].isin(["c"])) & (
+                combinations_df_bedeutung[baumart + "zuk2"].isin(["a"])))].index, baumart + "zukUE"] = "b"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "heu1"].isin(["c"])) & (
+                combinations_df_bedeutung[baumart + "heu2"].isin(["b", "c"])))].index, baumart + "heuUE"] = "c"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "zuk1"].isin(["c"])) & (
+                combinations_df_bedeutung[baumart + "zuk2"].isin(["b", "c"])))].index, baumart + "zukUE"] = "c"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "heu1"].isin(["", "ex"])) & (
+                combinations_df_bedeutung[baumart + "heu2"].isin(["a", "b"])))].index, baumart + "heuUE"] = "c"
+        combinations_df_bedeutung.loc[combinations_df_bedeutung[
+            ((combinations_df_bedeutung["ue"] == 1) & (combinations_df_bedeutung[baumart + "zuk1"].isin(["", "ex"])) & (
+                combinations_df_bedeutung[baumart + "zuk2"].isin(["a", "b"])))].index, baumart + "zukUE"] = "c"
 
-#convert geopandas to pandas
-#combinations_gdf=combinations_df.copy()
-#combinations_gdf.columns
-##test=combinations_df.groupby(['NaiS_LFI', 'mo', 'ue', 'taheute', 'storeg','slpprzrec', 'radiation', 'lage', 'tahs', 'nais1','nais2', 'tahsue', 'hs_de', 'code', 'subcode'])
-#test1=combinations_df[['mo', 'ue', 'taheute', 'storeg','slpprzrec', 'radiation', 'lage', 'tahs', 'nais1','nais2', 'tahsue', 'subcode','hszukcor','storegco','tazuk']]
-#combinations_df=test1.drop_duplicates(['mo', 'ue', 'taheute', 'storeg','slpprzrec', 'radiation', 'lage', 'tahs', 'nais1','nais2', 'tahsue', 'subcode','hszukcor','storegco','tazuk'])[['mo', 'ue', 'taheute', 'storeg','slpprzrec', 'radiation', 'lage', 'tahs', 'nais1','nais2', 'tahsue', 'subcode','hszukcor','storegco','tazuk']]
-#len(combinations_df)
-#combinations_df["naiszuk1"]=""
-#combinations_df["naiszuk2"]=""
+    # correct beech vaules in excemption areas
+    baumart = "BU"
+    for index, row in combinations_df_bedeutung.iterrows():
+        if row["storeg"] in ausnahmenausserhalbbuchenarealstoreg and row['nais1'] in ausnahmenausserhalbbuchenareal:
+            combinations_df_bedeutung.loc[index, baumart + "heu1"] = ""
+            if row["ue"] == 1:
+                combinations_df_bedeutung.loc[index, baumart + "heuUE"] = ""
+        if row["storeg"] in ausnahmenausserhalbbuchenarealstoreg and row['nais2'] in ausnahmenausserhalbbuchenareal:
+            combinations_df_bedeutung.loc[index, baumart + "heu2"] = ""
+            if row["ue"] == 1:
+                combinations_df_bedeutung.loc[index, baumart + "heuUE"] = ""
+        if row["storeg"] in ausnahmenausserhalbbuchenarealstoreg and row["hszukcor"] in ["collin", "hochmontan",
+                                                                                         "subalpin", "obersubalpin"] and \
+                row["naiszuk1"] in ausnahmenausserhalbbuchenareal:
+            combinations_df_bedeutung.loc[index, baumart + "zuk1"] = ""
+            if row["ue"] == 1:
+                combinations_df_bedeutung.loc[index, baumart + "zukUE"] = ""
+        if row["storeg"] in ausnahmenausserhalbbuchenarealstoreg and row["hszukcor"] in ["collin", "hochmontan",
+                                                                                         "subalpin", "obersubalpin"] and \
+                row["naiszuk2"] in ausnahmenausserhalbbuchenareal:
+            combinations_df_bedeutung.loc[index, baumart + "zuk2"] = ""
+            if row["ue"] == 1:
+                combinations_df_bedeutung.loc[index, baumart + "zukUE"] = ""
 
-#save pandas data frame
-#combinations_df.to_csv(projectspace+"/combinations_df.csv")
-joblib.dump(combinations_df, projectspace+"/GL/combinations_df"+climatescenario+".sav")
-combinations_df.columns
+    # correct TA in excemption areas
+    baumart = 'TA'
+    for index, row in combinations_df_bedeutung.iterrows():
+        if row["taheute"] == 3 and row['nais1'] in ausnahmentannenreliktareal:
+            combinations_df_bedeutung.loc[index, baumart + "heu1"] = ""
+            if row["ue"] == 1:
+                combinations_df_bedeutung.loc[index, baumart + "heuUE"] = ""
+        if row["subcode"] == 3 and row['nais1'] in ausnahmentannenreliktareal:
+            combinations_df_bedeutung.loc[index, baumart + "heu1"] = ""
+            if row["ue"] == 1:
+                combinations_df_bedeutung.loc[index, baumart + "heuUE"] = ""
+        if row["taheute"] == 3 and row['nais2'] in ausnahmentannenreliktareal:
+            combinations_df_bedeutung.loc[index, baumart + "heu2"] = ""
+            if row["ue"] == 1:
+                combinations_df_bedeutung.loc[index, baumart + "heuUE"] = ""
+        if row["subcode"] == 3 and row['nais2'] in ausnahmentannenreliktareal:
+            combinations_df_bedeutung.loc[index, baumart + "heu2"] = ""
+            if row["ue"] == 1:
+                combinations_df_bedeutung.loc[index, baumart + "heuUE"] = ""
 
-#***********************************************************************
-#iterate trough combinations dataframe and calculate future forest type
-#***********************************************************************
-#combinations_df["naiszuk1"]=""
-#combinations_df["naiszuk2"]=""
-extractprojektionswegestoreg2b3=projectionswegedf[projectionswegedf["Standortsregion"].isin(["2b","2b, 3","3"])]
-extractprojektionswegestoreg2b3combinationslist=[]
-extractprojektionswegestoreg2b=projectionswegedf[projectionswegedf["Standortsregion"].isin(["2b","2b, 3"])]
-extractprojektionswegestoreg2bcombinationslist=[]
-extractprojektionswegestoreg3=projectionswegedf[projectionswegedf["Standortsregion"].isin(["3","2b, 3"])]
-extractprojektionswegestoreg3combinationslist=[]
-for index, row in extractprojektionswegestoreg2b3.iterrows():
-    if [row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Standortsregion"],row["Hoehenstufe_Zukunft"]] not in extractprojektionswegestoreg2b3combinationslist:
-        extractprojektionswegestoreg2b3combinationslist.append([row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Standortsregion"],row["Hoehenstufe_Zukunft"]])
-for index, row in extractprojektionswegestoreg2b.iterrows():
-    if [row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Hoehenstufe_Zukunft"]] not in extractprojektionswegestoreg2bcombinationslist and row["Standortsregion"] in ["2b","2b, 3"]:
-        extractprojektionswegestoreg2bcombinationslist.append([row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Hoehenstufe_Zukunft"]])
-for index, row in extractprojektionswegestoreg3.iterrows():
-    if [row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Hoehenstufe_Zukunft"]] not in extractprojektionswegestoreg3combinationslist and row["Standortsregion"] in ["3","2b, 3"]:
-        extractprojektionswegestoreg3combinationslist.append([row["Hoehenstufe_heute"],row["Standortstyp_heute"],row["Hoehenstufe_Zukunft"]])
-hochmontandirektzucollin=projectionswegedf[((projectionswegedf["Hoehenstufe_heute"]=="hochmontan")&(projectionswegedf["Hoehenstufe_Zukunft"]=="collin"))]
-hochmontandirektzucollinlist=hochmontandirektzucollin["Standortstyp_heute"].unique().tolist()
-len(hochmontandirektzucollinlist)
-print("Berechne zukuenftige Standortstypen ...")
-print("all done")
+    # rename column TUL-->TU
+    # combinations_df_bedeutung.rename(columns = {'TULheute1':'TUheute1'}, inplace = True)
+    # combinations_df_bedeutung.rename(columns = {'TULheute2':'TUheute2'}, inplace = True)
+    # combinations_df_bedeutung.rename(columns = {'TULzukunft1':'TUzukunft1'}, inplace = True)
+    # combinations_df_bedeutung.rename(columns = {'TULzukunft2':'TUzukunft2'}, inplace = True)
+    # combinations_df_bedeutung.rename(columns = {'TULheuteUE':'TUheuteUE'}, inplace = True)
+    # combinations_df_bedeutung.rename(columns = {'TULzukunftUE':'TUzukunftUE'}, inplace = True)
+
+    # combinations_df_bedeutung.to_csv(projectspace+"/"+climatescenario.lower()+"_combinations_df_baumartenbedeutungen.csv")
+    joblib.dump(combinations_df_bedeutung,
+                projectspace + "/GL" + "/GL_" + climatescenario.lower() + "_combinations_df_baumartenbedeutungen.sav")
+    # combinations_df_bedeutung.to_sql("grnaistahsstoregclip6190"+climatescenario+"_baumartenbedeutungen", engine)
+    # combinations_df_bedeutung.to_postgis(name="sg_"+climatescenario+'_baumartenbedeutungen', con=engine)
+    # combinations_df_bedeutung.to_file(projectspace+"/"+"sg_"+climatescenario+"_baumartenbedeutungen.shp")
+    combinations_df_bedeutung.to_file(projectspace + "/GL" + "/GL_" + climatescenario + "_baumartenbedeutungen.gpkg",
+                                      layer="GL_" + climatescenario + "_baumartenbedeutungen", driver="GPKG")
+    # sqlstatement='SELECT * FROM public.grnaistahsstoregclip6190'+climatescenario+'_zukuenftigestandorte;'
+    # combinations_df=pd.read_sql_query(sqlstatement,con=engine)
+    # sqlstatement='SELECT * FROM public.grnaistahsstoregclip6190'+climatescenario+'_baumartenbedeutungen;'
+    # combinations_df_bedeutung=pd.read_sql_query(sqlstatement,con=engine)
+    # gr_treetypes_LFI=joblib.load(projectspace+"/"+"gr_treetypes_LFI.sav")
+    len(combinations_df_bedeutung)
+    len(combinations_df)
+
+    # iterate and calculate Baumartenempfehlungen
+    print("Berechne Baumartenempfehlungen ...")
+    # add columns to main layer
+    combinations_df_baumartenempfehlung = combinations_df_bedeutung.copy()
+    layercolumnslist = combinations_df_baumartenempfehlung.columns.tolist()
+    for col in gr_treetypes_LFI:
+        combinations_df_baumartenempfehlung[col] = -999
+
+    for col in gr_treetypes_LFI:
+        # print(col)
+        combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 0) & (
+            combinations_df_baumartenempfehlung[col + "zuk1"].isin(["a", "b"])) & (
+                                                     combinations_df_baumartenempfehlung[col + "heu1"].isin(
+                                                         ["a", "b", "c"]))), col] = 1
+        combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 0) & (
+            combinations_df_baumartenempfehlung[col + "zuk1"].isin(["c"])) & (
+                                                     combinations_df_baumartenempfehlung[col + "heu1"].isin(
+                                                         ["a", "b", "c"]))), col] = 2
+        combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 0) & (
+            ~combinations_df_baumartenempfehlung[col + "zuk1"].isin(["a", "b", "c"])) & (
+                                                     combinations_df_baumartenempfehlung[col + "heu1"].isin(
+                                                         ["a", "b", "c"]))), col] = 3
+        combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 0) & (
+            combinations_df_baumartenempfehlung[col + "zuk1"].isin(["a", "b"])) & (
+                                                     ~combinations_df_baumartenempfehlung[col + "heu1"].isin(
+                                                         ["a", "b", "c"]))), col] = 4
+        combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 0) & (
+            combinations_df_baumartenempfehlung[col + "zuk1"].isin(["c"])) & (
+                                                     ~combinations_df_baumartenempfehlung[col + "heu1"].isin(
+                                                         ["a", "b", "c"]))), col] = 5
+        # uebergang
+        combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 1) & (
+            combinations_df_baumartenempfehlung[col + "zukUE"].isin(["a", "b"])) & (
+                                                     combinations_df_baumartenempfehlung[col + "heuUE"].isin(
+                                                         ["a", "b", "c"]))), col] = 1
+        combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 1) & (
+            combinations_df_baumartenempfehlung[col + "zukUE"].isin(["c"])) & (
+                                                     combinations_df_baumartenempfehlung[col + "heuUE"].isin(
+                                                         ["a", "b", "c"]))), col] = 2
+        combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 1) & (
+            ~combinations_df_baumartenempfehlung[col + "zukUE"].isin(["a", "b", "c"])) & (
+                                                     combinations_df_baumartenempfehlung[col + "heuUE"].isin(
+                                                         ["a", "b", "c"]))), col] = 3
+        combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 1) & (
+            combinations_df_baumartenempfehlung[col + "zukUE"].isin(["a", "b"])) & (
+                                                     ~combinations_df_baumartenempfehlung[col + "heuUE"].isin(
+                                                         ["a", "b", "c"]))), col] = 4
+        combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 1) & (
+            combinations_df_baumartenempfehlung[col + "zukUE"].isin(["c"])) & (
+                                                     ~combinations_df_baumartenempfehlung[col + "heuUE"].isin(
+                                                         ["a", "b", "c"]))), col] = 5
+
+    layercolumnslist = combinations_df_baumartenempfehlung.columns.tolist()
+
+    # joblib.dump(gr_treetypes_LFI, projectspace+"/"+"gr_treetypes_LFI.sav")
+    for col in gr_treetypes_LFI:
+        # print(col)
+        combinations_df_baumartenempfehlung.loc[combinations_df_baumartenempfehlung[col].isna() == True, col] = -999
+        if (col + "heu1") in layercolumnslist:
+            combinations_df_baumartenempfehlung.drop(columns=col + "heu1", axis=1, inplace=True)
+        if (col + "heu2") in layercolumnslist:
+            combinations_df_baumartenempfehlung.drop(columns=col + "heu2", axis=1, inplace=True)
+        if (col + "zuk1") in layercolumnslist:
+            combinations_df_baumartenempfehlung.drop(columns=col + "zuk1", axis=1, inplace=True)
+        if (col + "zuk2") in layercolumnslist:
+            combinations_df_baumartenempfehlung.drop(columns=col + "zuk2", axis=1, inplace=True)
+        if (col + "heuUE") in layercolumnslist:
+            combinations_df_baumartenempfehlung.drop(columns=col + "heuUE", axis=1, inplace=True)
+        if (col + "zukUE") in layercolumnslist:
+            combinations_df_baumartenempfehlung.drop(columns=col + "zukUE", axis=1, inplace=True)
+
+    # save
+    # combinations_df_baumartenempfehlung.to_csv(projectspace+"/"+climatescenario.lower()+"_combinations_df_baumartenempfehlungen.csv")
+    joblib.dump(combinations_df_baumartenempfehlung,
+                projectspace + "/GL" + "/GL_" + climatescenario.lower() + "_baumartenempfehlungen.sav")
+    combinations_df_baumartenempfehlung.to_file(
+        projectspace + "/GL" + "/GL_" + climatescenario + "_baumartenempfehlungen.gpkg",
+        layer="GL_" + climatescenario + "_baumartenempfehlungen", driver="GPKG")
+    # combinations_df_baumartenempfehlung.to_sql("li"+climatescenario+"_baumartenempfehlungen", engine)
+    # combinations_df_baumartenempfehlung.to_postgis(name="sg_"+climatescenario+'_baumartenempfehlungen', con=engine)
+
+    # ******************************************************************************************************
+    # Sensitive Standorte
+    # ******************************************************************************************************
+    print("Berechne Sensitive Standorte ...")
+    combinations_df_senstivestandorte = combinations_df_bedeutung.copy()
+    combinations_df_senstivestandorte["sensi3ba"] = -9999
+    combinations_df_senstivestandorte["sensi4ba"] = -9999
+    combinations_df_senstivestandorte["lenzukab"] = -9999
+    combinations_df_senstivestandorte["lenheua"] = -9999
+    combinations_df_senstivestandorte["lenheub"] = -9999
+    for index, row in combinations_df_senstivestandorte.iterrows():
+        # if index%10000==0:
+        #    print(index)
+        # print(row["joinstr"])
+        uebergang = row["ue"]
+        baumartenzukunftablist = []
+        baumartenheutealist = []
+        baumartenheuteblist = []
+        sensitiverstandort3 = row["sensi3ba"]
+        sensitiverstandort4 = row["sensi4ba"]
+        if uebergang == 0:
+            for baumart in gr_treetypes_LFI:
+                if row[baumart + "zuk1"] in ["a", "b"]:
+                    baumartenzukunftablist.append(baumart)
+            for baumartheutea in baumartenzukunftablist:
+                if row[baumartheutea + "heu1"] == "a":
+                    baumartenheutealist.append(baumartheutea)
+            for baumartheuteb in baumartenzukunftablist:
+                if row[baumartheuteb + "heu1"] == "b":
+                    baumartenheuteblist.append(baumartheuteb)
+        elif uebergang == 1:
+            for baumart in gr_treetypes_LFI:
+                if row[baumart + "zukUE"] in ["a", "b"]:
+                    baumartenzukunftablist.append(baumart)
+            for baumartheutea in baumartenzukunftablist:
+                if row[baumartheutea + "heuUE"] == "a":
+                    baumartenheutealist.append(baumartheutea)
+            for baumartheuteb in baumartenzukunftablist:
+                if row[baumartheuteb + "heuUE"] == "b":
+                    baumartenheuteblist.append(baumartheuteb)
+        if len(baumartenheutealist) > 0:
+            sensitiverstandort3 = 0
+            sensitiverstandort4 = 0
+        if len(baumartenheutealist) == 0 and len(baumartenheuteblist) >= 3:
+            sensitiverstandort3 = 1
+        elif len(baumartenheutealist) == 0 and len(baumartenheuteblist) < 3:
+            sensitiverstandort3 = 2
+        if len(baumartenheutealist) == 0 and len(baumartenheuteblist) >= 4:
+            sensitiverstandort4 = 1
+        elif len(baumartenheutealist) == 0 and len(baumartenheuteblist) < 4:
+            sensitiverstandort4 = 2
+        combinations_df_senstivestandorte.loc[index, "lenzukab"] = len(baumartenheutealist)
+        combinations_df_senstivestandorte.loc[index, "lenheua"] = len(baumartenheutealist)
+        combinations_df_senstivestandorte.loc[index, "lenheub"] = len(baumartenheuteblist)
+        combinations_df_senstivestandorte.loc[index, "sensi3ba"] = sensitiverstandort3
+        combinations_df_senstivestandorte.loc[index, "sensi4ba"] = sensitiverstandort4
+
+    # delete columns not needed anymore
+    columnstodelete = []
+    for col in gr_treetypes_LFI:
+        # print(col)
+        columnstodelete.append(col)
+        columnstodelete.append(col + "heu1")
+        columnstodelete.append(col + "heu2")
+        columnstodelete.append(col + "zuk1")
+        columnstodelete.append(col + "zuk2")
+        columnstodelete.append(col + "heuUE")
+        columnstodelete.append(col + "zukUE")
+    for col in columnstodelete:
+        if col in combinations_df_senstivestandorte.columns.tolist():
+            combinations_df_senstivestandorte.drop(columns=col, axis=1, inplace=True)
+    # layercolumnslist=combinations_df_senstivestandorte.columns.tolist()
+
+    # write the output
+    print("write the output ...")
+    combinations_df_senstivestandorte.columns
+    joblib.dump(combinations_df_senstivestandorte,
+                projectspace + "/GL" + "/GL_" + climatescenario.lower() + "_sensitivestandorte.sav")
+    # combinations_df_senstivestandorte.to_file(projectspace+"/GL"+"/GL_"+climatescenario+"_sensitivestandorte.shp")
+    combinations_df_senstivestandorte.to_file(
+        projectspace + "/GL" + "/GL_" + climatescenario + "_sensitivestandorte.gpkg",
+        layer="GL_" + climatescenario + "_sensitivestandorte", driver="GPKG")
+    combinations_df.columns
+    # combinations_df.to_file(projectspace+"/GL/"+"GL_"+climatescenario+"_zukuenftigestandorte.shp")
+    # combinations_df.to_file(projectspace+"/"+"sg_"+climatescenario+"_zukuenftigestandorte.gpkg", layer="sg_"+climatescenario+"_zukuenftigestandorte", driver="GPKG")
+    # combinations_df=joblib.load(projectspace+"/GL"+"/GL_"+climatescenario.lower()+"_zukuenftigestandorte.sav")
+    # combinations_df_bedeutung.to_file(projectspace+"/"+"sg_"+climatescenario+"_baumartenbedeutungen.shp")
+    # combinations_df_bedeutung.to_file(projectspace+"/"+"sg_"+climatescenario+"_baumartenbedeutungen.gpkg", layer="sg_"+climatescenario+"_baumartenbedeutungen", driver="GPKG")
+    combinations_df_baumartenempfehlung.columns
+    # combinations_df_baumartenempfehlung.to_file(projectspace+"/GL/"+"GL_"+climatescenario+"_baumartenempfehlungen.shp")
+    # combinations_df_baumartenempfehlung.to_file(projectspace+"/"+"sg_"+climatescenario+"_baumartenempfehlungen.gpkg", layer="sg_"+climatescenario+"_baumartenempfehlungen", driver="GPKG")
+
+    print(climatescenario+" done")
+
