@@ -8,6 +8,8 @@ import shapely
 from osgeo import ogr
 import xlrd
 import openpyxl
+import warnings
+warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 
 #input data
@@ -203,7 +205,7 @@ for climatescenario in climatescenarios:
 
     #write the file
     #bk_gdf.to_file(projectspace+"/GL/"+"GL_"+climatescenario+"_bk_maxsensitivitaet.shp")
-    bk_gdf.to_file(projectspace+"/GL/"+"GL_"+climatescenario+"_bk_maxsensitivitaet"+str(int(fichtenanteil*100)).replace('.','_'))+".gpkg")
+    bk_gdf.to_file(projectspace+"/GL/"+"GL_"+climatescenario+"_bk_maxsensitivitaet"+str(int(fichtenanteil*100)).replace('.','_')+".gpkg")
 
 
     ##Auswertungen

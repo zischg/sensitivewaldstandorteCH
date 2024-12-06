@@ -234,7 +234,7 @@ combi.loc[(combi['hs_rcp85']==combi['hs_rcp45']),'nais1_rcp85']=combi['nais1_rcp
 combi.loc[(combi['hs_rcp85']==combi['hs_rcp45']),'nais2_rcp85']=combi['nais2_rcp45']
 combi['area']=combi.geometry.area
 len(combi)
-combi=combi[combi['area']>=100]
+combi=combi[combi['area']>=10000]
 combi.to_file(projectspace+"/GL"+"/GL_Projektionswege_combi.gpkg", layer="GL_Projektionswege_combi", driver="GPKG")
 combi.columns
 combi=combi[['nais_heute', 'hs_heute', 'hsue_heute', 'nais1_rcp45', 'nais2_rcp45','hs_rcp45', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85']]
