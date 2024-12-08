@@ -219,16 +219,16 @@ for index, row in naiseinheitenunique.iterrows():
     #special rules for altitudinal belts attribution
     if row['Bedingung Hangneigung'] in ['<60%', '>60%']:
         if row['Bedingung Hangneigung'] == '<60%' and len(hslist)==1:
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['meanslopeprc']<60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['meanslopeprc']<60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
         elif row['Bedingung Hangneigung'] == '>60%' and len(hslist)==1:
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['meanslopeprc']>=60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['meanslopeprc']>=60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
         elif row['Bedingung Hangneigung'] == '<60%' and len(hslist) > 1:
             if "(" in row['hs']:
-                stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['meanslopeprc']<60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
-                stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['meanslopeprc']<60)), "tahsue"] = hoehenstufendictabkuerzungen[hslist[1]]
+                stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['meanslopeprc']<60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+                stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['meanslopeprc']<60)), "tahsue"] = hoehenstufendictabkuerzungen[hslist[1]]
             else:
-                stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['meanslopeprc'] >= 60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[1]]
-                #for index2, row2 in stok_gdf[((stok_gdf["nais"] == nais)& (stok_gdf['meanslopeprc']<60))].iterrows():
+                stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['meanslopeprc'] >= 60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[1]]
+                #for index2, row2 in stok_gdf[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)& (stok_gdf['meanslopeprc']<60))].iterrows():
                 #    if row2['hs1975'] > 0:
                 #        hsmod = hsmoddictkurz[int(row2['hs1975'])]
                 #    else:
@@ -247,11 +247,11 @@ for index, row in naiseinheitenunique.iterrows():
                 #                row2['hs'].replace('(', ' ').replace(')', '').strip().split()[0]]
         elif row['Bedingung Hangneigung'] == '>60%' and len(hslist) > 1:
             if "(" in row['hs']:
-                stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['meanslopeprc']>=60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
-                stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['meanslopeprc']>=60)), "tahsue"] = hoehenstufendictabkuerzungen[hslist[1]]
+                stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['meanslopeprc']>=60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+                stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['meanslopeprc']>=60)), "tahsue"] = hoehenstufendictabkuerzungen[hslist[1]]
             else:
-                stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['meanslopeprc'] >= 60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[1]]
-                #for index2, row2 in stok_gdf[((stok_gdf["nais"] == nais)& (stok_gdf['meanslopeprc']<60))].iterrows():
+                stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['meanslopeprc'] >= 60)), "tahs"] = hoehenstufendictabkuerzungen[hslist[1]]
+                #for index2, row2 in stok_gdf[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)& (stok_gdf['meanslopeprc']<60))].iterrows():
                 #    if row2['hs1975'] > 0:
                 #        hsmod = hsmoddictkurz[int(row2['hs1975'])]
                 #    else:
@@ -270,57 +270,61 @@ for index, row in naiseinheitenunique.iterrows():
                 #                row2['hs'].replace('(', ' ').replace(')', '').strip().split()[-1]]
     elif row['Bedingung Höhenstufe'] in ['sm um','hm','om','om hm','sa']:
         if row['Bedingung Höhenstufe'] == 'sm um':
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975']==4)), "tahs"] = 'submontan'
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975']==4)), "nais"] = nais
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975'] == 5)), "tahs"] = 'untermontan'
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975'] == 5)), "nais"] = nais
-            #stok_gdf.loc[((stok_gdf["nais"] == nais) & (~stok_gdf['hs1975'].isin([4,5]))), "tahs"] = 'untermontan'
-            #stok_gdf.loc[((stok_gdf["nais"] == nais) & (~stok_gdf['hs1975'].isin([4,5]))), "nais"] = nais
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975']==4)), "tahs"] = 'submontan'
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975']==4)), "nais"] = nais
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975'] == 5)), "tahs"] = 'untermontan'
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975'] == 5)), "nais"] = nais
+            #stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (~stok_gdf['hs1975'].isin([4,5]))), "tahs"] = 'untermontan'
+            #stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (~stok_gdf['hs1975'].isin([4,5]))), "nais"] = nais
         elif row['Bedingung Höhenstufe'] == 'om hm':
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975']==6)), "tahs"] = 'obermontan'
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975']==6)), "tahs"] = 'obermontan'
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (
                         stok_gdf['hs1975'] == 6)), "nais"] = nais
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975'] == 8)), "tahs"] = 'hochmontan'
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975'] == 8)), "tahs"] = 'hochmontan'
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (
                         stok_gdf['hs1975'] == 8)), "nais"] = nais
-            #stok_gdf.loc[((stok_gdf["nais"] == nais) & (~stok_gdf['hs1975'].isin([6,8]))), "tahs"] = 'hochmontan'
-            #stok_gdf.loc[((stok_gdf["nais"] == nais) & (~stok_gdf['hs1975'].isin([6,8]))), "nais"] = nais
+            #stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (~stok_gdf['hs1975'].isin([6,8]))), "tahs"] = 'hochmontan'
+            #stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (~stok_gdf['hs1975'].isin([6,8]))), "nais"] = nais
         elif row['Bedingung Höhenstufe'] == 'hm':
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (
                         stok_gdf['hs1975'] == 8)), "tahs"] = 'hochmontan'
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (
                     stok_gdf['hs1975'] == 8)), "nais"] = nais
-            #stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975']!=8)), "tahs"] = 'hochmontan'
-            #stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975']!=8)), "nais"] = nais
+            #stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975']!=8)), "tahs"] = 'hochmontan'
+            #stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975']!=8)), "nais"] = nais
         elif row['Bedingung Höhenstufe'] == 'om':
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (
                         stok_gdf['hs1975'] == 6)), "tahs"] = 'obermontan'
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (
                     stok_gdf['hs1975'] == 6)), "nais"] = nais
-            #stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975']!=6)), "tahs"] = 'obermontan'
-            #stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975']!=6)), "nais"] = nais
+            #stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975']!=6)), "tahs"] = 'obermontan'
+            #stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975']!=6)), "nais"] = nais
         elif row['Bedingung Höhenstufe'] == 'sa':
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (
                         stok_gdf['hs1975'] == 9)), "tahs"] = 'subalpin'
-            stok_gdf.loc[((stok_gdf["nais"] == nais) & (
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (
                     stok_gdf['hs1975'] == 9)), "nais"] = nais
-            #stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975']!=9)), "tahs"] = 'subalpin'
-            #stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975']!=9)), "nais"] = nais
+            #stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975']!=9)), "tahs"] = 'subalpin'
+            #stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975']!=9)), "nais"] = nais
+    elif "(" in row['hs'] and len(hslist)==1 and row['Bedingung Höhenstufe'] not in ['sm um', 'hm', 'om', 'om hm', 'sa'] and row['Bedingung Hangneigung'] not in ['<60%', '>60%']:
+        stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+        stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "tahsue"] = hoehenstufendictabkuerzungen[hslist[0]]
     else:
         if len(hslist)==1:
-            stok_gdf.loc[((stok_gdf["nais"] == nais)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+            stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "tahsue"] = hoehenstufendictabkuerzungen[hslist[0]]
         else:
             if "(" in row['hs']:
-                stok_gdf.loc[((stok_gdf["nais"] == nais)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
-                stok_gdf.loc[((stok_gdf["nais"] == nais)), "tahsue"] = hoehenstufendictabkuerzungen[hslist[1]]
+                stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+                stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)), "tahsue"] = hoehenstufendictabkuerzungen[hslist[1]]
             else:
                 hslistinzahlen=[]
                 for item in hslist:
                     hslistinzahlen.append(hsdictzuzahlen[item])
-                stok_gdf.loc[((stok_gdf["nais"] == nais)&(stok_gdf['hs1975']==hslistinzahlen[0])), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
-                stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975'] == hslistinzahlen[1])), "tahs"] =hoehenstufendictabkuerzungen[hslist[1]]
-                stok_gdf.loc[((stok_gdf["nais"] == nais) & (stok_gdf['hs1975'].isin(hslist)==False)), "tahs"] =hoehenstufendictabkuerzungen[hslist[1]]
-                #for index2, row2 in stok_gdf[((stok_gdf["nais"] == nais))].iterrows():
+                stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2)&(stok_gdf['hs1975']==hslistinzahlen[0])), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+                stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975'] == hslistinzahlen[1])), "tahs"] =hoehenstufendictabkuerzungen[hslist[1]]
+                stok_gdf.loc[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2) & (stok_gdf['hs1975'].isin(hslist)==False)), "tahs"] =hoehenstufendictabkuerzungen[hslist[1]]
+                #for index2, row2 in stok_gdf[((stok_gdf["wg_haupt"] == kantonseinheit1) & (stok_gdf["wg_zusatz"] == kantonseinheit2))].iterrows():
                 #    if row2['hs1975']>0:
                 #        hsmod=hsmoddictkurz[int(row2['hs1975'])]
                 #    else:
@@ -352,7 +356,14 @@ stok_gdf.loc[(stok_gdf['nais']=='60*'), 'tahs'] = 'subalpin'
 stok_gdf.loc[(stok_gdf['nais']=='60*(67)'), 'tahs'] = 'subalpin'
 stok_gdf.loc[(stok_gdf['nais']=='60*(AV)'), 'tahs'] = 'subalpin'
 stok_gdf.loc[(stok_gdf['nais']=='69(60*)'), 'tahs'] = 'subalpin'
-
+stok_gdf.loc[(stok_gdf['nais']=='53'), 'tahsue'] = 'subalpin'
+stok_gdf.loc[(stok_gdf['nais']=='53(67)'), 'tahsue'] = 'subalpin'
+stok_gdf.loc[(stok_gdf['nais']=='53Ta(67)'), 'tahsue'] = 'hochmontan'
+stok_gdf.loc[(stok_gdf['nais']=='60*'), 'tahsue'] = 'subalpin'
+stok_gdf.loc[(stok_gdf['nais']=='60*(67)'), 'tahsue'] = 'subalpin'
+stok_gdf.loc[(stok_gdf['nais']=='60*(AV)'), 'tahsue'] = 'subalpin'
+stok_gdf.loc[(stok_gdf['nais']=='69(60*)'), 'tahsue'] = 'subalpin'
+test=stok_gdf[stok_gdf['nais']=='18M(48)']
 #fill hoehenstufe for empty values
 for index, row in stok_gdf.iterrows():
     if row["tahs"]=='' and row['hs1975']>0:
@@ -376,9 +387,11 @@ print("done")
 #Export for tree-app
 print('Export for Tree-App')
 stok_gdf.columns
-treeapp=stok_gdf[['wg_haupt','wg_zusatz', 'wg_name','nais', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','kantonseinheit','geometry']]
+treeapp=stok_gdf[['wg_haupt','wg_zusatz', 'wg_name','nais', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
 treeapp.to_file(myworkspace+"/GL/GL_treeapp.gpkg", layer='GL_treeapp', driver="GPKG")
+treeapp.columns
 print("done")
 
 #test = stok_gdf[stok_gdf['nais']=='18M(48)']
+#test = stok_gdf[stok_gdf['nais']=='60*(53)']
 

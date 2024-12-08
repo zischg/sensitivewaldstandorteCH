@@ -198,6 +198,8 @@ for col in treetypeslist:
                 combi.loc[index, col] = 6
                 combi.loc[index, col + "Fall"] = 21
 
+combi.loc[(combi['hszukcor_2']==combi['hszukcor_1']),'naiszuk1_2']=combi['naiszuk1_1']
+combi.loc[(combi['hszukcor_2']==combi['hszukcor_1']),'naiszuk2_2']=combi['naiszuk2_1']
 
 for col in treetypeslist:
     combi.drop(columns=col+ 'heu1_1', axis=1, inplace=True)
@@ -220,22 +222,24 @@ for column in combi.columns.tolist():
     if '_2' in column:
         combi.drop(columns=column, axis=1, inplace=True)
 combi.columns
-combi.loc[(combi['hszukcor_2']==combi['hszukcor_1']),'naiszuk1_2']=combi['naiszuk1_1']
-combi.loc[(combi['hszukcor_2']==combi['hszukcor_1']),'naiszuk2_2']=combi['naiszuk2_1']
+
 combi.to_file(projectspace+"/GL"+"/GL_baumartenempfehlungen_combi.gpkg", layer="GL_baumartenempfehlungen_combi", driver="GPKG")
 print('all done')
 
 #unique pathways
 combi=gpd.overlay(baumartenbedeutungenrcp45, baumartenbedeutungenrcp85, how='intersection', make_valid=True, keep_geom_type=True)
+test45=baumartenbedeutungenrcp45[baumartenbedeutungenrcp45['nais']=='18M(48)']
+test85=baumartenbedeutungenrcp85[baumartenbedeutungenrcp85['nais']=='18M(48)']
 colist=combi.columns.tolist()
 combi=combi[['nais_1','tahs_1','tahsue_1','naiszuk1_1', 'naiszuk2_1','hszukcor_1','naiszuk1_2', 'naiszuk2_2','hszukcor_2','geometry']]
 combi.rename(columns={'nais_1':'nais_heute', 'tahs_1':'hs_heute','tahsue_1':'hsue_heute','naiszuk1_1':'nais1_rcp45', 'naiszuk2_1':'nais2_rcp45','hszukcor_1':'hs_rcp45','naiszuk1_2':'nais1_rcp85', 'naiszuk2_2':'nais2_rcp85','hszukcor_2':'hs_rcp85'}, inplace=True)
 combi.loc[(combi['hs_rcp85']==combi['hs_rcp45']),'nais1_rcp85']=combi['nais1_rcp45']
 combi.loc[(combi['hs_rcp85']==combi['hs_rcp45']),'nais2_rcp85']=combi['nais2_rcp45']
 combi['area']=combi.geometry.area
+#test = combi[combi['nais_heute']=='18M(48)']
 len(combi)
-combi=combi[combi['area']>=10000]
 combi.to_file(projectspace+"/GL"+"/GL_Projektionswege_combi.gpkg", layer="GL_Projektionswege_combi", driver="GPKG")
+combi=combi[combi['area']>=10000]
 combi.columns
 combi=combi[['nais_heute', 'hs_heute', 'hsue_heute', 'nais1_rcp45', 'nais2_rcp45','hs_rcp45', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85']]
 #test=combi[((combi['hs_rcp85']==combi['hs_rcp45'])&(combi['nais2_rcp45']!=combi['nais2_rcp85']))]
