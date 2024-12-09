@@ -102,6 +102,12 @@ for climatescenario in climatescenarios:
             rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out["nhd_anteil"]*fichtenanteil >20) & (rcp_bk_gdf_out["nhd_anteil"]*fichtenanteil <= 40) & (rcp_bk_gdf_out[col].isin([3])))].index, "sb" + col] = 2
             rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out["nhd_anteil"]*fichtenanteil >10) & (rcp_bk_gdf_out["nhd_anteil"]*fichtenanteil <=20) & (rcp_bk_gdf_out[col].isin([3])))].index, "sb" + col] = 1
             rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out["nhd_anteil"]*fichtenanteil >0) & (rcp_bk_gdf_out["nhd_anteil"]*fichtenanteil <= 10) & (rcp_bk_gdf_out[col].isin([3])))].index, "sb" + col] = 0
+    #Arve
+    if 'AR' in mainlayercolumnslist:
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out["nhd_anteil"] * fichtenanteil > 95) & (
+            rcp_bk_gdf_out[col].isin([2, 5])))].index, "sb" + col] = 4
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out["nhd_anteil"] * fichtenanteil > 40) & (
+            rcp_bk_gdf_out[col].isin([3])))].index, "sb" + col] = 4
 
     #calculate maximum sensitivity over all treetypes
     rcp_bk_gdf_out["maxsens"]=-999

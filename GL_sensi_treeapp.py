@@ -1463,6 +1463,10 @@ climatescenarios=['rcp45','rcp85']
 #climatescenario="rcp45"
 #climatescenario="rcp26"
 
+arvenundlaerchen=['59','59A','59C','59E','59J','59L','59S','59V','59H','59R','72,' '59*','59G','59AG','59EG','59VG','72G','57CLä','57VLä','58Lä', '59Lä', '59ELä', '59LLä', '59VLä','59LLä']
+#arvenstandorte =['47*', '57Bl', '57BlTa', '57C', '57CLä', '57CTa', '57Mm', '57S', '57STa', '57V', '57VLä', '57VTa', '57VM', '58', '58Lä', '58Bl', '58Fe', '58C', '58L', '58LLä', '59', '59Lä', '59A', '59c', '59E', '59ELä', '59J', '59L', '59LLä', '59S', '59V', '59VLä', '59H', '59R', '66PM', '72', '72Lä', '47*G', '57BlG', '57CG', '57VG', '58G', '58LG', '59G', '59AG', '59EG', '59VG', '72G']
+
+
 #*******************************************
 #clean NAIS matrix table
 #*******************************************
@@ -2524,7 +2528,23 @@ for climatescenario in climatescenarios:
             combinations_df_baumartenempfehlung[col + "zukUE"].isin(["c"])) & (
                                                      ~combinations_df_baumartenempfehlung[col + "heuUE"].isin(
                                                          ["a", "b", "c"]))), col] = 5
-
+    # Arve
+    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["nais1"].isin(arvenundlaerchen)) & (combinations_df_baumartenempfehlung["tahs"] == 'obersubalpin') & (combinations_df_baumartenempfehlung["hszukcor"] == 'hochmontan')), 'AR'] = 6
+    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["nais1"].isin(arvenundlaerchen)) & (
+                combinations_df_baumartenempfehlung["tahs"] == 'obersubalpin') & (combinations_df_baumartenempfehlung[
+                                                                                      "hszukcor"] == 'hochmontan')), 'AR'] = 6
+    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["nais1"].isin(arvenundlaerchen)) & (
+                combinations_df_baumartenempfehlung["tahs"] == 'subalpin') & (combinations_df_baumartenempfehlung[
+                                                                                      "hszukcor"] == 'hochmontan')), 'AR'] = 6
+    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["nais2"].isin(arvenundlaerchen)) & (
+                combinations_df_baumartenempfehlung["tahsue"] == 'obersubalpin') & (combinations_df_baumartenempfehlung[
+                                                                                      "hszukcor"] == 'hochmontan')), 'AR'] = 6
+    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["nais2"].isin(arvenundlaerchen)) & (
+            combinations_df_baumartenempfehlung["tahsue"] == 'obersubalpin') & (combinations_df_baumartenempfehlung[
+                                                                                  "hszukcor"] == 'hochmontan')), 'AR'] = 6
+    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["nais2"].isin(arvenundlaerchen)) & (
+            combinations_df_baumartenempfehlung["tahsue"] == 'subalpin') & (combinations_df_baumartenempfehlung[
+                                                                              "hszukcor"] == 'hochmontan')), 'AR'] = 6
     layercolumnslist = combinations_df_baumartenempfehlung.columns.tolist()
 
     # joblib.dump(gr_treetypes_LFI, projectspace+"/"+"gr_treetypes_LFI.sav")
@@ -2544,6 +2564,9 @@ for climatescenario in climatescenarios:
         if (col + "zukUE") in layercolumnslist:
             combinations_df_baumartenempfehlung.drop(columns=col + "zukUE", axis=1, inplace=True)
 
+
+
+
     # save
     # combinations_df_baumartenempfehlung.to_csv(projectspace+"/"+climatescenario.lower()+"_combinations_df_baumartenempfehlungen.csv")
     joblib.dump(combinations_df_baumartenempfehlung,
@@ -2553,6 +2576,8 @@ for climatescenario in climatescenarios:
         layer="GL_" + climatescenario + "_baumartenempfehlungen", driver="GPKG")
     # combinations_df_baumartenempfehlung.to_sql("li"+climatescenario+"_baumartenempfehlungen", engine)
     # combinations_df_baumartenempfehlung.to_postgis(name="sg_"+climatescenario+'_baumartenempfehlungen', con=engine)
+
+
 
     # ******************************************************************************************************
     # Sensitive Standorte
@@ -2610,6 +2635,37 @@ for climatescenario in climatescenarios:
         combinations_df_senstivestandorte.loc[index, "lenheub"] = len(baumartenheuteblist)
         combinations_df_senstivestandorte.loc[index, "sensi3ba"] = sensitiverstandort3
         combinations_df_senstivestandorte.loc[index, "sensi4ba"] = sensitiverstandort4
+
+    #Arve, bedingt sensitiver Standort
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais1"].isin(arvenundlaerchen))&(combinations_df_senstivestandorte["tahs"]=="obersubalpin")&(combinations_df_senstivestandorte["hszukcor"]=="subalpin")), "sensi3ba"] = 3
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais1"].isin(arvenundlaerchen)) & (combinations_df_senstivestandorte["tahs"] == "obersubalpin")&(combinations_df_senstivestandorte["hszukcor"]=="hochmontan")), "sensi3ba"] = 3
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais1"].isin(arvenundlaerchen)) & (combinations_df_senstivestandorte["tahs"] == "subalpin")&(combinations_df_senstivestandorte["hszukcor"]=="hochmontan")), "sensi3ba"] = 3
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais2"].isin(arvenundlaerchen))&(combinations_df_senstivestandorte["tahsue"]=="obersubalpin")&(combinations_df_senstivestandorte["hszukcor"]=="subalpin")), "sensi3ba"] = 3
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais2"].isin(arvenundlaerchen)) & (combinations_df_senstivestandorte["tahsue"] == "obersubalpin")&(combinations_df_senstivestandorte["hszukcor"]=="hochmontan")), "sensi3ba"] = 3
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais2"].isin(arvenundlaerchen)) & (combinations_df_senstivestandorte["tahsue"] == "subalpin")&(combinations_df_senstivestandorte["hszukcor"]=="hochmontan")), "sensi3ba"] = 3
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais1"].isin(arvenundlaerchen)) & (
+                combinations_df_senstivestandorte["tahs"] == "obersubalpin") & (combinations_df_senstivestandorte[
+                                                                                    "hszukcor"] == "subalpin")), "sensi4ba"] = 3
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais1"].isin(arvenundlaerchen)) & (
+                combinations_df_senstivestandorte["tahs"] == "obersubalpin") & (combinations_df_senstivestandorte[
+                                                                                    "hszukcor"] == "hochmontan")), "sensi4ba"] = 3
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais1"].isin(arvenundlaerchen)) & (
+                combinations_df_senstivestandorte["tahs"] == "subalpin") & (combinations_df_senstivestandorte[
+                                                                                "hszukcor"] == "hochmontan")), "sensi4ba"] = 3
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais2"].isin(arvenundlaerchen)) & (
+                combinations_df_senstivestandorte["tahsue"] == "obersubalpin") & (combinations_df_senstivestandorte[
+                                                                                      "hszukcor"] == "subalpin")), "sensi4ba"] = 3
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais2"].isin(arvenundlaerchen)) & (
+                combinations_df_senstivestandorte["tahsue"] == "obersubalpin") & (combinations_df_senstivestandorte[
+                                                                                      "hszukcor"] == "hochmontan")), "sensi4ba"] = 3
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["nais2"].isin(arvenundlaerchen)) & (
+                combinations_df_senstivestandorte["tahsue"] == "subalpin") & (combinations_df_senstivestandorte[
+                                                                                  "hszukcor"] == "hochmontan")), "sensi4ba"] = 3
+
+    #teilweise sensitiver Standort
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["tahs"] == 'untermontan') & (combinations_df_senstivestandorte["hszukcor"] == 'untermontan')),'sensi3ba']=4
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["tahs"] == 'untermontan') & (combinations_df_senstivestandorte["hszukcor"] == 'untermontan')), 'sensi4ba'] = 4
+
 
     # delete columns not needed anymore
     columnstodelete = []

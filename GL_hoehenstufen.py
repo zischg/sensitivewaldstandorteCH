@@ -387,6 +387,7 @@ print("done")
 #Export for tree-app
 print('Export for Tree-App')
 stok_gdf.columns
+stok_gdf.loc[((stok_gdf['ue']==1])&(stok_gdf['tahs']=='')&(stok_gdf['tahs']!='')),'tahsue']=stok_gdf['tahs']
 treeapp=stok_gdf[['wg_haupt','wg_zusatz', 'wg_name','nais', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
 treeapp.to_file(myworkspace+"/GL/GL_treeapp.gpkg", layer='GL_treeapp', driver="GPKG")
 treeapp.columns
@@ -394,4 +395,5 @@ print("done")
 
 #test = stok_gdf[stok_gdf['nais']=='18M(48)']
 #test = stok_gdf[stok_gdf['nais']=='60*(53)']
+#test=stok_gdf[((stok_gdf['ue']==1)&(stok_gdf['tahs']=='')&(stok_gdf['tahs']!=''))]
 
