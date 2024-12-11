@@ -202,20 +202,14 @@ for col in treetypeslist:
                 col + 'zukUE_1'] not in ['a', 'b', 'c'] and row[col + 'zukUE_2'] in ['c']:
                 combi.loc[index, col] = 6
                 combi.loc[index, col + "Fall"] = 21
-
+combi.columns
 # Arve 6
-combi.loc[((combi["nais1"].isin(arvenundlaerchen)) & (combi["tahs"] == 'obersubalpin') & (
-            combi["hszukcor"] == 'hochmontan')), 'AR'] = 6
-combi.loc[((combi["nais1"].isin(arvenundlaerchen)) & (combi["tahs"] == 'obersubalpin') & (
-            combi["hszukcor"] == 'hochmontan')), 'AR'] = 6
-combi.loc[((combi["nais1"].isin(arvenundlaerchen)) & (combi["tahs"] == 'subalpin') & (
-            combi["hszukcor"] == 'hochmontan')), 'AR'] = 6
-combi.loc[((combi["nais2"].isin(arvenundlaerchen)) & (combi["tahsue"] == 'obersubalpin') & (
-            combi["hszukcor"] == 'hochmontan')), 'AR'] = 6
-combi.loc[((combi["nais2"].isin(arvenundlaerchen)) & (combi["tahsue"] == 'obersubalpin') & (
-            combi["hszukcor"] == 'hochmontan')), 'AR'] = 6
-combi.loc[((combi["nais2"].isin(arvenundlaerchen)) & (combi["tahsue"] == 'subalpin') & (
-            combi["hszukcor"] == 'hochmontan')), 'AR'] = 6
+#combi.loc[((combi["nais1_1"].isin(arvenundlaerchen)) & (combi["tahs_1"] == 'obersubalpin') & (combi["hszukcor_1"] == 'hochmontan')), 'AR'] = 6
+#combi.loc[((combi["nais1_1"].isin(arvenundlaerchen)) & (combi["tahs_1"] == 'obersubalpin') & (combi["hszukcor_1"] == 'hochmontan')), 'AR'] = 6
+#combi.loc[((combi["nais1_1"].isin(arvenundlaerchen)) & (combi["tahs_1"] == 'subalpin') & (combi["hszukcor_1"] == 'hochmontan')), 'AR'] = 6
+#combi.loc[((combi["nais2_1"].isin(arvenundlaerchen)) & (combi["tahsue_1"] == 'obersubalpin') & (combi["hszukcor_1"] == 'hochmontan')), 'AR'] = 6
+#combi.loc[((combi["nais2_1"].isin(arvenundlaerchen)) & (combi["tahsue_1"] == 'obersubalpin') & (combi["hszukcor_+"] == 'hochmontan')), 'AR'] = 6
+#combi.loc[((combi["nais2_1"].isin(arvenundlaerchen)) & (combi["tahsue_1"] == 'subalpin') & (combi["hszukcor_1"] == 'hochmontan')), 'AR'] = 6
 
 combi.loc[(combi['hszukcor_2']==combi['hszukcor_1']),'naiszuk1_2']=combi['naiszuk1_1']
 combi.loc[(combi['hszukcor_2']==combi['hszukcor_1']),'naiszuk2_2']=combi['naiszuk2_1']
