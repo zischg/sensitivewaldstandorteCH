@@ -188,7 +188,7 @@ stok_gdf.dtypes
 #del zonstaths
 
 #uebersetzung von Kantonseinheit in NAIS
-
+#stok_gdf=gpd.read_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['NaiS'].isnull() == False]
 len(naiseinheitenunique)
 stok_gdf['nais']=''
