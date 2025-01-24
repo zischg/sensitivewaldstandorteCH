@@ -407,13 +407,14 @@ naisohnetahsue=checknohsue['nais'].unique().tolist()
 #        stok_gdf.loc[index, "nais1"] = row['nais'].replace('/', ' ').replace('(', ' ').replace(')', '').strip().split()[0]
 #write output
 stok_gdf.to_file(myworkspace+"/GL/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
-#stok_gdf=gpd.read_file(myworkspace+"/GL/stok_gdf_attributed.gpkg")
+#stok_gdf=gpd.read_file(myworkspace+"/GL/stok_gdf_attributed.gpkg", layer='stok_gdf_attributed')
 print("done")
 #Export for tree-app
 print('Export for Tree-App')
 stok_gdf.columns
 stok_gdf.loc[((stok_gdf['ue']==1)&(stok_gdf['tahsue']=='')&(stok_gdf['tahs']!='')),'tahsue']=stok_gdf['tahs']
-treeapp=stok_gdf[['wg_haupt','wg_zusatz', 'wg_name','nais', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
+treeapp=stok_gdf[['joinid','wg_haupt','wg_zusatz', 'wg_name','nais', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
+
 treeapp.to_file(myworkspace+"/GL/GL_treeapp.gpkg", layer='GL_treeapp', driver="GPKG")
 treeapp.columns
 print("done")
