@@ -275,6 +275,22 @@ stok_gdf.to_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
 #stok_gdf=gpd.read_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
 print("done")
 
+#Korrekturen
+stok_gdf.columns
+#test=stok_gdf[stok_gdf['nais']=='32V']
+stok_gdf.loc[stok_gdf['nais']=='18v(53)','nais2']='53Ta'
+stok_gdf.loc[stok_gdf['nais']=='18v(53)','nais']='18v(53Ta)'
+stok_gdf.loc[stok_gdf['nais']=='12w(12Fe)','nais2']='12aFe'
+stok_gdf.loc[stok_gdf['nais']=='12w(12Fe)','nais']='12w(12aFe)'
+stok_gdf.loc[stok_gdf['nais']=='22(12)','nais2']='12a'
+stok_gdf.loc[stok_gdf['nais']=='22(12)','nais']='22(12a)'
+stok_gdf.loc[stok_gdf['nais']=='26h(12)','nais2']='12a'
+stok_gdf.loc[stok_gdf['nais']=='26h(12)','nais']='26h(12a)'
+#test=stok_gdf[stok_gdf['hs']=='um(om)']
+#test=stok_gdf[stok_gdf['hs']=='hm(om)']
+#test=stok_gdf[stok_gdf['hs']=='om(um)']
+#test=stok_gdf[stok_gdf['hs']=='om(hm)']
+
 
 #Export for tree-app
 print('Export for Tree-App')

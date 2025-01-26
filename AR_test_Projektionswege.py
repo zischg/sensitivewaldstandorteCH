@@ -38,7 +38,7 @@ combi['area']=combi.geometry.area
 len(combi)
 combi=combi[combi['area']>=0]
 combi.to_file(projectspace+"/AR"+"/AR_Projektionswege_combi.gpkg", layer="AR_Projektionswege_combi", driver="GPKG")
-#combi=combi[combi['area']>=10000]
+combi=combi[combi['area']>=10]
 combi.columns
 combi_unique=combi[['nais', 'tahs', 'tahsue', 'nais1_rcp45', 'nais2_rcp45','hs_rcp45', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85']]
 #test=combi[((combi['hs_rcp85']==combi['hs_rcp45'])&(combi['nais2_rcp45']!=combi['nais2_rcp85']))]
@@ -60,5 +60,5 @@ combi_unique2.to_excel(projectspace+'/AR/'+"/AR_Projektionspfade_unique.xlsx")
 
 
 areastatistics=combi.groupby(['nais', 'tahs', 'tahsue', 'nais1_rcp45', 'nais2_rcp45','hs_rcp45', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85']).agg({'area': 'sum'})
-areastatistics.to_excel(projectspace+'/AR/'+"/AR_Projektionspfade_unique_area.xlsx")
+areastatistics.to_excel(projectspace+'/AR/'+"/AR_Projektionspfade_unique_area20250125.xlsx")
 
