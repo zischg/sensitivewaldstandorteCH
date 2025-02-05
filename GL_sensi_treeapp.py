@@ -2231,7 +2231,576 @@ for climatescenario in climatescenarios:
     combinations_df.loc[((combinations_df['nais2'] == "22") & (combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "obermontan")), "naiszuk2"] = "22"
     combinations_df.loc[((combinations_df['nais2'] == "22") & (combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "untermontan")), "naiszuk2"] = "22"
 
+    # neue Korrekturen, muesste generell implementiert werden
+    combinations_df.loc[(combinations_df['naiszuk1'] == ""), "naiszuk1"] = "no path"
+    combinations_df.loc[(combinations_df['naiszuk2'] == "no path c"), "naiszuk2"] = "no path"
+    combinations_df.loc[(
+                (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18v(53Ta)") & (
+                    combinations_df["tahs"] == "obermontan") & (
+                            combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "53Ta"
+    combinations_df.loc[(
+                (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18v(53Ta)") & (
+                    combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "untermontan") & (
+                            combinations_df["naiszuk2"] == 'no path')), "naiszuk2"] = "62"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "13h") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "13a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18(18M)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18(18M)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18*)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "14"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18M)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18M(18*)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18M(18*)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "14"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18M(18v)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18M(18v)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18M(18w)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18M(18w)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18M(19)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18M(19)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "6"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18M(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18M(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18v") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18v(18*)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18v(18*)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "14"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18v(18M)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18v(18M)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18v(53Ta)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18v(53Ta)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "62"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18w") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18w(18*)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18w(18*)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "14"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18w(18M)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18w(18M)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18w(19)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18w(19)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "6"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18w(27*)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18w(27*)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18w(27h)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "18w(27h)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "6"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19(18M)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "6"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19(18M)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19(18w)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "6"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19(18w)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19(19f)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "6"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19(19f)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7b"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "6"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19(46)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "6"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19(46)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7*"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19f") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7b"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19f(19)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7b"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19f(19)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "6"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19f(46)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7b"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19f(46)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7*"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19f(48)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7b"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19f(48)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "22"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19f(49)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7b"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "19f(49)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(18)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(18)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(18*)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(18*)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "14"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(18M)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(18M)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(18v)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(18v)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(18w)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(18w)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(19f)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(19f)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7b"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(27h)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(27h)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(46)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(46)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7*"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(49)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(49)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(50)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20(50)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20E") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20E(18w)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20E(18w)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20E(19)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "20E(19)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "6"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "24*") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "25F"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "24*(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "25F"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "24*(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "26h") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "26"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "26h(18v)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "26"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "26h(18v)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "26h(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "26"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "26h(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "26h(49)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "26"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "26h(49)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "27*(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "27*(20)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "27h") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "27h(18w)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "27h(18w)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "27h(20E)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "27h(20E)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7*"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7*"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46(18v)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7*"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46(18v)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46(19)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7*"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46(19)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "6"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46(49)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7*"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46(49)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46(60*Ta)") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7*"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46(60*Ta)") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "49") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "49") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "49(48)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7*"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "49(48)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "49(60*Ta)") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "49(60*Ta)") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "50") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "7S"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "50*") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "50*(18M)") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "50*(18M)") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "50*(51)") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "50*(51)") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "503") & (
+            combinations_df["tahs"] == "subalpin") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "62"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "53Ta(18v)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "62"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "53Ta(18v)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "53Ta(46)") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "62"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "53Ta(46)") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7*"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "56") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "45"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "60*") & (
+            combinations_df["tahs"] == "subalpin") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "17"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "71") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "45"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "71(56)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "45"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "71(56)") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "45"
+    # Bedingungen
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "18*") & (
+            combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "14"
+    # test = combinations_df[combinations_df['nais1'] == '18*']
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "49") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan") & (
+                        combinations_df["meanslopeprc"] >= 20.0)), "naiszuk1"] = "7b"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "49") & (
+            combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan") & (
+                    combinations_df["meanslopeprc"] < 20.0)), "naiszuk1"] = "27"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "49") & (
+            combinations_df["tahsue"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan") & (
+                    combinations_df["meanslopeprc"] >= 20.0)), "naiszuk2"] = "7b"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "49") & (
+            combinations_df["tahsue"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "submontan") & (
+                    combinations_df["meanslopeprc"] < 20.0)), "naiszuk2"] = "27"
+    # test = combinations_df[((combinations_df['nais1'] == '49')&(combinations_df["tahs"] == "hochmontan"))]
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "60*") & (
+            combinations_df["tahs"] == "subalpin") & (
+                    combinations_df["hszukcor"] == "submontan") & (
+                    combinations_df["meanslopeprc"] >= 70.0)), "naiszuk1"] = "17"
 
+
+    
     # !!!!!!!!correct LI only!!!!!!!!!!!!!
     # combinations_df.loc[((combinations_df['nais2']=="24*")&(combinations_df["tahsue"]=="obermontan")&(combinations_df["hszukcor"]=="hochmontan")), "naiszuk2"]="24*"
     # combinations_df.loc[((combinations_df['nais2']=="24*")&(combinations_df["tahsue"]=="obermontan")&(combinations_df["hszukcor"]=="hochmontan")), "hszukcor"]="obermontan"
