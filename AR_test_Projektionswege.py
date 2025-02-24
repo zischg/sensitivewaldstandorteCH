@@ -60,5 +60,5 @@ combi_unique2.to_excel(projectspace+'/AR/'+"/AR_Projektionspfade_unique.xlsx")
 
 
 areastatistics=combi.groupby(['nais', 'tahs', 'tahsue', 'nais1_rcp45', 'nais2_rcp45','hs_rcp45', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85']).agg({'area': 'sum'})
-areastatistics.to_excel(projectspace+'/AR/'+"/AR_Projektionspfade_unique_area20250125.xlsx")
+areastatistics.to_excel(projectspace+'/AR/'+"/AR_Projektionspfade_unique_area20250206.xlsx")
 

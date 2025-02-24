@@ -270,11 +270,6 @@ naisohnetahs=checknohs['nais'].unique().tolist()
 naisohnetahsue=checknohsue['nais'].unique().tolist()
 stok_gdf.loc[((stok_gdf['ue']==0)&(stok_gdf['nais1']=='')&(stok_gdf['nais']!='')),'nais1']=stok_gdf['nais']
 
-print("write output")
-stok_gdf.to_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
-#stok_gdf=gpd.read_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
-print("done")
-
 #Korrekturen
 stok_gdf.columns
 #test=stok_gdf[stok_gdf['nais']=='32V']
@@ -290,6 +285,14 @@ stok_gdf.loc[stok_gdf['nais']=='26h(12)','nais']='26h(12a)'
 #test=stok_gdf[stok_gdf['hs']=='hm(om)']
 #test=stok_gdf[stok_gdf['hs']=='om(um)']
 #test=stok_gdf[stok_gdf['hs']=='om(hm)']
+#test=stok_gdf[stok_gdf['nais']=='27h(49)']
+
+print("write output")
+stok_gdf.to_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
+#stok_gdf=gpd.read_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
+print("done")
+
+
 
 
 #Export for tree-app

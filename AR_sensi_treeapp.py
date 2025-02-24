@@ -2790,6 +2790,57 @@ for climatescenario in climatescenarios:
             combinations_df["tahs"] == "subalpin") & (
                     combinations_df["hszukcor"] == "submontan") & (
                         combinations_df["meanslopeprc"] >= 70.0)), "naiszuk1"] = "17"
+    #additional corrections BH und MF, gelten generell
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46") & (combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "submontan") & (combinations_df["meanslopeprc"] >= 20.0)&(climatescenario=='rcp85')), "naiszuk1"] = "6"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46") & (
+                combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "obermontan") & (
+                                     combinations_df["meanslopeprc"] >= 20.0)&(climatescenario=='rcp45')), "naiszuk1"] = "19"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "46") & (
+            combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "submontan") & (
+                                 combinations_df["meanslopeprc"] >= 20.0)&(climatescenario=='rcp45')), "naiszuk1"] = "19"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "49") & (
+            combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "obermontan") & (
+                                 combinations_df["meanslopeprc"] >= 20.0) & (
+                                     climatescenario == 'rcp45')), "naiszuk1"] = "27h"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "49(60*Ta)") & (
+            combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "obermontan") & (
+                                 combinations_df["meanslopeprc"] >= 20.0) & (
+                                 climatescenario == 'rcp45')), "naiszuk1"] = "27h"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "53Ta(46)") & (combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "obermontan") & (combinations_df["meanslopeprc"] >= 20.0) & (climatescenario == 'rcp85')), "naiszuk2"] = "6"
+    combinations_df.loc[(
+                (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "53Ta(46)") & (
+                    combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "obermontan") & (
+                            combinations_df["meanslopeprc"] >= 20.0) & (climatescenario == 'rcp45')), "naiszuk2"] = "19"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "60*") & (
+            combinations_df["tahs"] == "subalpin") & (combinations_df["hszukcor"] == "untermontan") & (
+                    combinations_df["meanslopeprc"] < 70.0) & (climatescenario == 'rcp45')), "naiszuk1"] = "12a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "60*") & (
+            combinations_df["tahs"] == "subalpin") & (combinations_df["hszukcor"] == "obermontan") & (
+                    combinations_df["meanslopeprc"] < 70.0) & (climatescenario == 'rcp45')), "naiszuk1"] = "18M"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "60*") & (
+            combinations_df["tahs"] == "subalpin") & (combinations_df["hszukcor"] == "submontan") & (
+                    combinations_df["meanslopeprc"] < 70.0) & (climatescenario == 'rcp85')), "naiszuk1"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "60*") & (
+            combinations_df["tahs"] == "subalpin") & (combinations_df["hszukcor"] == "submontan") & (
+                    combinations_df["meanslopeprc"] < 70.0) & (climatescenario == 'rcp85')), "naiszuk1"] = "9a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "60*Ta(49)") & (
+            combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "submontan") & (
+                    combinations_df["meanslopeprc"] >=20.0) & (climatescenario == 'rcp45')), "naiszuk2"] = "27h"
+    #neue generelle Korrekturen BH
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "26(12a)") & (
+            combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan") & (climatescenario == 'rcp45')), "naiszuk1"] = "26"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "26(12a)") & (
+            combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan") & (
+                        climatescenario == 'rcp85')), "naiszuk1"] = "26"
+
+
     #test = combinations_df[((combinations_df['nais2'] == '60*')&(combinations_df["tahs"] == "subalpin"))]
 
     #test ue==1 no path
@@ -3242,8 +3293,8 @@ for climatescenario in climatescenarios:
                                                                                   "hszukcor"] == "hochmontan")), "sensi4ba"] = 3
 
     #teilweise sensitiver Standort
-    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["tahs"] == 'untermontan') & (combinations_df_senstivestandorte["hszukcor"] == 'untermontan')),'sensi3ba']=4
-    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["tahs"] == 'untermontan') & (combinations_df_senstivestandorte["hszukcor"] == 'untermontan')), 'sensi4ba'] = 4
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["tahs"] == 'submontan') & (combinations_df_senstivestandorte["hszukcor"] == 'submontan')),'sensi3ba']=4
+    combinations_df_senstivestandorte.loc[((combinations_df_senstivestandorte["tahs"] == 'submontan') & (combinations_df_senstivestandorte["hszukcor"] == 'submontan')), 'sensi4ba'] = 4
 
 
     # delete columns not needed anymore
