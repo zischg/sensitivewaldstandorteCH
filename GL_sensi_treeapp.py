@@ -3338,6 +3338,10 @@ for climatescenario in climatescenarios:
                                                                               "hszukcor"] == 'hochmontan')), 'AR'] = 6
     layercolumnslist = combinations_df_baumartenempfehlung.columns.tolist()
 
+    #Fichte FI die submontan bleibt
+    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 0) & (combinations_df_baumartenempfehlung["FIheu1"].isin(["a", "b", "c"]))& (combinations_df_baumartenempfehlung["tahs"] == 'submontan')& (combinations_df_baumartenempfehlung["hszukcor"] == 'submontan')), 'FI'] = 3
+    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 1) & (combinations_df_baumartenempfehlung["FIheuUE"].isin(["a", "b", "c"])) & (combinations_df_baumartenempfehlung["tahs"] == 'submontan') & (combinations_df_baumartenempfehlung["hszukcor"] == 'submontan')), 'FI'] = 3
+
     # joblib.dump(gr_treetypes_LFI, projectspace+"/"+"gr_treetypes_LFI.sav")
     for col in gr_treetypes_LFI:
         # print(col)
@@ -3354,9 +3358,6 @@ for climatescenario in climatescenarios:
             combinations_df_baumartenempfehlung.drop(columns=col + "heuUE", axis=1, inplace=True)
         if (col + "zukUE") in layercolumnslist:
             combinations_df_baumartenempfehlung.drop(columns=col + "zukUE", axis=1, inplace=True)
-
-
-
 
     # save
     # combinations_df_baumartenempfehlung.to_csv(projectspace+"/"+climatescenario.lower()+"_combinations_df_baumartenempfehlungen.csv")

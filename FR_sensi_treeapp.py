@@ -1456,6 +1456,8 @@ codeworkspace="C:/DATA/develops/sensitivewaldstandorteCH"
 projectspace="D:/CCW24sensi"
 naismatrixdf=pd.read_excel(codeworkspace+"/"+"Matrix_Baum_inkl_collin_20210412_mit AbkuerzungenCLEAN.xlsx", dtype="str", engine='openpyxl')
 projectionswegedf=pd.read_excel(codeworkspace+"/"+"L_Projektionswege_im_Klimawandel_18022020_export.xlsx", dtype="str", engine='openpyxl')
+treeapp=gpd.read_file(projectspace+"/FR/stok_gdf_attributed.gpkg", layer='stok_gdf_attributed')
+treeapp.crs
 #gr_tree_abbreviations_df=pd.read_excel(codeworkspace+"/"+"Baumarten_LFI_export.xls", dtype=str)
 #gr_tree_abbreviations_extract_df=gr_tree_abbreviations_df[gr_tree_abbreviations_df["Abkürzung_BK"].notnull()]
 climatescenarios=['rcp45','rcp85']
@@ -1608,8 +1610,6 @@ for index, row in projectionswegedf.iterrows():
 #*******************************************
 #preprocessing
 #*******************************************
-treeapp=gpd.read_file(projectspace+"/FR/stok_gdf_attributed.gpkg", layer='stok_gdf_attributed')
-treeapp.crs
 #treeapp.set_crs(epsg=2056, inplace=True)
 treeapp['lage']=3
 treeapp.loc[treeapp['meanslopeprc']<10, 'lage']=1
@@ -2226,10 +2226,20 @@ for climatescenario in climatescenarios:
     combinations_df.loc[((combinations_df["tahsue"] == "collin") & (combinations_df['nais2'] != "") & (combinations_df["hszukcor"] == "collin mit Buche")), "naiszuk2"] = combinations_df['nais2']
 
     # !!!!!!!!correct AR only!!!!!!!!!!!!!
-    combinations_df.loc[((combinations_df['nais1']=="8d")&(combinations_df["tahs"]=="obermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk1"]="6"
-    combinations_df.loc[((combinations_df['nais1'] == "13h") & (combinations_df["tahs"] == "untermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "13a"
-    combinations_df.loc[((combinations_df['nais2'] == "20") & (combinations_df["tahs"] == "untermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
-    combinations_df.loc[((combinations_df['nais2'] == "53") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "62"
+    #combinations_df.loc[((combinations_df['nais1']=="8d")&(combinations_df["tahs"]=="obermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk1"]="6"
+    #combinations_df.loc[((combinations_df['nais1'] == "13h") & (combinations_df["tahs"] == "untermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "13a"
+    #combinations_df.loc[((combinations_df['nais2'] == "20") & (combinations_df["tahs"] == "untermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
+    #combinations_df.loc[((combinations_df['nais2'] == "53") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "62"
+
+    # !!!!!!!!correct FR only!!!!!!!!!!!!!
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True)&(combinations_df['nais1'] == "27h") & (combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "27"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "57BI") & (combinations_df["tahs"] == "subalpin") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "22"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "57BI") & (combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "22"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "57BI") & (combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "22"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "12e") & (combinations_df["tahs"] == "obersubalpin") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "10a"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "12e") & (combinations_df["tahs"] == "obersubalpin") & (combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "10a collin"
+
+
     #neue Korrekturen, muesste generell implementiert werden
     combinations_df.loc[(combinations_df['naiszuk1'] == ""), "naiszuk1"] = "no path"
     combinations_df.loc[(combinations_df['naiszuk2'] == "no path c"), "naiszuk2"] = "no path"
@@ -3180,6 +3190,11 @@ for climatescenario in climatescenarios:
             combinations_df_baumartenempfehlung["tahsue"] == 'subalpin') & (combinations_df_baumartenempfehlung[
                                                                               "hszukcor"] == 'hochmontan')), 'AR'] = 6
     layercolumnslist = combinations_df_baumartenempfehlung.columns.tolist()
+
+    #Fichte FI die submontan bleibt
+    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 0) & (combinations_df_baumartenempfehlung["FIheu1"].isin(["a", "b", "c"]))& (combinations_df_baumartenempfehlung["tahs"] == 'submontan')& (combinations_df_baumartenempfehlung["hszukcor"] == 'submontan')), 'FI'] = 3
+    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["ue"] == 1) & (combinations_df_baumartenempfehlung["FIheuUE"].isin(["a", "b", "c"])) & (combinations_df_baumartenempfehlung["tahs"] == 'submontan') & (combinations_df_baumartenempfehlung["hszukcor"] == 'submontan')), 'FI'] = 3
+
 
     # joblib.dump(gr_treetypes_LFI, projectspace+"/"+"gr_treetypes_LFI.sav")
     for col in gr_treetypes_LFI:
