@@ -26,7 +26,7 @@ arvenundlaerchen=['59','59A','59C','59E','59J','59L','59S','59V','59H','59R','72
 for item in combi.columns.tolist():
     if "FI" in item:
         print(item)
-treetypeslist=baumartenempfehlungenrcp45.columns.tolist()[26:-1]
+treetypeslist=baumartenempfehlungenrcp45.columns.tolist()[25:-2]
 #****************************************************************************
 # #combi
 for col in treetypeslist:

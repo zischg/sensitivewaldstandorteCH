@@ -21,7 +21,7 @@ rcp85=gpd.read_file(projectspace+"/FR"+"/FR_rcp85_zukuenftigestandorte.gpkg", la
 rcp45.columns
 rcp45=rcp45[['nais','nais1', 'nais2', 'mo', 'ue','taheute', 'storeg', 'tahs', 'tahsue','naiszuk1','naiszuk2', 'hszukcor', 'geometry']]
 rcp45=rcp45.rename(columns={'naiszuk1':'nais1_rcp45','naiszuk2':'nais2_rcp45', 'hszukcor':'hs_rcp45'})
-rcp85=rcp85[['naiszuk1','naiszuk2', 'hszukcor', 'geometry']]
+rcp85=rcp85[['nais','nais1', 'nais2', 'mo', 'ue','taheute', 'storeg', 'tahs', 'tahsue','naiszuk1','naiszuk2', 'hszukcor', 'geometry']]
 rcp85=rcp85.rename(columns={'naiszuk1':'nais1_rcp85','naiszuk2':'nais2_rcp85', 'hszukcor':'hs_rcp85'})
 rcp85.columns
 #unique pathways
@@ -43,7 +43,7 @@ combi.to_file(projectspace+"/FR"+"/FR_Projektionswege_combi.gpkg", layer="FR_Pro
 #combi=combi[combi['area']>=10000]
 combi.columns
 combi=combi[combi['area']>=100]
-combi_unique=combi[['nais', 'tahs', 'tahsue', 'nais1_rcp45', 'nais2_rcp45','hs_rcp45', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85']]
+combi_unique=combi[['nais_1', 'tahs_1', 'tahsue_1', 'nais1_rcp45', 'nais2_rcp45','hs_rcp45', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85']]
 #test=combi[((combi['hs_rcp85']==combi['hs_rcp45'])&(combi['nais2_rcp45']!=combi['nais2_rcp85']))]
 #testunique=test.drop_duplicates()
 #len(testunique)
@@ -57,10 +57,30 @@ combi_unique=combi_unique.drop_duplicates()
 #combi_unique.loc[combi_unique['hs_heute']==4,'hs_heute']='submontah'
 #combi_unique.loc[combi_unique['hs_heute']==2,'hs_heute']='collin'
 len(combi_unique)
-combi_unique=combi_unique[combi_unique['tahs'].isin(['obersubalpin','subalpin','hochmontan','obermontan','untermontan','submontan','collin'])]
-combi_unique=combi_unique.sort_values(by=['nais'])
+combi_unique=combi_unique[combi_unique['tahs_1'].isin(['obersubalpin','subalpin','hochmontan','obermontan','untermontan','submontan','collin'])]
+combi_unique=combi_unique.sort_values(by=['nais_1'])
 combi_unique.to_excel(projectspace+'/FR/'+"/FR_Projektionspfade_unique.xlsx")
 
-areastatistics=combi.groupby(['nais', 'tahs', 'tahsue', 'nais1_rcp45', 'nais2_rcp45','hs_rcp45', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85']).agg({'area': 'sum'})
+areastatistics=combi.groupby(['nais_1', 'tahs_1', 'tahsue_1', 'nais1_rcp45', 'nais2_rcp45','hs_rcp45', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85']).agg({'area': 'sum'})
 areastatistics.to_excel(projectspace+'/FR/'+"/FR_Projektionspfade_unique_area.xlsx")
+
+#Einzeln
+rcp45.columns
+rcp45['area']=rcp45.geometry.area
+rcp45=rcp45[rcp45['area']>=100]
+rcp45unique=rcp45[['nais', 'nais1', 'nais2','tahs', 'tahsue', 'nais1_rcp45', 'nais2_rcp45', 'hs_rcp45', 'mo', 'ue','taheute', 'storeg',]]
+rcp45unique=rcp45unique.drop_duplicates()
+rcp45unique.to_excel(projectspace+'/FR/'+"/FR_Projektionspfade_unique_RCP45.xlsx")
+areastatistics_rcp45=rcp45.groupby(['nais', 'nais1', 'nais2','tahs', 'tahsue', 'nais1_rcp45', 'nais2_rcp45', 'hs_rcp45', 'mo', 'ue','taheute', 'storeg']).agg({'area': 'sum'})
+areastatistics_rcp45.to_excel(projectspace+'/FR/'+"/FR_Projektionspfade_unique_area_RCP45.xlsx")
+
+rcp85.columns
+rcp85['area']=rcp85.geometry.area
+rcp85=rcp85[rcp85['area']>=100]
+rcp85unique=rcp85[['nais', 'nais1', 'nais2','tahs', 'tahsue', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85', 'mo', 'ue','taheute', 'storeg',]]
+rcp85unique=rcp85unique.drop_duplicates()
+rcp85unique.to_excel(projectspace+'/FR/'+"/FR_Projektionspfade_unique_RCP85.xlsx")
+areastatistics_rcp85=rcp85.groupby(['nais', 'nais1', 'nais2','tahs', 'tahsue', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85', 'mo', 'ue','taheute', 'storeg']).agg({'area': 'sum'})
+areastatistics_rcp85.to_excel(projectspace+'/FR/'+"/FR_Projektionspfade_unique_area_RCP85.xlsx")
+
 

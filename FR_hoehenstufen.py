@@ -203,6 +203,8 @@ stok_gdf.dtypes
 winsound.Beep(frequency, duration)
 
 stok_gdf.to_file(myworkspace+"/FR/stok_gdf_attributed_temp.gpkg")
+#stok_gdf=gpd.read_file(myworkspace+"/FR/stok_gdf_attributed_temp.gpkg")
+
 
 #uebersetzung von Kantonseinheit in NAIS
 #stok_gdf=gpd.read_file(myworkspace+"/FR/stok_gdf_attributed_temp.gpkg")
@@ -406,6 +408,7 @@ for index, row in stok_gdf.iterrows():
         if len(hslist)==1:
             stok_gdf.loc[index, 'tahsue']=row['tahs']
 
+
 #check empty values
 stok_gdf["tahs"].unique().tolist()
 stok_gdf["tahsue"].unique().tolist()
@@ -415,6 +418,14 @@ stok_gdf.loc[((stok_gdf["tahsue"]=="")&(stok_gdf["ue"]==1)), 'tahsue']=stok_gdf[
 naisohnetahs=checknohs['nais'].unique().tolist()
 naisohnetahsue=checknohsue['nais'].unique().tolist()
 stok_gdf.loc[((stok_gdf['ue']==0)&(stok_gdf['nais1']=='')&(stok_gdf['nais']!='')),'nais1']=stok_gdf['nais']
+
+#fill nais2
+checknais2=stok_gdf[((stok_gdf["nais2"]=="")&(stok_gdf["ue"]==1))]
+for index, row in stok_gdf.iterrows():
+    if row['nais2']=='' and row['ue']==1:
+        naislist=row['nais'].replace('(', ' ').replace(')', ' ').replace('/',' ').replace('  ',' ').strip().split()
+        stok_gdf.loc[index,'nais2']=naislist[1]
+
 
 #Korrekturen
 stok_gdf.columns
