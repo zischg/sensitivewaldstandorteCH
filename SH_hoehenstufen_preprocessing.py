@@ -13,10 +13,10 @@ hoehenstufendict={"collin":"co","submontan":"sm","untermontan":"um","obermontan"
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 
 #read geodata BE
-sh_gdf=gpd.read_file(myworkspace+"/geops_treeapp/forest_types_sh/forest_types_sh.shp")
+sh_gdf=gpd.read_file(myworkspace+"/SH/SH_forest_types_intsct_Waldstandortkarte_detailliert.gpkg")
 len(sh_gdf)
 sh_gdf.columns
-sh_gdf=sh_gdf[["waldgesell","nais","naisue","Tree-App_2","geometry"]]
+sh_gdf=sh_gdf[["wg_nr","waldgesell","nais","naisue","Tree-App_2","geometry"]]
 print(sh_gdf['Tree-App_2'].unique().tolist())
 sh_gdf["tahs"]=''
 sh_gdf.loc[(sh_gdf["Tree-App_2"]=='obersubalpin'),"tahs"]="osa"
@@ -29,7 +29,7 @@ sh_gdf.loc[(sh_gdf["Tree-App_2"]=='submontan'),"tahs"]="sm"
 sh_gdf.loc[(sh_gdf["Tree-App_2"]=='collin'),"tahs"]="co"
 print(sh_gdf['tahs'].unique().tolist())
 
-sh_unique=sh_gdf[['waldgesell', 'nais', 'naisue']].drop_duplicates()
+sh_unique=sh_gdf[["wg_nr",'waldgesell', 'nais', 'naisue']].drop_duplicates()
 len(sh_unique)
 sh_unique["tahs"]=''
 
@@ -46,4 +46,4 @@ for index, row in sh_unique.iterrows():
     sh_unique.loc[((sh_unique["nais"] == stotyp)), "tahs"] = str(tahs_listshort).replace("[","").replace("]","").replace("'","").replace("]","")
 
 #sh_gdf.to_file(myworkspace+"/SH"+"/SH_standortstypen_hs.gpkg", layer="SH_standortstypen", driver="GPKG")
-sh_unique.to_excel(codespace+"/SH_nais_einheiten_unique.xlsx")
+sh_unique.to_excel(codespace+"/SH_nais_einheiten_unique_v2.xlsx")
