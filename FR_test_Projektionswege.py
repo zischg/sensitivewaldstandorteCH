@@ -82,5 +82,6 @@ rcp85unique=rcp85unique.drop_duplicates()
 rcp85unique.to_excel(projectspace+'/FR/'+"/FR_Projektionspfade_unique_RCP85.xlsx")
 areastatistics_rcp85=rcp85.groupby(['nais', 'nais1', 'nais2','tahs', 'tahsue', 'nais1_rcp85', 'nais2_rcp85', 'hs_rcp85', 'mo', 'ue','taheute', 'storeg']).agg({'area': 'sum'})
 areastatistics_rcp85.to_excel(projectspace+'/FR/'+"/FR_Projektionspfade_unique_area_RCP85.xlsx")
+print('all done')
 
 
