@@ -2241,6 +2241,10 @@ for climatescenario in climatescenarios:
     combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "57BI") & (combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "22"
     combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "12e") & (combinations_df["tahs"] == "obersubalpin") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "10a"
     combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "12e") & (combinations_df["tahs"] == "obersubalpin") & (combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "10a collin"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "57BITa") & (combinations_df["tahs"] == "subalpin") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "22"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "57BlTa") & (combinations_df["tahs"] == "subalpin") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "22"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "57BITa") & (combinations_df["tahs"] == "subalpin") & (combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "48"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais1'] == "57BlTa") & (combinations_df["tahs"] == "subalpin") & (combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "48"
     #UE
     combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "50") & (combinations_df["tahsue"] == "obermontan") & (combinations_df["hszukcor"] == "untermontan")), "naiszuk2"] = "8S"
     combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "18") & (combinations_df["tahsue"] == "untermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7a"
@@ -2261,6 +2265,11 @@ for climatescenario in climatescenarios:
     combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "50") & (combinations_df["tahsue"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
     combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "24") & (combinations_df["tahsue"] == "untermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "25"
     combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "13h") & (combinations_df["tahsue"] == "hochmontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "13a"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "57BITa") & (combinations_df["tahsue"] == "subalpin") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "22"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "57BlTa") & (combinations_df["tahsue"] == "subalpin") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "22"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "57BITa") & (combinations_df["tahsue"] == "subalpin") & (combinations_df["hszukcor"] == "obermontan")), "naiszuk2"] = "48"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "57BlTa") & (combinations_df["tahsue"] == "subalpin") & (combinations_df["hszukcor"] == "obermontan")), "naiszuk2"] = "48"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais2'] == "27h") & (combinations_df["tahsue"] == "hochmontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "27"
 
 
     #neue Korrekturen, muesste generell implementiert werden
