@@ -14,7 +14,7 @@ hoehenstufenlist=['collin','submontan','untermontan','obermontan','hochmontan','
 hoehenstufenlistshort=['co','sm','um','om','hm','sa','osa']
 
 
-#read geodata LU
+#read geodata NW
 nw_gdf=gpd.read_file(myworkspace+'/NW/Waldgesellschaften_Ellenberg_Klötzli_1972.shp')
 len(nw_gdf)
 nw_gdf.columns
