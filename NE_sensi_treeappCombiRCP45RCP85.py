@@ -16,9 +16,9 @@ warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 codeworkspace="C:/DATA/develops/sensitivewaldstandorteCH"
 projectspace="D:/CCW24sensi"
 
-baumartenempfehlungenrcp45=gpd.read_file(projectspace+"/NW"+"/NW_rcp45_baumartenempfehlungen.gpkg", layer="NW_rcp45_baumartenempfehlungen", driver="GPKG")
-baumartenbedeutungenrcp45=gpd.read_file(projectspace+"/NW"+"/NW_rcp45_baumartenbedeutungen.gpkg", layer="NW_rcp45_baumartenbedeutungen", driver="GPKG")
-baumartenbedeutungenrcp85=gpd.read_file(projectspace+"/NW"+"/NW_rcp85_baumartenbedeutungen.gpkg", layer="NW_rcp85_baumartenbedeutungen", driver="GPKG")
+baumartenempfehlungenrcp45=gpd.read_file(projectspace+"/NE"+"/NE_rcp45_baumartenempfehlungen.gpkg", layer="NE_rcp45_baumartenempfehlungen", driver="GPKG")
+baumartenbedeutungenrcp45=gpd.read_file(projectspace+"/NE"+"/NE_rcp45_baumartenbedeutungen.gpkg", layer="NE_rcp45_baumartenbedeutungen", driver="GPKG")
+baumartenbedeutungenrcp85=gpd.read_file(projectspace+"/NE"+"/NE_rcp85_baumartenbedeutungen.gpkg", layer="NE_rcp85_baumartenbedeutungen", driver="GPKG")
 combi=gpd.overlay(baumartenbedeutungenrcp45, baumartenbedeutungenrcp85, how='intersection', make_valid=True, keep_geom_type=True)
 
 arvenundlaerchen=['59','59A','59C','59E','59J','59L','59S','59V','59H','59R','72,' '59*','59G','59AG','59EG','59VG','72G','57CLä','57VLä','58Lä', '59Lä', '59ELä', '59LLä', '59VLä','59LLä']
@@ -238,6 +238,6 @@ combi.columns
 #combi.drop(columns='Art_1', axis=1, inplace=True)
 #combi.drop(columns='Art_2', axis=1, inplace=True)
 'geometry' in colist
-combi.to_file(projectspace+"/NW"+"/NW_baumartenempfehlungen_combi.gpkg", layer="NW_baumartenempfehlungen_combi", driver="GPKG")
+combi.to_file(projectspace+"/NE"+"/NE_baumartenempfehlungen_combi.gpkg", layer="NE_baumartenempfehlungen_combi", driver="GPKG")
 print('all done')
 
