@@ -234,7 +234,11 @@ for column in combi.columns.tolist():
         combi.rename(columns={column: str(column[0:-2])}, inplace=True)
     if '_2' in column and column not in ['Art_1', 'Art_2']:
         combi.drop(columns=column, axis=1, inplace=True)
-combi.columns
+colist=combi.columns.tolist()
+if 'Art_1' in colist:
+    combi.drop(columns='Art_1', axis=1, inplace=True)
+if 'Art_2' in colist:
+    combi.drop(columns='Art_2', axis=1, inplace=True)
 #combi.drop(columns='Art_1', axis=1, inplace=True)
 #combi.drop(columns='Art_2', axis=1, inplace=True)
 'geometry' in colist

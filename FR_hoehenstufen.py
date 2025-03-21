@@ -52,7 +52,7 @@ hsmoddictkurz={3:"co",4:"sm",5:"um",6:"om",8:"hm",9:"sa",10:"osa"}
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 
 #read excel files
-naiseinheitenunique=pd.read_excel(codespace+"/FR_nais_einheiten_unique_mf.xlsx", sheet_name='Sheet1_sortiert', dtype="str", engine='openpyxl')
+naiseinheitenunique=pd.read_excel(codespace+"/FR_nais_einheiten_unique_mf_mit_7f.xlsx", sheet_name='Sheet1_sortiert', dtype="str", engine='openpyxl')
 naiseinheitenunique.columns
 naiseinheitenunique.dtypes
 naiseinheitenunique=naiseinheitenunique.astype({'LEGENDE':str, 'ASSOC_TOT_':str,'Bedingung Hangneigung':str,'Bedingung Region':str,'NaiS vereinfacht':str, 'hs':str})
@@ -61,7 +61,7 @@ naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['NaiS vereinfacht']!
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['hs']!='']
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['hs'].isnull()==False]
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['hs']!='nan']
-sheet1=pd.read_excel(codespace+"/FR_nais_einheiten_unique_mf.xlsx", sheet_name='Sheet1', dtype="str", engine='openpyxl')
+#sheet1=pd.read_excel(codespace+"/FR_nais_einheiten_unique_mf.xlsx", sheet_name='Sheet1', dtype="str", engine='openpyxl')
 #read the rasters
 #reference tif raster
 print("read reference raster")
@@ -93,7 +93,7 @@ storeg.crs
 #stok_gdf.set_crs(epsg=2056, inplace=True)
 #stok_gdf.plot()
 stok_gdf.columns
-stok_gdf.drop(columns=['index_right'], inplace=True)
+#stok_gdf.drop(columns=['index_right'], inplace=True)
 #change column names (sg___ are the St Gallen units)
 #stok_gdf.rename(columns={"DTWGEINHEI": "kanteinh", "naisueberg": "sgue", "naismosaic":"sgmosaic"}, inplace=True)
 #stok_gdf["nais1"]=""
@@ -131,6 +131,8 @@ len(stok_gdf)
 stok_gdf.columns
 #stok_gdf=stok_gdf[['DTWGEINHEI','taheute','geometry']]
 stok_gdf['joinid']=stok_gdf.index
+if 'index_right' in stok_gdf.columns:
+    stok_gdf.drop(columns=['index_right'], inplace=True)
 
 #Standortregionen
 storeg.crs
@@ -152,6 +154,8 @@ len(stok_gdf)
 #del storeg
 #del stok_gdfstoreggrouped
 #del stok_gdfstoreg
+if 'index_right' in stok_gdf.columns:
+    stok_gdf.drop(columns=['index_right'], inplace=True)
 
 
 #attribute shapefile
@@ -171,6 +175,8 @@ stok_gdf.loc[stok_gdf["meanslopeprc"]<20.0,"slpprzrec"]=1
 stok_gdf.columns
 #del zonstatslope
 winsound.Beep(frequency, duration)
+if 'index_right' in stok_gdf.columns:
+    stok_gdf.drop(columns=['index_right'], inplace=True)
 
 #radiation
 stok_gdf["rad"]=0
@@ -186,6 +192,8 @@ stok_gdf.loc[stok_gdf["rad"]<=112.0,"radiation"]=-1 #90% quantile
 stok_gdf.columns
 #del zonstatrad
 winsound.Beep(frequency, duration)
+if 'index_right' in stok_gdf.columns:
+    stok_gdf.drop(columns=['index_right'], inplace=True)
 
 #hoehenstufen heute
 stok_gdf["hs1975"]=0
@@ -314,7 +322,7 @@ for index, row in naiseinheitenunique.iterrows():
                             stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
                         else:
                             stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
-    winsound.Beep(frequency, duration)
+winsound.Beep(frequency, duration)
 stok_gdf.columns
 stok_gdf=stok_gdf[['joinid', 'ASSOC_TOT_', 'LEGENDE','taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'naisdetail','nais', 'nais1', 'nais2','mo', 'ue', 'hs', 'tahs', 'tahsue','geometry']]
 
