@@ -14,7 +14,7 @@ hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","
 hoehenstufenlistshort=["co","sm","um","om","hm","sa","osa"]
 
 #read Parametertabelle OW
-parameterdf=pd.read_excel('C:/DATA/develops/ccwbe/Anhang1_Parameter_Waldstandorte_BE_20220908.xlsx', dtype="str", engine='openpyxl')
+parameterdf=pd.read_excel('C:/DATA/develops/ccwvd/Anhang1_Parameter_Waldstandorte_VD_20250314.xlsx', dtype="str", engine='openpyxl')
 parameterdf.columns
 parameterdf=parameterdf[['BE','NaiS_LFI_JU','NaiS_LFI_M/A','Ju SM', 'Ju UM', 'Ju OM', 'Ju HM', 'Ju SA','M/A SM', 'M/A UM', 'M/A OM', 'M/A HM', 'M/A SA', 'M/A OSA']]
 be_unique=parameterdf[['BE','NaiS_LFI_JU','NaiS_LFI_M/A']].drop_duplicates()
@@ -139,5 +139,5 @@ for index, row in be_unique.iterrows():
 
 
 
-be_unique.to_excel(codespace+"/BE_nais_einheiten_unique.xlsx")
+be_unique.to_excel(codespace+"/VD_nais_einheiten_unique_v2.xlsx")
 
