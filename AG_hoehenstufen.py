@@ -187,7 +187,7 @@ winsound.Beep(frequency, duration)
 #stok_gdf=gpd.read_file(myworkspace+"/AG/stok_gdf_attributed_temp.gpkg")
 #naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['NaiS'].isnull() == False]
 stok_gdf.columns
-len(naiseinheitenunique)
+len(stok_gdf)
 stok_gdf['nais']=''
 stok_gdf['nais1']=''
 stok_gdf['nais2']=''
@@ -247,7 +247,10 @@ for index, row in stok_gdf.iterrows():
             else:
                 stok_gdf.loc[index, 'tahs'] =hoehenstufendictabkuerzungen[hslist[-1]]
                 stok_gdf.loc[index, 'tahsue'] = hoehenstufendictabkuerzungen[hslist[-1]]
+stok_gdf.loc[((stok_gdf["ue"] == 1) & (stok_gdf["tahsue"] == '')), "tahsue"] = stok_gdf["tahs"]
+
 winsound.Beep(frequency, duration)
+
 
 
 stok_gdf.columns
