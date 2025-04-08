@@ -15,14 +15,14 @@ hoehenstufenlistshort=['co','sm','um','om','hm','sa','osa']
 
 
 #read geodata LU
-ju_gdf=gpd.read_file(myworkspace+'/geops_treeapp/forest_types_ju/forest_types_ju.shp')
+ju_gdf=gpd.read_file(myworkspace+'/JU/ENV_3_01_Phytosociologie_stations_forestieres/donnees.gpkg', layeer='env.env_03_01_phytosociologie_stations_forestieres')
 len(ju_gdf)
 ju_gdf.columns
-ju_gdf=ju_gdf[['nais1', 'naisue', 'hs1', 'hsue','geometry']]
+ju_gdf=ju_gdf[['association','etiquette','nais1', 'naisue', 'hs1', 'hsue','geometry']]
 #ju_gdf=ju_gdf[ju_gdf['hs1'].isna() == False]
 print(ju_gdf['hs1'].unique().tolist())
 
-ju_unique=ju_gdf[['nais1', 'naisue']].drop_duplicates()
+ju_unique=ju_gdf[['association','etiquette','nais1', 'naisue']].drop_duplicates()
 len(ju_unique)
 ju_unique['tahs']=''
 ju_unique['tauehs']=''
@@ -48,4 +48,4 @@ for index, row in ju_unique.iterrows():
     ju_unique.loc[((ju_unique['nais1'] == nais1)), 'tahs'] = str(tahs_listshort).replace('[','').replace(']','').replace("'",'').replace(']','').replace('_','').replace('-','').replace('None','').replace(',','')
     ju_unique.loc[((ju_unique['naisue'] == nais2)), 'tauehs'] = str(tahsue_listshort).replace('[','').replace(']','').replace("'",'').replace(']','').replace('_','').replace('-','').replace('None','').replace(',','')
 
-ju_unique.to_excel(codespace+'/JU_nais_einheiten_unique.xlsx')
+ju_unique.to_excel(codespace+'/JU_nais_einheiten_unique_v2.xlsx')
