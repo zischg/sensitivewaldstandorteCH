@@ -57,3 +57,35 @@ for index, row in bl_unique.iterrows():
     bl_unique.loc[((bl_unique["nais_2022"] == stotyp)), "tahs"] = str(tahs_listshort).replace("[","").replace("]","").replace("'","").replace("]","")
 
 bl_unique.to_excel(codespace+"/BL_nais_einheiten_unique_v2.xlsx")
+
+
+
+#originaltebelle only
+bl_gdf=gpd.read_file(myworkspace+"/BLBS/Standortskarte_fixed.gpkg")
+len(bl_gdf)
+bl_gdf['area']=bl_gdf['geometry'].area
+bl_gdf=bl_gdf[bl_gdf['area']>0]
+bl_gdf.columns
+
+bl_unique=bl_gdf[['g1_txt','waldgesell']].drop_duplicates()
+len(bl_unique)
+bljoin=pd.read_excel(codespace+"/BL_nais_einheiten_unique_v2_mf.xlsx", engine='openpyxl')
+bljoin.columns
+bljoin=bljoin[['g1_txt', 'waldgesell','nais_2025','tahs_2025']]
+len(bljoin)
+bljoin=bljoin[bljoin['nais_2025'].isna() == False]
+len(bljoin)
+bl_unique2=pd.merge(bl_unique,bljoin, left_on=['g1_txt', 'waldgesell'], right_on=['g1_txt', 'waldgesell'], how='left')
+len(bl_unique2)
+bl_unique.to_excel(codespace+"/BL_nais_einheiten_unique_v3.xlsx")
+
+#treeapp only
+bl_gdf=gpd.read_file(myworkspace+"/geops_treeapp/forest_types_bl/forest_types_bl.shp")
+len(bl_gdf)
+bl_gdf['area']=bl_gdf['geometry'].area
+bl_gdf=bl_gdf[bl_gdf['area']>0]
+bl_gdf.columns
+
+bl_unique=bl_gdf[['nais_2022', 'hoehenstuf']].drop_duplicates()
+len(bl_unique)
+bl_unique.to_excel(codespace+"/BL_nais_einheiten_unique_v4_treeapp.xlsx")
