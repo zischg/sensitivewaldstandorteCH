@@ -12,7 +12,7 @@ codespace="C:/DATA/develops/sensitivewaldstandorteCH"
 hoehenstufendict={"collin":"co","submontan":"sm","untermontan":"um","obermontan":"om","hochmontan":"hm","subalpin":"sa","obersubalpin":"osa"}
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 
-#read geodata BE
+#read geodata SH
 sh_gdf=gpd.read_file(myworkspace+"/SH/SH_forest_types_intsct_Waldstandortkarte_detailliert.gpkg")
 len(sh_gdf)
 sh_gdf.columns
