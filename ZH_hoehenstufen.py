@@ -305,7 +305,7 @@ print("write output")
 stok_gdf.columns
 #stok_gdf['BedingungHangneigung'].unique().tolist()
 #stok_gdf['BedingungRegion'].unique().tolist()
-stok_gdf=stok_gdf[['joinid','VECODE','EK72', 'VENAME','NAIS','taheute','storeg','meanslopeprc', 'slpprzrec','rad', 'radiation', 'hs1975','nais','nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
+stok_gdf=stok_gdf[['joinid','VECODE','EK72', 'VENAME','NAIS','taheute','storeg','meanslopeprc', 'slpprzrec','rad', 'radiation', 'hs1975','nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
 
 #stok_gdf=gpd.read_file(myworkspace+"/ZH/stok_gdf_attributed.gpkg")
 print("done")
