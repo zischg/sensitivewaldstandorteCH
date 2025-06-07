@@ -52,18 +52,17 @@ hsmoddictkurz={0:"med",1:"hyp",2:"co", 3:"co",4:"sm",5:"um",6:"om",7:"umom",8:"h
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 
 #read excel files
-naiseinheitenunique=pd.read_excel(codespace+"/ZH_nais_einheiten_unique_mf.xlsx", sheet_name='Sheet1', dtype="str", engine='openpyxl')
+naiseinheitenunique=pd.read_excel(codespace+"/BL_nais_einheiten_unique_v3_mf.xlsx", sheet_name='Sheet1', dtype="str", engine='openpyxl')
 naiseinheitenunique.columns
-naiseinheitenunique=naiseinheitenunique[['id', 'EK72', 'NAIS', 'Bedingung Höhenstufe', 'nais1', 'nais2', 'tahs']]
 naiseinheitenunique.dtypes
 len(naiseinheitenunique)
-naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['nais1']!='-']
+naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['nais1']!='']
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['nais1'].isnull()==False]
 #naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['hs']!='nan']
 #read the rasters
 #reference tif raster
 print("read reference raster")
-referenceraster=myworkspace+"/ZH/zh_dem10m.tif"
+referenceraster=myworkspace+"/BLBS/BLBS_dem10m.tif"
 referencetifraster=gdal.Open(referenceraster)
 referencetifrasterband=referencetifraster.GetRasterBand(1)
 referencerasterProjection=referencetifraster.GetProjection()
@@ -74,13 +73,13 @@ indatatype=referencetifrasterband.DataType
 #dhmarr=convert_tif_to_array("D:/CCW20/GIS/dhm25.tif")
 NODATA_value=-9999
 
-sloperaster=myworkspace+"/ZH/zh_slopeprz.tif"
-radiationraster=myworkspace+"/ZH/zh_globradyyw.tif"
-hoehenstufenraster=myworkspace+"/ZH/zh_hs1975.tif"
+sloperaster=myworkspace+"/BLBS/BLBS_slopeprz.tif"
+radiationraster=myworkspace+"/BLBS/BLBS_globradyyw.tif"
+hoehenstufenraster=myworkspace+"/BLBS/BLBS_vegetationshoehenstufen1975.tif"
 
 
 #read shapefile
-stok_gdf=gpd.read_file(myworkspace+'/geops_treeapp/forest_types_zh_merge.gpkg')
+stok_gdf=gpd.read_file(myworkspace+'/BLBS/Standortskarte_fixed.gpkg')
 taheute=gpd.read_file(myworkspace+"/Tannenareale.shp")
 storeg=gpd.read_file(myworkspace+"/Waldstandortsregionen.shp")
 #stok_gdf=gpd.read_file(projectspace+"/GIS/stok_gdf_attributed.shp")
@@ -197,13 +196,13 @@ stok_gdf.dtypes
 #stok_gdf.to_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
 #del zonstaths
 winsound.Beep(frequency, duration)
-
-stok_gdf.to_file(myworkspace+"/ZH/stok_gdf_attributed_temp2.gpkg")
-#stok_gdf=gpd.read_file(myworkspace+"/ZH/stok_gdf_attributed_temp.gpkg")
+stok_gdf.columns
+stok_gdf.to_file(myworkspace+"/BLBS/stok_gdf_attributed_temp.gpkg")
+#stok_gdf.to_file(myworkspace+"/BLBS/stok_gdf_attributed_temp.shp")
 
 
 #uebersetzung von Kantonseinheit in NAIS
-#stok_gdf=gpd.read_file(myworkspace+"/ZH/stok_gdf_attributed_temp.gpkg")
+#stok_gdf=gpd.read_file(myworkspace+"/BSBL/stok_gdf_attributed_temp.gpkg")
 #naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['NaiS'].isnull() == False]
 stok_gdf.columns
 len(naiseinheitenunique)
@@ -216,37 +215,38 @@ stok_gdf['hs']=''
 stok_gdf['tahs']=''
 stok_gdf['tahsue']=''
 #transform null values
-stok_gdf.loc[stok_gdf['EK72'].isnull()==True,'EK72']=''
-naiseinheitenunique.loc[naiseinheitenunique['EK72'].isnull()==True,'EK72']=''
-stok_gdf.loc[stok_gdf['NAIS'].isnull()==True,'NAIS']=''
-naiseinheitenunique.loc[naiseinheitenunique['NAIS'].isnull()==True,'NAIS']=''
+stok_gdf.loc[stok_gdf['g1_txt'].isnull()==True,'g1_txt']=''
+naiseinheitenunique.loc[naiseinheitenunique['g1_txt'].isnull()==True,'g1_txt']=''
+stok_gdf.loc[stok_gdf['waldgesell'].isnull()==True,'waldgesell']=''
+naiseinheitenunique.loc[naiseinheitenunique['waldgesell'].isnull()==True,'waldgesell']=''
 naiseinheitenunique.loc[naiseinheitenunique['nais1'].isnull()==True,'nais1']=''
 naiseinheitenunique.loc[naiseinheitenunique['nais2'].isnull()==True,'nais2']=''
+naiseinheitenunique.loc[naiseinheitenunique['hs'].isnull()==True,'hs']=''
 
-print('iterate for attributinmg nais and tahs')
+print('iterate for attributing nais and tahs')
 for index, row in naiseinheitenunique.iterrows():
-    kantonseinheit=row['EK72']
-    NAIS=row['NAIS']
+    kantonseinheit=row['g1_txt']
+    waldgesell=row['waldgesell']
     nais1=row["nais1"]
     nais2 = row["nais2"]
-    hs=row["tahs"]
-    hslist=row['tahs'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()
+    hs=row["hs"]
+    hslist=row['hs'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()
     #Hoehenstufenzuweisung
-    stok_gdf.loc[((stok_gdf["EK72"] == kantonseinheit) & (stok_gdf["NAIS"] == NAIS)), "nais1"] = nais1
-    stok_gdf.loc[((stok_gdf["EK72"] == kantonseinheit) & (stok_gdf["NAIS"] == NAIS)), "nais2"] = nais2
-    stok_gdf.loc[((stok_gdf["EK72"] == kantonseinheit) & (stok_gdf["NAIS"] == NAIS)), "hs"] = hs
+    stok_gdf.loc[((stok_gdf["g1_txt"] == kantonseinheit) & (stok_gdf["waldgesell"] == waldgesell)), "nais1"] = nais1
+    stok_gdf.loc[((stok_gdf["g1_txt"] == kantonseinheit) & (stok_gdf["waldgesell"] == waldgesell)), "nais2"] = nais2
+    stok_gdf.loc[((stok_gdf["g1_txt"] == kantonseinheit) & (stok_gdf["waldgesell"] == waldgesell)), "hs"] = hs
     #Uebergang
     if nais2 !='':
-        stok_gdf.loc[((stok_gdf["EK72"] == kantonseinheit) & (stok_gdf["NAIS"] == NAIS)), "ue"] = 1
+        stok_gdf.loc[((stok_gdf["g1_txt"] == kantonseinheit) & (stok_gdf["waldgesell"] == waldgesell)), "ue"] = 1
     #Hohenstufenzuweisung
     if len(hslist)==1:
-        stok_gdf.loc[((stok_gdf["EK72"] == kantonseinheit) & (stok_gdf["NAIS"] == NAIS)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+        stok_gdf.loc[((stok_gdf["g1_txt"] == kantonseinheit) & (stok_gdf["waldgesell"] == waldgesell)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
     else:
-        if "(" in row['tahs']:
-            stok_gdf.loc[((stok_gdf["EK72"] == kantonseinheit) & (stok_gdf["NAIS"] == NAIS)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
-            stok_gdf.loc[((stok_gdf["EK72"] == kantonseinheit) & (stok_gdf["NAIS"] == NAIS)), "tahsue"] = hoehenstufendictabkuerzungen[hslist[1]]
+        if "(" in row['hs']:
+            stok_gdf.loc[((stok_gdf["g1_txt"] == kantonseinheit) & (stok_gdf["waldgesell"] == waldgesell)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+            stok_gdf.loc[((stok_gdf["g1_txt"] == kantonseinheit) & (stok_gdf["waldgesell"] == waldgesell)), "tahsue"] = hoehenstufendictabkuerzungen[hslist[1]]
         else:
-            for index2, row2 in stok_gdf[((stok_gdf["EK72"] == kantonseinheit) & (stok_gdf["NAIS"] == NAIS))].iterrows():
+            for index2, row2 in stok_gdf[((stok_gdf["g1_txt"] == kantonseinheit) & (stok_gdf["waldgesell"] == waldgesell))].iterrows():
                 if row2['hs1975']>0:
                     hsmod=hsmoddictkurz[int(row2['hs1975'])]
                 else:
@@ -262,20 +262,23 @@ for index, row in naiseinheitenunique.iterrows():
                             stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
 winsound.Beep(frequency, duration)
 stok_gdf.columns
-stok_gdf=stok_gdf[['VECODE', 'EK72', 'VENAME', 'NAIS', 'HSTUFE', 'SHAPE_AREA', 'SHAPE_LEN','layer', 'taheute', 'joinid', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'geometry', 'nais', 'nais1','nais2', 'mo', 'ue', 'hs', 'tahs', 'tahsue']]
+stok_gdf=stok_gdf[['g1','g1_txt', 'waldgesell', 'joinid', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1','nais2', 'mo', 'ue', 'hs', 'tahs', 'tahsue', 'geometry']]
 
 #fill hs of ue
 stok_gdf.loc[((stok_gdf["nais2"] != '') & (stok_gdf["ue"] == 1)&(stok_gdf["tahsue"] == '')), "tahsue"] = stok_gdf["tahs"]
 
+#fill nais column
+stok_gdf.loc[((stok_gdf["nais2"] != '') & (stok_gdf["ue"] == 1)), "nais"] = stok_gdf["nais1"]+'('+stok_gdf["nais2"]+')'
+stok_gdf.loc[((stok_gdf["nais2"] == '') & (stok_gdf["ue"] == 0)), "nais"] = stok_gdf["nais1"]
 
 #check empty values
 stok_gdf["tahs"].unique().tolist()
 stok_gdf["tahsue"].unique().tolist()
-checknohs=stok_gdf[stok_gdf["tahs"]==""][['EK72', 'NAIS','nais1','nais2',"hs"]]
-print('Diese EInheiten haben keine Uebersetzung: '+str(checknohs['EK72'].unique().tolist()))
+checknohs=stok_gdf[stok_gdf["tahs"]==""][['g1_txt', 'waldgesell','nais1','nais2',"hs"]]
+print('Diese EInheiten haben keine Uebersetzung: '+str(checknohs['g1_txt'].unique().tolist()))
 #korrigiere mit sheet1
-fehlendeuebersetzungen=checknohs[['EK72', 'NAIS','nais1','nais2',"hs"]].drop_duplicates()
-fehlendeuebersetzungen.to_excel(myworkspace+'/ZH/'+'fehlendeHoehenstufen.xlsx')
+fehlendeuebersetzungen=checknohs[['g1_txt', 'waldgesell','nais1','nais2',"hs"]].drop_duplicates()
+fehlendeuebersetzungen.to_excel(myworkspace+'/BLBS/'+'fehlendeHoehenstufen.xlsx')
 
 len(fehlendeuebersetzungen)
 
@@ -305,30 +308,23 @@ print("write output")
 stok_gdf.columns
 #stok_gdf['BedingungHangneigung'].unique().tolist()
 #stok_gdf['BedingungRegion'].unique().tolist()
-stok_gdf=stok_gdf[['joinid','VECODE','EK72', 'VENAME','NAIS','taheute','storeg','meanslopeprc', 'slpprzrec','rad', 'radiation', 'hs1975','nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
-
+#stok_gdf=stok_gdf[['g1','g1_txt', 'waldgesell', 'joinid', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1','nais2', 'mo', 'ue', 'hs', 'tahs', 'tahsue', 'geometry']]
 #stok_gdf=gpd.read_file(myworkspace+"/ZH/stok_gdf_attributed.gpkg")
-print("done")
+
 stok_gdf['fid']=stok_gdf.index
 stok_gdf['area']=stok_gdf.geometry.area
 len(stok_gdf)
 stok_gdf=stok_gdf[stok_gdf['area']>0]
-stok_gdf.to_file(myworkspace+"/ZH/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
-stok_gdf.to_file(myworkspace+"/ZH/stok_gdf_attributed.sqlite",layer='stok_gdf_attributed', driver="SQLite",spatialite=True)
-stok_gdf.to_file(myworkspace+"/ZH/stok_gdf_attributed.geojson", driver="GeoJSON")
-stok_gdf.to_file(myworkspace+"/ZH/stok_gdf_attributed.shp")
-joblib.dump(stok_gdf, myworkspace+"/ZH/stok_gdf_attributed.pkl")
-stok_gdf2=stok_gdf.copy()
-stok_gdf2.to_file(myworkspace+"/ZH/stok_gdf_attributed3.gpkg",layer='stok_gdf_attributed', driver="GPKG")
-
+stok_gdf.to_file(myworkspace+"/BLBS/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
+print("done")
 
 
 #Export for tree-app
 print('Export for Tree-App')
 stok_gdf.columns
 #stok_gdf.loc[((stok_gdf['ue']==1)&(stok_gdf['tahsue']=='')&(stok_gdf['tahs']!='')),'tahsue']=stok_gdf['tahs']
-treeapp=stok_gdf[['EK72', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
-treeapp.to_file(myworkspace+"/ZH/ZH_treeapp.gpkg", layer='ZH_treeapp', driver="GPKG")
+treeapp=stok_gdf[['g1_txt', 'waldgesell', 'nais','nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
+treeapp.to_file(myworkspace+"/BLBS/BLBS_treeapp.gpkg", layer='BLBS_treeapp', driver="GPKG")
 treeapp.columns
 print("done")
 

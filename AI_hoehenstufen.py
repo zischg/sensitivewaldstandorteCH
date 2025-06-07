@@ -49,12 +49,23 @@ hsmoddictkurz={3:"co",4:"sm",5:"um",6:"om",8:"hm",9:"sa",10:"osa"}
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 
 #read excel files
-naiseinheitenunique=pd.read_excel(codespace+"/AR_nais_einheiten_unique_mf_mit_7f.xlsx", dtype="str", engine='openpyxl')
+naiseinheitenunique=pd.read_excel(codespace+"/AI_nais_einheiten_unique_mf.xlsx", dtype="str", engine='openpyxl')
+len(naiseinheitenunique)
+naiseinheitenunique.dtypes
+naiseinheitenunique["nais2"].unique().tolist()
+naiseinheitenunique.loc[naiseinheitenunique['nais2'].isnull()==True, 'nais2']=''
+naiseinheitenunique.loc[naiseinheitenunique['tahs'].isnull()==True, 'tahs']=''
+naiseinheitenunique.loc[naiseinheitenunique['WSTEinheit'].isnull()==True, 'WSTEinheit']=''
+naiseinheitenunique.loc[naiseinheitenunique['nais'].isnull()==True, 'nais']=''
+naiseinheitenunique.loc[naiseinheitenunique['naisue'].isnull()==True, 'naisue']=''
+naiseinheitenunique.loc[naiseinheitenunique['naismosaic'].isnull()==True, 'naismosaic']=''
+naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['tahs'].isnull()==False]
+naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['tahs']!='']
 
 #read the rasters
 #reference tif raster
 print("read reference raster")
-referenceraster=myworkspace+"/AR/dem10m.tif"
+referenceraster=myworkspace+"/AI/ai_dem10m.tif"
 referencetifraster=gdal.Open(referenceraster)
 referencetifrasterband=referencetifraster.GetRasterBand(1)
 referencerasterProjection=referencetifraster.GetProjection()
@@ -65,16 +76,27 @@ indatatype=referencetifrasterband.DataType
 #dhmarr=convert_tif_to_array("D:/CCW20/GIS/dhm25.tif")
 NODATA_value=-9999
 
-sloperaster=myworkspace+"/AR/slope10mprz.tif"
-radiationraster=myworkspace+"/AR/globradyw.tif"
-hoehenstufenraster=myworkspace+"/AR/hs1975.tif"
+sloperaster=myworkspace+"/AI/ai_slopeprz.tif"
+radiationraster=myworkspace+"/AI/ai_globradyyw.tif"
+hoehenstufenraster=myworkspace+"/AI/ai_vegetationshoehenstufen.tif"
 #hsheute=gpd.read_file(myworkspace+"/Ar/vegetationshoehenstufen19611990clipSGAIAR.shp")
 
 #read shapefile
-stok_gdf=gpd.read_file(myworkspace+"/AR/forest_types_ar.gpkg")
+stok_gdf=gpd.read_file(myworkspace+"/AI/stok_ai_wst_20250409.shp")
 taheute=gpd.read_file(myworkspace+"/Tannenareale.shp")
 storeg=gpd.read_file(myworkspace+"/Waldstandortsregionen.shp")
 #stok_gdf=gpd.read_file(projectspace+"/GIS/stok_gdf_attributed.shp")
+stok_gdf.rename(columns={'nais':'naisalt'}, inplace=True)
+stok_gdf.rename(columns={'nais1':'nais1alt'}, inplace=True)
+stok_gdf.loc[stok_gdf['WSTEinheit'].isnull()==True, 'WSTEinheit']=''
+stok_gdf.loc[stok_gdf['nais1alt'].isnull()==True, 'nais1alt']=''
+stok_gdf.loc[stok_gdf['naisue'].isnull()==True, 'naisue']=''
+stok_gdf.loc[stok_gdf['naismosaic'].isnull()==True, 'naismosaic']=''
+stok_gdf.loc[stok_gdf['naisue']=='None', 'naisue']=''
+stok_gdf.loc[stok_gdf['naismosaic']=='None', 'naismosaic']=''
+stok_gdf.dtypes
+stok_gdf=stok_gdf.astype({'WSTEinheit': 'str','nais1alt': 'str', 'naisue': 'str', 'naismosaic': 'str'})
+
 len(stok_gdf)
 stok_gdf.crs
 taheute.crs
@@ -83,7 +105,7 @@ stok_gdf.set_crs(epsg=2056, inplace=True)
 #stok_gdf.plot()
 stok_gdf.columns
 #change column names (sg___ are the St Gallen units)
-#stok_gdf.rename(columns={"DTWGEINHEI": "kanteinh", "naisueberg": "sgue", "naismosaic":"sgmosaic"}, inplace=True)
+#stok_gdf.rename(columns={"WSTEinheit": "kanteinh", "naisueberg": "sgue", "naismosaic":"sgmosaic"}, inplace=True)
 #stok_gdf["nais1"]=""
 #stok_gdf["naisue"]=""
 #stok_gdf["naismosaic"]=""
@@ -117,12 +139,14 @@ len(stok_gdf)
 #del stok_gdftagrouped
 #del stok_gdfta
 stok_gdf.columns
-stok_gdf=stok_gdf[['DTWGEINHEI','taheute','geometry']]
+#stok_gdf=stok_gdf[['WSTEinheit', 'nais1', 'naisue','naismosaic', 'hs1', 'hsue', 'hsmosaic', 'geometry']]
 stok_gdf['joinid']=stok_gdf.index
 
 #Standortregionen
 storeg.crs
 storeg.columns
+stok_gdf.columns
+stok_gdf.drop(columns='index_right', inplace=True)
 #taheute.plot()
 storeg.rename(columns={"Subcode": "storeg"}, inplace=True)
 storeg.drop(columns=['Region_de', 'Region_fr', 'Region_it', 'Region_en', 'Code', 'Code_Bu', 'Code_Fi', 'Shape_Leng', 'Shape_Area'], inplace=True)
@@ -136,10 +160,6 @@ stok_gdfstoreggrouped.columns
 #stok_gdf.columns
 stok_gdf=stok_gdf.merge(stok_gdfstoreggrouped, on='joinid', how='left')#left_on='joinid', right_on='joinid',
 len(stok_gdf)
-#stok_gdf.to_file(projectspace+"/GIS/stok_gdf_attributed.shp")
-#del storeg
-#del stok_gdfstoreggrouped
-#del stok_gdfstoreg
 
 
 #attribute shapefile
@@ -184,13 +204,15 @@ while i < len(stok_gdf):
 stok_gdf.columns
 stok_gdf.dtypes
 #stok_gdf=stok_gdf.astype({'hs1975': 'int'})#.dtypes
-#stok_gdf.to_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
+#stok_gdf.to_file(myworkspace+"/AI/stok_gdf_attributed.gpkg")
 #del zonstaths
 
 #uebersetzung von Kantonseinheit in NAIS
-#stok_gdf=gpd.read_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
-naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['NaiS'].isnull() == False]
+#stok_gdf=gpd.read_file(myworkspace+"/AI/stok_gdf_attributed.gpkg")
+#naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['NaiS'].isnull() == False]
 len(naiseinheitenunique)
+
+stok_gdf.columns
 stok_gdf['nais']=''
 stok_gdf['nais1']=''
 stok_gdf['nais2']=''
@@ -199,30 +221,33 @@ stok_gdf['ue']=0
 stok_gdf['hs']=''
 stok_gdf['tahs']=''
 stok_gdf['tahsue']=''
+naiseinheitenunique.columns
 for index, row in naiseinheitenunique.iterrows():
-    kantonseinheit=row["DTWGEINHEI"]
-    nais=row["NaiS"]
-    hslist=row['hs'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()
-    stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "nais"] = nais
-    stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "hs"] =row['hs']
-    if '(' in row['NaiS']:
-        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "nais1"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()[0]
-        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "nais2"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()[1]
-        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "ue"] = 1
-    if '/' in row['NaiS']:
-        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "nais1"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()[0]
-        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "nais2"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()[1]
-        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "mo"] = 1
-        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "ue"] = 1
-    if len(hslist)==1:
-        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
-        stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "nais1"] = row['NaiS'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()[0]
+    kantonseinheit=row["WSTEinheit"]
+    nais1alt=row["nais"]
+    naisue=row["naisue"]
+    naismosaic =row['naismosaic']
+    nais1 = row["nais1"]
+    nais2 = row["nais2"]
+    hslist=row['tahs'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()
+    stok_gdf.loc[((stok_gdf["WSTEinheit"] == kantonseinheit)&(stok_gdf["nais1alt"] == nais1alt)&(stok_gdf["naisue"] == naisue)&(stok_gdf["naismosaic"] == naismosaic)), "nais1"] = nais1
+    stok_gdf.loc[((stok_gdf["WSTEinheit"] == kantonseinheit) & (stok_gdf["nais1alt"] == nais1alt) & (stok_gdf["naisue"] == naisue) & (stok_gdf["naismosaic"] == naismosaic)), "nais2"] = nais2
+    stok_gdf.loc[((stok_gdf["WSTEinheit"] == kantonseinheit)&(stok_gdf["nais1alt"] == nais1alt)&(stok_gdf["naisue"] == naisue)&(stok_gdf["naismosaic"] == naismosaic)), "hs"] =row['tahs']
+    if row['nais2']=='':
+        stok_gdf.loc[((stok_gdf["WSTEinheit"] == kantonseinheit)&(stok_gdf["nais1alt"] == nais1alt)&(stok_gdf["naisue"] == naisue)&(stok_gdf["naismosaic"] == naismosaic)), "nais"] = row['nais1']
     else:
-        if "(" in row['hs']:
-            stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
-            stok_gdf.loc[stok_gdf["DTWGEINHEI"] == kantonseinheit, "tahsue"] = hoehenstufendictabkuerzungen[hslist[1]]
+        stok_gdf.loc[((stok_gdf["WSTEinheit"] == kantonseinheit)&(stok_gdf["nais1alt"] == nais1alt)&(stok_gdf["naisue"] == naisue)&(stok_gdf["naismosaic"] == naismosaic)), "nais"] = row['nais1'] + '(' + row['nais2']+')'
+    if row['nais2']!='':
+        stok_gdf.loc[((stok_gdf["WSTEinheit"] == kantonseinheit)&(stok_gdf["nais1alt"] == nais1alt)&(stok_gdf["naisue"] == naisue)&(stok_gdf["naismosaic"] == naismosaic)), "ue"] = 1
+    if len(hslist)==1:
+        stok_gdf.loc[((stok_gdf["WSTEinheit"] == kantonseinheit)&(stok_gdf["nais1alt"] == nais1alt)&(stok_gdf["naisue"] == naisue)&(stok_gdf["naismosaic"] == naismosaic)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+        stok_gdf.loc[((stok_gdf["WSTEinheit"] == kantonseinheit)&(stok_gdf["nais1alt"] == nais1alt)&(stok_gdf["naisue"] == naisue)&(stok_gdf["naismosaic"] == naismosaic)), "nais1"] = row['nais'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()[0]
+    else:
+        if "(" in row['tahs']:
+            stok_gdf.loc[((stok_gdf["WSTEinheit"] == kantonseinheit)&(stok_gdf["nais1alt"] == nais1alt)&(stok_gdf["naisue"] == naisue)&(stok_gdf["naismosaic"] == naismosaic)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+            stok_gdf.loc[((stok_gdf["WSTEinheit"] == kantonseinheit)&(stok_gdf["nais1alt"] == nais1alt)&(stok_gdf["naisue"] == naisue)&(stok_gdf["naismosaic"] == naismosaic)), "tahsue"] = hoehenstufendictabkuerzungen[hslist[1]]
         else:
-            for index2, row2 in stok_gdf[stok_gdf["DTWGEINHEI"]==kantonseinheit].iterrows():
+            for index2, row2 in stok_gdf[((stok_gdf["WSTEinheit"] == kantonseinheit)&(stok_gdf["nais1alt"] == nais1alt)&(stok_gdf["naisue"] == naisue)&(stok_gdf["naismosaic"] == naismosaic))].iterrows():
                 if row2['hs1975']>0:
                     hsmod=hsmoddictkurz[int(row2['hs1975'])]
                 else:
@@ -235,52 +260,53 @@ for index, row in naiseinheitenunique.iterrows():
                         stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
                     else:
                         stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
+stok_gdf.loc[((stok_gdf['tahsue']=='')&(stok_gdf['ue']==1)), 'tahsue']=stok_gdf['tahs']
 stok_gdf.columns
-stok_gdf=stok_gdf[['joinid', 'DTWGEINHEI', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1', 'nais2','mo', 'ue', 'hs', 'tahs', 'tahsue','geometry']]
+stok_gdf=stok_gdf[['joinid', 'WSTEinheit', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1', 'nais2','mo', 'ue', 'hs', 'tahs', 'tahsue','geometry']]
 
 #check empty values
 stok_gdf["tahs"].unique().tolist()
 stok_gdf["tahsue"].unique().tolist()
-checknohs=stok_gdf[stok_gdf["tahs"]==""][["DTWGEINHEI","nais",'hs1975']]
-#fill hoehenstufe for empty values
-for index, row in stok_gdf.iterrows():
-    if row["tahs"]=='' and row['hs1975']>0:
-        stok_gdf.loc[index, "tahs"] = hoehenstufendictabkuerzungen[hsmoddictkurz[int(row['hs1975'])]]
+checknohs=stok_gdf[stok_gdf["tahs"]==""][["WSTEinheit","nais",'hs1975']]
+##fill hoehenstufe for empty values
+#for index, row in stok_gdf.iterrows():
+#    if row["tahs"]=='' and row['hs1975']>0:
+#        stok_gdf.loc[index, "tahs"] = hoehenstufendictabkuerzungen[hsmoddictkurz[int(row['hs1975'])]]
 
 #Gebüschwald
-stok_gdf.loc[((stok_gdf['nais']=='AV')&(stok_gdf['hs1975']==-1)), 'tahs'] = 'subalpin'
+#stok_gdf.loc[((stok_gdf['nais']=='AV')&(stok_gdf['hs1975']==-1)), 'tahs'] = 'subalpin'
 
 stok_gdf.columns
-#stok_gdf=stok_gdf[['joinid', 'DTWGEINHEI', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1', 'nais2','mo', 'ue', 'hs', 'tahs', 'tahsue','geometry']]
+#stok_gdf=stok_gdf[['joinid', 'WSTEinheit', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1', 'nais2','mo', 'ue', 'hs', 'tahs', 'tahsue','geometry']]
 
-#fill tahsue
-for index, row in stok_gdf.iterrows():
-    if '(' in row['nais'] and row['ue']==1 and row['tahsue']=='':
-        hslist = row['hs'].replace('/', ' ').replace('(', ' ').replace(')', '').strip().split()
-        if len(hslist)==1:
-            stok_gdf.loc[index, 'tahsue']=row['tahs']
+##fill tahsue
+#for index, row in stok_gdf.iterrows():
+#    if '(' in row['nais'] and row['ue']==1 and row['tahsue']=='':
+#        hslist = row['hs'].replace('/', ' ').replace('(', ' ').replace(')', '').strip().split()
+#        if len(hslist)==1:
+#            stok_gdf.loc[index, 'tahsue']=row['tahs']
 
-#check empty values
-stok_gdf["tahs"].unique().tolist()
-stok_gdf["tahsue"].unique().tolist()
-checknohs=stok_gdf[stok_gdf["tahs"]==""]#[["wg_haupt","wg_zusatz","nais",'hs1975']]
-checknohsue=stok_gdf[((stok_gdf["tahsue"]=="")&(stok_gdf["ue"]==1))]
-stok_gdf.loc[((stok_gdf["tahsue"]=="")&(stok_gdf["ue"]==1)), 'tahsue']=stok_gdf['tahs']
-naisohnetahs=checknohs['nais'].unique().tolist()
-naisohnetahsue=checknohsue['nais'].unique().tolist()
-stok_gdf.loc[((stok_gdf['ue']==0)&(stok_gdf['nais1']=='')&(stok_gdf['nais']!='')),'nais1']=stok_gdf['nais']
+##check empty values
+#stok_gdf["tahs"].unique().tolist()
+#stok_gdf["tahsue"].unique().tolist()
+#checknohs=stok_gdf[stok_gdf["tahs"]==""]#[["wg_haupt","wg_zusatz","nais",'hs1975']]
+#checknohsue=stok_gdf[((stok_gdf["tahsue"]=="")&(stok_gdf["ue"]==1))]
+#stok_gdf.loc[((stok_gdf["tahsue"]=="")&(stok_gdf["ue"]==1)), 'tahsue']=stok_gdf['tahs']
+#naisohnetahs=checknohs['nais'].unique().tolist()
+#naisohnetahsue=checknohsue['nais'].unique().tolist()
+#stok_gdf.loc[((stok_gdf['ue']==0)&(stok_gdf['nais1']=='')&(stok_gdf['nais']!='')),'nais1']=stok_gdf['nais']
 
-#Korrekturen
-stok_gdf.columns
-#test=stok_gdf[stok_gdf['nais']=='32V']
-stok_gdf.loc[stok_gdf['nais']=='18v(53)','nais2']='53Ta'
-stok_gdf.loc[stok_gdf['nais']=='18v(53)','nais']='18v(53Ta)'
-stok_gdf.loc[stok_gdf['nais']=='12w(12Fe)','nais2']='12aFe'
-stok_gdf.loc[stok_gdf['nais']=='12w(12Fe)','nais']='12w(12aFe)'
-stok_gdf.loc[stok_gdf['nais']=='22(12)','nais2']='12a'
-stok_gdf.loc[stok_gdf['nais']=='22(12)','nais']='22(12a)'
-stok_gdf.loc[stok_gdf['nais']=='26h(12)','nais2']='12a'
-stok_gdf.loc[stok_gdf['nais']=='26h(12)','nais']='26h(12a)'
+##Korrekturen
+#stok_gdf.columns
+##test=stok_gdf[stok_gdf['nais']=='32V']
+#stok_gdf.loc[stok_gdf['nais']=='18v(53)','nais2']='53Ta'
+#stok_gdf.loc[stok_gdf['nais']=='18v(53)','nais']='18v(53Ta)'
+#stok_gdf.loc[stok_gdf['nais']=='12w(12Fe)','nais2']='12aFe'
+#stok_gdf.loc[stok_gdf['nais']=='12w(12Fe)','nais']='12w(12aFe)'
+#stok_gdf.loc[stok_gdf['nais']=='22(12)','nais2']='12a'
+#stok_gdf.loc[stok_gdf['nais']=='22(12)','nais']='22(12a)'
+#stok_gdf.loc[stok_gdf['nais']=='26h(12)','nais2']='12a'
+#stok_gdf.loc[stok_gdf['nais']=='26h(12)','nais']='26h(12a)'
 #test=stok_gdf[stok_gdf['hs']=='um(om)']
 #test=stok_gdf[stok_gdf['hs']=='hm(om)']
 #test=stok_gdf[stok_gdf['hs']=='om(um)']
@@ -288,8 +314,8 @@ stok_gdf.loc[stok_gdf['nais']=='26h(12)','nais']='26h(12a)'
 #test=stok_gdf[stok_gdf['nais']=='27h(49)']
 
 print("write output")
-stok_gdf.to_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
-#stok_gdf=gpd.read_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
+stok_gdf.to_file(myworkspace+"/AI/stok_gdf_attributed.gpkg")
+#stok_gdf=gpd.read_file(myworkspace+"/AI/stok_gdf_attributed.gpkg")
 print("done")
 
 
@@ -299,8 +325,8 @@ print("done")
 print('Export for Tree-App')
 stok_gdf.columns
 #stok_gdf.loc[((stok_gdf['ue']==1)&(stok_gdf['tahsue']=='')&(stok_gdf['tahs']!='')),'tahsue']=stok_gdf['tahs']
-treeapp=stok_gdf[['DTWGEINHEI','nais', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
-treeapp.to_file(myworkspace+"/AR/AR_treeapp.gpkg", layer='AR_treeapp', driver="GPKG")
+treeapp=stok_gdf[['WSTEinheit','nais', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
+treeapp.to_file(myworkspace+"/AI/AI_treeapp.gpkg", layer='AR_treeapp', driver="GPKG")
 treeapp.columns
 print("done")
 
