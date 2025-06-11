@@ -14,7 +14,7 @@ hoehenstufenlist=['collin','submontan','untermontan','obermontan','hochmontan','
 hoehenstufenlistshort=['co','sm','um','om','hm','sa','osa']
 
 
-#read geodata LU
+#read geodata ZG
 zg_gdf=gpd.read_file(myworkspace+'/ZG/ZG_kartierung_merge.gpkg')
 len(zg_gdf)
 zg_gdf.columns
