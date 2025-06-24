@@ -1456,35 +1456,9 @@ codeworkspace="C:/DATA/develops/sensitivewaldstandorteCH"
 projectspace="D:/CCW24sensi"
 naismatrixdf=pd.read_excel(codeworkspace+"/"+"Matrix_Baum_inkl_collin_20210412_mit AbkuerzungenCLEAN.xlsx", dtype="str", engine='openpyxl')
 projectionswegedf=pd.read_excel(codeworkspace+"/"+"L_Projektionswege_im_Klimawandel_18022020_export.xlsx", dtype="str", engine='openpyxl')
-treeapp=gpd.read_file(projectspace+"/OW/stok_gdf_attributed.gpkg", layer='stok_gdf_attributed')
-#treeapp.loc[treeapp['nais2']=='12w ', 'nais2']='12w' #remove trailing space
-#treeapp.loc[treeapp['nais2']=='7a ', 'nais2']='7a' #remove trailing space
-#treeapp.loc[treeapp['nais2']=='8a ', 'nais2']='8a' #remove trailing space
-#treeapp.loc[treeapp['nais2']=='7f ', 'nais2']='7f' #remove trailing space
-#treeapp.loc[treeapp['nais2']=='9a ', 'nais2']='9a' #remove trailing space
-#treeapp.loc[treeapp['nais2']=='13e ', 'nais2']='13e' #remove trailing space
-#treeapp.loc[treeapp['nais2']=='13a ', 'nais2']='13a' #remove trailing space
-#treeapp.loc[treeapp['nais']=='46(53Ta)', 'nais1']='46'
-#treeapp.loc[treeapp['nais']=='46(53Ta)', 'nais2']='53Ta'
-
-
-
-
-
-
-check53=treeapp[treeapp['OW_Einheit']=='53w']
-#treeapp.to_file(projectspace + '/OW/stok_gdf_attributed.gpkg', layer='stok_gdf_attributed', driver="GPKG")
-
-
-
-
-
-
-
-
-
+treeapp=gpd.read_file(projectspace+"/GE/stok_gdf_attributed.gpkg", layer='stok_gdf_attributed')
 treeapp.columns
-treeapp=treeapp[['joinid', 'OW_Einheit', 'taheute', 'storeg','meanslopeprc', 'slpprzrec', 'rad', 'radiation', 'hs1975', 'nais','nais1', 'nais2', 'mo', 'ue', 'tahs', 'tahsue', 'geometry']]
+treeapp=treeapp[['joinid', 'NO_TYPOLOG', 'taheute', 'storeg','meanslopeprc', 'slpprzrec', 'rad', 'radiation', 'hs1975', 'nais','nais1', 'nais2', 'mo', 'ue', 'tahs', 'tahsue', 'geometry']]
 treeapp.loc[treeapp['storeg']=='2c','storeg']='2b' #solange die alten Projektionswege gueltig sind, wird die neue Standortregionenkarte zurueckuebersetzt
 treeapp.loc[treeapp['storeg']=='4a','storeg']='4' #solange die alten Projektionswege gueltig sind, wird die neue Standortregionenkarte zurueckuebersetzt
 treeapp.loc[treeapp['storeg']=='4b','storeg']='4' #solange die alten Projektionswege gueltig sind, wird die neue Standortregionenkarte zurueckuebersetzt
@@ -1495,6 +1469,7 @@ treeapp.loc[treeapp['nais2'].isnull()==True,'nais2']=''
 #treeapp.drop(columns='NAIS', inplace=True)
 len(treeapp)
 treeapp=treeapp[treeapp['nais1'].isnull()==False]
+treeapp['storeg']='M'
 treeapp.crs
 climatescenarios=['rcp45','rcp85']
 #climatescenario="rcp85"
@@ -1525,7 +1500,7 @@ for col in naismatrixdf.columns[8:].tolist():
         nais_matrix_columsdict.update({id:col})
         nais_matrix_columsdict_inv.update({col: id})
     id+=1
-joblib.dump(nais_matrix_standorte_list,projectspace+"/OW/"+"nais_matrix_standorte_list.sav")
+joblib.dump(nais_matrix_standorte_list,projectspace+"/GE/"+"nais_matrix_standorte_list.sav")
 
 #*******************************************
 #projections pathways Projektionswege Data cleaning
@@ -1654,11 +1629,22 @@ len(treeapp)
 print('Start treeapp...')
 for climatescenario in climatescenarios:
     print(climatescenario)
-    ccgdf=gpd.read_file(projectspace+"/OW/OW_vegetationshoehenstufen_"+climatescenario+".gpkg", layer='OW_vegetationshoehenstufen_'+climatescenario)
-    ccgdf.crs
-    len(ccgdf)
+    ccgdf=gpd.read_file(projectspace+"/GE/GE_vegetationshoehenstufen_"+climatescenario+".gpkg", layer='GE_vegetationshoehenstufen_'+climatescenario)
+    #ccgdf.crs
+    #len(ccgdf)
     print("Overlay ...")
     combinations_df=treeapp.overlay(ccgdf, how='intersection')
+    #combinations_df = gpd.read_file(projectspace+"/GE/stok_gdf_attributed_"+climatescenario+".gpkg", layer='stok_gdf_attributed_'+climatescenario)
+    combinations_df.loc[combinations_df['storeg'] == '2c', 'storeg'] = '2b'  # solange die alten Projektionswege gueltig sind, wird die neue Standortregionenkarte zurueckuebersetzt
+    combinations_df.loc[combinations_df['storeg'] == '4a', 'storeg'] = '4'  # solange die alten Projektionswege gueltig sind, wird die neue Standortregionenkarte zurueckuebersetzt
+    combinations_df.loc[combinations_df['storeg'] == '4b', 'storeg'] = '4'  # solange die alten Projektionswege gueltig sind, wird die neue Standortregionenkarte zurueckuebersetzt
+    print('Folgende STandortregionen sind vertreten: ' + str(combinations_df['storeg'].unique().tolist()))
+    # treeapp.rename(columns={'meanslopep':'meanslopeprc', 'nais_1':'nais'}, inplace=True)
+    combinations_df.loc[combinations_df['tahs'].isnull() == True, 'tahs'] = ''
+    combinations_df.loc[combinations_df['nais2'].isnull() == True, 'nais2'] = ''
+    combinations_df['lage'] = 3
+    combinations_df.loc[combinations_df['meanslopeprc'] < 10, 'lage'] = 1
+    combinations_df.columns
     print("Overlay done...")
     #combinations_df['nais']=''
     #combinations_df.loc[combinations_df['ue']==0, 'nais'] = combinations_df['nais1']
@@ -1669,7 +1655,7 @@ for climatescenario in climatescenarios:
     #combinations_df.loc[combinations_df['meanslopeprc']<10, 'lage']=1
     len(combinations_df)
     combinations_df.columns
-    combinations_df=combinations_df[['OW_Einheit', 'nais','nais1', 'nais2', 'mo', 'ue','hs1975','taheute','storeg', 'tahs','tahsue', 'meanslopeprc', 'slpprzrec', 'lage','rad', 'radiation', 'HS_de', 'Code', 'Subcode','geometry']]
+    combinations_df=combinations_df[['NO_TYPOLOG', 'nais','nais1', 'nais2', 'mo', 'ue','hs1975','taheute','storeg', 'tahs','tahsue', 'meanslopeprc', 'slpprzrec', 'lage','rad', 'radiation', 'HS_de', 'Code', 'Subcode','geometry']]
     combinations_df.columns
     combinations_df.rename(columns={"HS_de":"hs_de","Subcode":"subcode","Code":"code"}, inplace=True)
     combinations_df.columns
@@ -1916,7 +1902,7 @@ for climatescenario in climatescenarios:
 
     #save pandas data frame
     #combinations_df.to_csv(projectspace+"/combinations_df.csv")
-    joblib.dump(combinations_df, projectspace+"/OW/combinations_df"+climatescenario+".sav")
+    joblib.dump(combinations_df, projectspace+"/GE/combinations_df"+climatescenario+".sav")
     combinations_df.columns
 
     #***********************************************************************
@@ -2258,6 +2244,16 @@ for climatescenario in climatescenarios:
     combinations_df.loc[(combinations_df["tahsue"] == combinations_df["hszukcor"]), "naiszuk2"] = combinations_df['nais2']
     combinations_df.loc[((combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "collin mit Buche")), "naiszuk1"] = combinations_df['nais1']
     combinations_df.loc[((combinations_df["tahsue"] == "collin") & (combinations_df['nais2'] != "") & (combinations_df["hszukcor"] == "collin mit Buche")), "naiszuk2"] = combinations_df['nais2']
+
+    # correct VD
+    combinations_df.loc[((combinations_df['storeg'].isin(['M', 'J']) == True) & (combinations_df['nais1'] == "16") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "39"
+    combinations_df.loc[((combinations_df['storeg'].isin([1,'1',2, '2','2a','2b','3']) == True) & (combinations_df['nais1'] == "16") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "40*"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 2, '2', '2a', '2b', '3','J','M']) == True) & (combinations_df['nais1'] == "16") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "16"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M','J']) == True) & (combinations_df['nais1'] == "43") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "43"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 'J']) == True) & (combinations_df['nais1'] == "45") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "45"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 'J','2a']) == True) & (combinations_df['nais1'] == "68") & (combinations_df["tahs"] == "untermontan") & (combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "41* collin"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 'J', '2a']) == True) & (combinations_df['nais1'] == "68") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "41* collin"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 'J', '2a']) == True) & (combinations_df['nais1'] == "34*") & (combinations_df["tahs"] == "untermontan") & (combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "34* collin"
 
     # !!!!!!!!correct AR only!!!!!!!!!!!!!
     #combinations_df.loc[((combinations_df['nais1']=="8d")&(combinations_df["tahs"]=="obermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk1"]="6"
@@ -2930,11 +2926,6 @@ for climatescenario in climatescenarios:
             (combinations_df['storeg'].isin([1, '1', 'M']) == True) & (combinations_df['nais'] == "26(12a)") & (
             combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan") & (
                         climatescenario == 'rcp85')), "naiszuk1"] = "26"
-
-    # correct SO
-    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 'J']) == True) & (combinations_df['nais2'] == "10a") & (combinations_df["tahsue"] == "submontan") & (combinations_df["hszukcor"] == "untermontan")), "naiszuk2"] = "10a"
-    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 'J']) == True) & (combinations_df['nais2'] == "9a") & (combinations_df["tahsue"] == "submontan") & (combinations_df["hszukcor"] == "untermontan")), "naiszuk2"] = "9a"
-
     # correct neue Projektionswege
     # nais1
     combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 2, '2', '2a', '2b', '2c', 3, '3', 'J']) == True) & (combinations_df['nais1'] == "68*V") & (combinations_df["tahs"] == "subalpin") & (combinations_df["hszukcor"] == "hochmontan")), "naiszuk1"] = '68*V'
@@ -3051,7 +3042,24 @@ for climatescenario in climatescenarios:
     #test=combinations_df[((combinations_df['ue']==1)&(combinations_df['naiszuk2']=='no path'))]
     #test wo hoehenstufe gleich bleibt und no path
     #test = combinations_df[((combinations_df['tahs'] == combinations_df['hszukcor']) & (combinations_df['naiszuk2'] == 'no path'))]
-
+    combinations_df['tahs'].unique().tolist()
+    combinations_df['tahsue'].unique().tolist()
+    # !!!!!!!!correct GE
+    combinations_df.loc[((combinations_df['nais1']=="35M")&(combinations_df["tahs"]=="collin")&(combinations_df["hszukcor"]=="_")), "naiszuk1"]="35M"
+    combinations_df.loc[((combinations_df['nais1'] == "35M") & (combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "_")), "hszukcor"] = "collin"
+    combinations_df.loc[((combinations_df['nais1'] == "26") & (combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "_")), "naiszuk1"] = "26"
+    combinations_df.loc[((combinations_df['nais1'] == "26") & (combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "_")), "hszukcor"] = "collin"
+    combinations_df.loc[((combinations_df['nais1'] == "29A") & (combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "_")), "naiszuk1"] = "29A"
+    combinations_df.loc[((combinations_df['nais1'] == "29A") & (combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "_")), "hszukcor"] = "collin"
+    combinations_df.loc[((combinations_df['nais1'] == "62") & (combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "_")), "naiszuk1"] = "62"
+    combinations_df.loc[((combinations_df['nais1'] == "62") & (combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "_")), "hszukcor"] = "collin"
+    combinations_df.loc[((combinations_df['nais1'] == "28") & (combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "_")), "naiszuk1"] = "28"
+    combinations_df.loc[((combinations_df['nais1'] == "28") & (combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "_")), "hszukcor"] = "collin"
+    combinations_df.loc[((combinations_df['nais1'] == "31") & (combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "_")), "naiszuk1"] = "31"
+    combinations_df.loc[((combinations_df['nais1'] == "31") & (combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "_")), "hszukcor"] = "collin"
+    #ue
+    combinations_df.loc[((combinations_df['nais2'] == "26") & (combinations_df["tahsue"] == "collin") & (combinations_df["hszukcor"] == "_")), "naiszuk2"] = "26"
+    combinations_df.loc[((combinations_df['nais2'] == "26") & (combinations_df["tahsue"] == "collin") & (combinations_df["hszukcor"] == "_")), "hszukcor"] = "collin"
 
     # !!!!!!!!correct LI only!!!!!!!!!!!!!
     # combinations_df.loc[((combinations_df['nais2']=="24*")&(combinations_df["tahsue"]=="obermontan")&(combinations_df["hszukcor"]=="hochmontan")), "naiszuk2"]="24*"
@@ -3114,7 +3122,7 @@ for climatescenario in climatescenarios:
     len(listofnopathcombinations2)
     # listofnopathcombinations2.sort()
     # listofnopathcombinations
-    nopathoutfile = open(projectspace + "/OW/" + climatescenario.lower() + "_listofnopathcombinations.txt", "w")
+    nopathoutfile = open(projectspace + "/GE/" + climatescenario.lower() + "_listofnopathcombinations.txt", "w")
     nopathoutfile.write("standortregion;nais;hsheute;hszukunft\n")
     for item in listofnopathcombinations:
         nopathoutfile.write(str(item[0]) + ";" + str(item[1]) + ";" + str(item[2]) + ";" + str(item[3]) + "\n")
@@ -3122,8 +3130,8 @@ for climatescenario in climatescenarios:
     for item in listofnopathcombinations2:
         nopathoutfile.write(str(item[0]) + ";" + str(item[1]) + ";" + str(item[2]) + ";" + str(item[3]) + "\n")
     nopathoutfile.close()
-    joblib.dump(combinations_df, projectspace + "/OW" + "OW_" + climatescenario + "_combinations_df_futureSTO.sav")
-    combinations_df.to_file(projectspace + "/OW/" + "OW_" + climatescenario + "_zukuenftigestandorte.gpkg")
+    joblib.dump(combinations_df, projectspace + "/GE" + "GE_" + climatescenario + "_combinations_df_futureSTO.sav")
+    combinations_df.to_file(projectspace + "/GE/" + "GE_" + climatescenario + "_zukuenftigestandorte.gpkg")
 
     # ******************************************************************************************************
     # Baumartenempfehlungen
@@ -3137,11 +3145,11 @@ for climatescenario in climatescenarios:
         if item in gr_treetypes_LFI:
             gr_treetypes_LFI.remove(item)
     len(gr_treetypes_LFI)
-    joblib.dump(gr_treetypes_LFI, projectspace + "/OW/" + "treetypes_LFI.sav")
+    joblib.dump(gr_treetypes_LFI, projectspace + "/GE/" + "treetypes_LFI.sav")
 
     naismatrix_gr_df = naismatrixdf[naismatrixdf["Abkuerzung"].isin(gr_treetypes_LFI)]
     len(naismatrix_gr_df)
-    joblib.dump(naismatrix_gr_df, projectspace + "/OW/" + "naismatrix_gr_df.sav")
+    joblib.dump(naismatrix_gr_df, projectspace + "/GE/" + "naismatrix_gr_df.sav")
     ausnahmenausserhalbbuchenareal = ['21*', '23*', '25a', '25as', '25b', '25f', '25au', '26', '26h', '29A', '29C',
                                       '33a', '33b', '33m', '34a', '34b', '35Q', '40Pt', '40PBlt', '42C', '42V', '42t',
                                       '46', '46*', '47', '47D', '47M', '47*', '48', '91']
@@ -3317,12 +3325,12 @@ for climatescenario in climatescenarios:
     print('write Baumartenbedeutungen')
     # combinations_df_bedeutung.to_csv(projectspace+"/"+climatescenario.lower()+"_combinations_df_baumartenbedeutungen.csv")
     joblib.dump(combinations_df_bedeutung,
-                projectspace + "/OW" + "/OW_" + climatescenario.lower() + "_combinations_df_baumartenbedeutungen.sav")
+                projectspace + "/GE" + "/GE_" + climatescenario.lower() + "_combinations_df_baumartenbedeutungen.sav")
     # combinations_df_bedeutung.to_sql("grnaistahsstoregclip6190"+climatescenario+"_baumartenbedeutungen", engine)
     # combinations_df_bedeutung.to_postgis(name="sg_"+climatescenario+'_baumartenbedeutungen', con=engine)
     # combinations_df_bedeutung.to_file(projectspace+"/"+"sg_"+climatescenario+"_baumartenbedeutungen.shp")
-    combinations_df_bedeutung.to_file(projectspace + "/OW" + "/OW_" + climatescenario + "_baumartenbedeutungen.gpkg",
-                                      layer="OW_" + climatescenario + "_baumartenbedeutungen", driver="GPKG")
+    combinations_df_bedeutung.to_file(projectspace + "/GE" + "/GE_" + climatescenario + "_baumartenbedeutungen.gpkg",
+                                      layer="GE_" + climatescenario + "_baumartenbedeutungen", driver="GPKG")
     # sqlstatement='SELECT * AGOM public.grnaistahsstoregclip6190'+climatescenario+'_zukuenftigestandorte;'
     # combinations_df=pd.read_sql_query(sqlstatement,con=engine)
     # sqlstatement='SELECT * FROM public.grnaistahsstoregclip6190'+climatescenario+'_baumartenbedeutungen;'
@@ -3383,7 +3391,7 @@ for climatescenario in climatescenarios:
                                                      ~combinations_df_baumartenempfehlung[col + "heuUE"].isin(
                                                          ["a", "b", "c"]))), col] = 5
     # Arve
-    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["nais1"].isin(arvenundlaerchen)) & (combinations_df_baumartenempfehlung["tahs"] == 'obersubalpin') & (combinations_df_baumartenempfehlung["hszukcor"] == 'hochmontan')), 'OW_'] = 6
+    combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["nais1"].isin(arvenundlaerchen)) & (combinations_df_baumartenempfehlung["tahs"] == 'obersubalpin') & (combinations_df_baumartenempfehlung["hszukcor"] == 'hochmontan')), 'GE_'] = 6
     combinations_df_baumartenempfehlung.loc[((combinations_df_baumartenempfehlung["nais1"].isin(arvenundlaerchen)) & (
                 combinations_df_baumartenempfehlung["tahs"] == 'obersubalpin') & (combinations_df_baumartenempfehlung[
                                                                                       "hszukcor"] == 'hochmontan')), 'AR'] = 6
@@ -3429,10 +3437,10 @@ for climatescenario in climatescenarios:
     # save
     # combinations_df_baumartenempfehlung.to_csv(projectspace+"/"+climatescenario.lower()+"_combinations_df_baumartenempfehlungen.csv")
     joblib.dump(combinations_df_baumartenempfehlung,
-                projectspace + "/OW" + "/OW_" + climatescenario.lower() + "_baumartenempfehlungen.sav")
+                projectspace + "/GE" + "/GE_" + climatescenario.lower() + "_baumartenempfehlungen.sav")
     combinations_df_baumartenempfehlung.to_file(
-        projectspace + "/OW" + "/OW_" + climatescenario + "_baumartenempfehlungen.gpkg",
-        layer="OW_" + climatescenario + "_baumartenempfehlungen", driver="GPKG")
+        projectspace + "/GE" + "/GE_" + climatescenario + "_baumartenempfehlungen.gpkg",
+        layer="GE_" + climatescenario + "_baumartenempfehlungen", driver="GPKG")
     # combinations_df_baumartenempfehlung.to_sql("li"+climatescenario+"_baumartenempfehlungen", engine)
     # combinations_df_baumartenempfehlung.to_postgis(name="sg_"+climatescenario+'_baumartenempfehlungen', con=engine)
 
@@ -3544,10 +3552,10 @@ for climatescenario in climatescenarios:
     print("write the output ...")
     combinations_df_senstivestandorte.columns
     joblib.dump(combinations_df_senstivestandorte,
-                projectspace + "/OW" + "/OW_" + climatescenario.lower() + "_sensitivestandorte.sav")
+                projectspace + "/GE" + "/GE_" + climatescenario.lower() + "_sensitivestandorte.sav")
     combinations_df_senstivestandorte.to_file(
-        projectspace + "/OW" + "/OW_" + climatescenario + "_sensitivestandorte.gpkg",
-        layer="OW_" + climatescenario + "_sensitivestandorte", driver="GPKG")
+        projectspace + "/GE" + "/GE_" + climatescenario + "_sensitivestandorte.gpkg",
+        layer="GE_" + climatescenario + "_sensitivestandorte", driver="GPKG")
     combinations_df.columns
     combinations_df_baumartenempfehlung.columns
     print(climatescenario+" done")

@@ -1627,6 +1627,8 @@ treeapp['lage']=3
 treeapp.loc[treeapp['meanslopeprc']<10, 'lage']=1
 treeapp.columns
 len(treeapp)
+treeapp.loc[treeapp['nais']=='18M ', 'nais']='18M' #remove space in NAIS
+treeapp.loc[treeapp['nais1']=='18M ', 'nais1']='18M' #remove space in NAIS
 print('Start treeapp...')
 for climatescenario in climatescenarios:
     print(climatescenario)
@@ -2240,6 +2242,17 @@ for climatescenario in climatescenarios:
     #combinations_df.loc[((combinations_df['nais1'] == "13h") & (combinations_df["tahs"] == "untermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "13a"
     #combinations_df.loc[((combinations_df['nais2'] == "20") & (combinations_df["tahs"] == "untermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
     #combinations_df.loc[((combinations_df['nais2'] == "53") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "62"
+
+    # !!!!!!!!correct JU
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', '2a', 3, '3', 'J']) == True) & (combinations_df["nais1"] == "18M ") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "9a"
+    #ue
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', '2a', 3, '3', 'J']) == True) & (combinations_df['nais2'] == "9w") & (combinations_df["tahsue"] == "untermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "9w"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', '2a', 3, '3', 'J']) == True) & (combinations_df['nais2'] == "12a") & (combinations_df["tahsue"] == "submontan") & (combinations_df["hszukcor"] == "collin")), "naiszuk2"] = "9a collin"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', '2a', 3, '3', 'J']) == True) & (combinations_df['nais2'] == "12a") & (combinations_df["tahsue"] == "untermontan") & (combinations_df["hszukcor"] == "obermontan")), "naiszuk2"] = "12a"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', '2a', 3, '3', 'J']) == True) & (combinations_df['nais2'] == "7S") & (combinations_df["tahsue"] == "untermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "7S"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', '2a', 3, '3', 'J']) == True) & (combinations_df['nais2'] == "7S") & (combinations_df["tahsue"] == "untermontan") & (combinations_df["hszukcor"] == "collin")), "naiszuk2"] = "7S collin"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', '2a', 3, '3', 'J']) == True) & (combinations_df['nais2'] == "9a") & (combinations_df["tahsue"] == "untermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk2"] = "9a"
+
 
     # !!!!!!!!correct SG only!!!!!!!!!!!!!
     # combinations_df.loc[((combinations_df["taue"]=="8a(12a)")&(combinations_df["tauehs"]=="untermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk2"]="8a(12a)"

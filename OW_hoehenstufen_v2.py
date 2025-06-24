@@ -54,20 +54,20 @@ hsmoddictkurz={0:"med",1:"hyp",2:"co", 3:"co",4:"sm",5:"um",6:"om",7:"umom",8:"h
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 
 #read excel files
-naiseinheitenunique=pd.read_excel(codespace+"/SZ_nais_einheiten_unique_bh_20241128_mf_bh.xlsx", sheet_name='Sheet', dtype="str", engine='openpyxl')
+naiseinheitenunique=pd.read_excel(codespace+"/OW_nais_einheiten_unique_bh_20241128_mf_bh2.xlsx", sheet_name='Sheet1', dtype="str", engine='openpyxl')
 naiseinheitenunique.columns
 naiseinheitenunique.dtypes
 len(naiseinheitenunique)
-naiseinheitenunique=naiseinheitenunique[['SZ Einheit', 'NaiS_LFI','hs_ohne_co', 'hs_inkl_co','Bedingung_Hoehenstufe', 'nais', 'nais1', 'nais2','hs', 'Bemerkung Monika', 'Bemerkung BH']]
-naiseinheitenunique.loc[naiseinheitenunique['Bedingung_Hoehenstufe'].isnull()==True, 'Bedingung_Hoehenstufe']=''
-naiseinheitenunique.loc[naiseinheitenunique['nais2'].isnull()==True, 'nais2']=''
-naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['Bedingung_Hoehenstufe']=='']
+naiseinheitenunique=naiseinheitenunique[['OW_Einheit', 'NaiS_LFI','nais','hs']]
+naiseinheitenunique.loc[naiseinheitenunique['nais'].isnull()==True, 'nais']=''
+naiseinheitenunique.loc[naiseinheitenunique['hs'].isnull()==True, 'hs']=''
+naiseinheitenunique.loc[naiseinheitenunique['OW_Einheit'].isnull()==True, 'OW_Einheit']=''
 
-#naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['hs']!='nan']
+
 #read the rasters
 #reference tif raster
 print("read reference raster")
-referenceraster=myworkspace+"/SZ/SZ_dem10m.tif"
+referenceraster=myworkspace+"/OW/OW_dem10m.tif"
 referencetifraster=gdal.Open(referenceraster)
 referencetifrasterband=referencetifraster.GetRasterBand(1)
 referencerasterProjection=referencetifraster.GetProjection()
@@ -78,17 +78,17 @@ indatatype=referencetifrasterband.DataType
 #dhmarr=convert_tif_to_array("D:/CCW20/GIS/dhm25.tif")
 NODATA_value=-9999
 
-sloperaster=myworkspace+"/SZ/SZ_slopeprz.tif"
-radiationraster=myworkspace+"/SZ/SZ_globradyyw.tif"
-hoehenstufenraster=myworkspace+"/SZ/SZ_vegetationshoehenstufen1975.tif"
+sloperaster=myworkspace+"/OW/OW_slopeprz.tif"
+radiationraster=myworkspace+"/OW/OW_globradyyw.tif"
+hoehenstufenraster=myworkspace+"/OW/OW_vegetationshoehenstufen1975.tif"
 
 
 #read shapefile
-stok_gdf=gpd.read_file(myworkspace+'/SZ/SZ_standortstypen.gpkg', layer='SZ_standortstypen')
+stok_gdf=gpd.read_file(myworkspace+'/OW/OW_standortstypen_hs.gpkg', layer='OW_standortstypen')
 stok_gdf['joinid']=stok_gdf.index
 taheute=gpd.read_file(myworkspace+"/Tannenareale2025.gpkg")
 storeg=gpd.read_file(myworkspace+"/Waldstandortregionen_2024_TI4ab_Final_GR.gpkg", layer='waldstandortregionen_2024_ti4ab_final')
-entwaesserungen=gpd.read_file(myworkspace+"/SZ/"+"Drainage_NGK.shp")
+entwaesserungen=gpd.read_file(myworkspace+"/OW/"+"ow_entwaesserteFlaechen.gpkg", layer='ow_entwaesserteFlaechen')
 entwaesserungen=entwaesserungen[['drainage','geometry']]
 #stok_gdf=gpd.read_file(projectspace+"/GIS/stok_gdf_attributed.shp")
 len(stok_gdf)
@@ -199,8 +199,8 @@ stok_gdf.dtypes
 
 winsound.Beep(frequency, duration)
 stok_gdf.columns
-stok_gdf.to_file(myworkspace+"/SZ/stok_gdf_attributed_temp.gpkg")
-#stok_gdf=gpd.read_file(myworkspace+"/SZ/stok_gdf_attributed_temp.gpkg")
+stok_gdf.to_file(myworkspace+"/OW/stok_gdf_attributed_temp.gpkg")
+#stok_gdf=gpd.read_file(myworkspace+"/OW/stok_gdf_attributed_temp.gpkg")
 
 #Entwaesserungen
 #overlay
@@ -211,8 +211,8 @@ stok_gdf.columns
 stok_gdf.loc[((stok_gdf['NaiS_LFI']=='49')&(stok_gdf['drainage']==1)&(stok_gdf['hs1975']==8)),'NaiS_LFI']='49(50)'
 stok_gdf.loc[((stok_gdf['NaiS_LFI']=='49')&(stok_gdf['drainage']==1)&(stok_gdf['hs1975']==6)),'NaiS_LFI']='49(20)'
 len(stok_gdf)
-stok_gdf=stok_gdf[stok_gdf['SZ Einheit']!='']
-stok_gdf.to_file(myworkspace+"/SZ/stok_gdf_attributed_temp_entw.gpkg")
+#stok_gdf=stok_gdf[stok_gdf['OW_Einheit']!='']
+stok_gdf.to_file(myworkspace+"/OW/stok_gdf_attributed_temp_entw.gpkg")
 
 
 #uebersetzung von Kantonseinheit in NAIS
@@ -225,27 +225,30 @@ stok_gdf['nais2']=''
 stok_gdf['mo']=0
 stok_gdf['ue']=0
 stok_gdf['hs']=''
-stok_gdf['hsue']=''
 stok_gdf['tahs']=''
 stok_gdf['tahsue']=''
-
+#stok_gdf.drop(columns=['hsue'], inplace=True, errors='ignore')
 #transform null values
 stok_gdf.loc[stok_gdf['nais'].isnull()==True,'nais']=''
-stok_gdf.loc[stok_gdf['SZ Einheit'].isnull()==True,'SZ Einheit']=''
-naiseinheitenunique.loc[naiseinheitenunique['SZ Einheit'].isnull()==True,'SZ Einheit']=''
+stok_gdf.loc[stok_gdf['OW_Einheit'].isnull()==True,'OW_Einheit']=''
+naiseinheitenunique.loc[naiseinheitenunique['OW_Einheit'].isnull()==True,'OW_Einheit']=''
 naiseinheitenunique.loc[naiseinheitenunique['hs'].isnull()==True,'hs']=''
-naiseinheitenunique.loc[naiseinheitenunique['nais2'].isnull()==True,'nais2']=''
+
 
 #create nais 1 and nais2
-#stok_gdf['nais1'] = stok_gdf['nais'].str.split('(').str[0].str.strip()
-#stok_gdf['nais2']= stok_gdf['nais'].str.split('(').str[1].str.split(')').str[0].str.strip()
-#stok_gdf.loc[stok_gdf['nais2'].isnull()==True, 'nais2']= ''
-#stok_gdf.loc[stok_gdf['nais2']!='', 'ue']= 1
-#check= stok_gdf[stok_gdf['ue']==1]
+naiseinheitenunique['nais1'] = naiseinheitenunique['nais'].str.split('(').str[0].str.strip()
+naiseinheitenunique['nais2']= naiseinheitenunique['nais'].str.split('(').str[1].str.split(')').str[0].str.strip()
+naiseinheitenunique.loc[naiseinheitenunique['nais2'].isnull()==True, 'nais2']= ''
+
+stok_gdf.loc[stok_gdf['NaiS_LFI']=='49(20)','OW_Einheit']='49(20)'
+stok_gdf.loc[stok_gdf['NaiS_LFI']=='49(50)','OW_Einheit']='49(50)'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='27','NaiS_LFI']='27a'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='29','OW_Einheit']='29A'
+
 
 print('iterate for attributing tahs and tahsue')
 for index, row in naiseinheitenunique.iterrows():
-    kantonseinheit=row['SZ Einheit']
+    kantonseinheit=row['OW_Einheit']
     naislfi=row['NaiS_LFI']
     hs=row["hs"]
     hslist=row['hs'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()
@@ -253,17 +256,17 @@ for index, row in naiseinheitenunique.iterrows():
     nais1=row['nais1']
     nais2=row['nais2']
     #Hoehenstufenzuweisung
-    stok_gdf.loc[((stok_gdf["SZ Einheit"] == kantonseinheit)&(stok_gdf["NaiS_LFI"] == naislfi)), "hs"] = hs
-    stok_gdf.loc[((stok_gdf["SZ Einheit"] == kantonseinheit)&(stok_gdf["NaiS_LFI"] == naislfi)), "nais"] = nais
-    stok_gdf.loc[((stok_gdf["SZ Einheit"] == kantonseinheit) & (stok_gdf["NaiS_LFI"] == naislfi)), "nais1"] = nais1
-    stok_gdf.loc[((stok_gdf["SZ Einheit"] == kantonseinheit) & (stok_gdf["NaiS_LFI"] == naislfi)), "nais2"] = nais2
+    stok_gdf.loc[((stok_gdf["OW_Einheit"] == kantonseinheit)&(stok_gdf["NaiS_LFI"] == naislfi)), "hs"] = hs
+    stok_gdf.loc[((stok_gdf["OW_Einheit"] == kantonseinheit)&(stok_gdf["NaiS_LFI"] == naislfi)), "nais"] = nais
+    stok_gdf.loc[((stok_gdf["OW_Einheit"] == kantonseinheit) & (stok_gdf["NaiS_LFI"] == naislfi)), "nais1"] = nais1
+    stok_gdf.loc[((stok_gdf["OW_Einheit"] == kantonseinheit) & (stok_gdf["NaiS_LFI"] == naislfi)), "nais2"] = nais2
     if nais2!='':
-        stok_gdf.loc[((stok_gdf["SZ Einheit"] == kantonseinheit) & (stok_gdf["NaiS_LFI"] == naislfi)), "ue"] = 1
+        stok_gdf.loc[((stok_gdf["OW_Einheit"] == kantonseinheit) & (stok_gdf["NaiS_LFI"] == naislfi)), "ue"] = 1
     #Hohenstufenzuweisung
     if len(hslist)==1:
-        stok_gdf.loc[((stok_gdf["SZ Einheit"] == kantonseinheit)&(stok_gdf["NaiS_LFI"] == naislfi)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
+        stok_gdf.loc[((stok_gdf["OW_Einheit"] == kantonseinheit)&(stok_gdf["NaiS_LFI"] == naislfi)), "tahs"] = hoehenstufendictabkuerzungen[hslist[0]]
     else:
-        for index2, row2 in stok_gdf[((stok_gdf["SZ Einheit"] == kantonseinheit)&(stok_gdf["NaiS_LFI"] == naislfi))].iterrows():
+        for index2, row2 in stok_gdf[((stok_gdf["OW_Einheit"] == kantonseinheit)&(stok_gdf["NaiS_LFI"] == naislfi))].iterrows():
             if row2['hs1975']>0:
                 hsmod=hsmoddictkurz[int(row2['hs1975'])]
             else:
@@ -279,128 +282,30 @@ for index, row in naiseinheitenunique.iterrows():
                         stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
 
 
-#check=stok_gdf[stok_gdf['SZ Einheit']=='49F']
+stok_gdf.loc[stok_gdf['OW_Einheit']=='27','nais']='27f'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='27','nais1']='27f'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='29','nais']='29A'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='29','nais1']='29A'
+
+stok_gdf.loc[stok_gdf['OW_Einheit']=='53w','nais']='53(60*)'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='53w','nais1']='53'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='53w','nais2']='60*'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='53w','hs']='hm sa'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='53w','ue']=1
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='53w')&(stok_gdf['hs1975']<=8)),'tahs']='hochmontan'
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='53w')&(stok_gdf['hs1975']<=8)),'tahsue']='hochmontan'
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='53w')&(stok_gdf['hs1975'].isnull())),'tahs']='hochmontan'
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='53w')&(stok_gdf['hs1975'].isnull())),'tahsue']='hochmontan'
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='53w')&(stok_gdf['hs1975']>8)),'tahs']='subalpin'
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='53w')&(stok_gdf['hs1975']>8)),'tahsue']='subalpin'
+
+#check=stok_gdf[stok_gdf['OW_Einheit']=='49F']
 winsound.Beep(frequency, duration)
-
-#correct multiple entries
-#13
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '13')&(stok_gdf["hs1975"] <= 4)), "tahs"] = 'submontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '13')&(stok_gdf["hs1975"] == 5)), "tahs"] = 'untermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '13')&(stok_gdf["hs1975"] >= 6)), "tahs"] = 'obermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '13')&(stok_gdf["hs1975"].isnull()==True)), "tahs"] = 'obermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '13')&(stok_gdf["tahs"] == 'obermontan')), "nais"] = '13h'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '13')&(stok_gdf["tahs"] == 'untermontan')), "nais"] = '13a'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '13')&(stok_gdf["tahs"] == 'submontan')), "nais"] = '13a'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '13')&(stok_gdf["tahs"] == 'obermontan')), "nais1"] = '13h'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '13')&(stok_gdf["tahs"] == 'untermontan')), "nais1"] = '13a'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '13')&(stok_gdf["tahs"] == 'submontan')), "nais1"] = '13a'
-#53
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53')&(stok_gdf["hs1975"] <= 6)), "tahs"] = 'obermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53')&(stok_gdf["hs1975"] == 8)), "tahs"] = 'hochmontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53')&(stok_gdf["hs1975"] >= 9)), "tahs"] = 'subalpin'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53')&(stok_gdf["tahs"] == 'obermontan')), "nais"] = '53Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53')&(stok_gdf["tahs"] == 'hochmontan')), "nais"] = '53Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53')&(stok_gdf["tahs"] == 'subalpin')), "nais"] = '53'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53')&(stok_gdf["tahs"] == 'obermontan')), "nais1"] = '53Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53')&(stok_gdf["tahs"] == 'hochmontan')), "nais1"] = '53Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53')&(stok_gdf["tahs"] == 'subalpin')), "nais1"] = '53'
-#27h
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27h')&(stok_gdf["hs1975"] <= 6)), "tahs"] = 'obermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27h')&(stok_gdf["hs1975"] >= 8)), "tahs"] = 'hochmontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27h')&(stok_gdf["hs1975"].isnull()==True)), "tahs"] = 'hochmontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27h')&(stok_gdf["tahs"] == 'obermontan')), "nais"] = '27h'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27h')&(stok_gdf["tahs"] == 'hochmontan')), "nais"] = '27*'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27h')&(stok_gdf["tahs"] == 'obermontan')), "nais1"] = '27h'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27h')&(stok_gdf["tahs"] == 'hochmontan')), "nais1"] = '27*'
-#27w
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27w')&(stok_gdf["hs1975"] <= 6)), "tahs"] = 'obermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27w')&(stok_gdf["hs1975"] >= 8)), "tahs"] = 'hochmontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27w')&(stok_gdf["tahs"] == 'obermontan')), "nais"] = '27h(26w)'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27w')&(stok_gdf["tahs"] == 'obermontan')), "nais1"] = '27h'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27w')&(stok_gdf["tahs"] == 'obermontan')), "nais2"] = '26w'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27w')&(stok_gdf["tahs"] == 'hochmontan')), "nais"] = '27*(60*Ta)'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27w')&(stok_gdf["tahs"] == 'hochmontan')), "nais1"] = '27h'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27w')&(stok_gdf["tahs"] == 'hochmontan')), "nais2"] = '60*Ta'
-#32V
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["NaiS_LFI"] == '32C')&(stok_gdf["hs1975"] <= 4)), "tahs"] = 'submontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["NaiS_LFI"] == '32C')&(stok_gdf["hs1975"] >= 5)), "tahs"] = 'untermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["NaiS_LFI"] == '32V')&(stok_gdf["hs1975"] <= 6)), "tahs"] = 'obermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["NaiS_LFI"] == '32V')&(stok_gdf["hs1975"] == 8)), "tahs"] = 'hochmontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["NaiS_LFI"] == '32V')&(stok_gdf["hs1975"] >= 9)), "tahs"] = 'subalpin'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["NaiS_LFI"] == '32V')&(stok_gdf["hs1975"].isnull()==True)), "tahs"] = 'subalpin'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["tahs"] == 'submontan')), "nais"] = '32C'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["tahs"] == 'submontan')), "nais1"] = '32C'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["tahs"] == 'untermontan')), "nais"] = '32C'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["tahs"] == 'untermontan')), "nais1"] = '32C'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["tahs"] == 'obermontan')), "nais"] = '32V'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["tahs"] == 'obermontan')), "nais1"] = '32V'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["tahs"] == 'hochmontan')), "nais"] = '32V'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["tahs"] == 'hochmontan')), "nais1"] = '32V'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["tahs"] == 'subalpin')), "nais"] = '32V'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '32V')&(stok_gdf["tahs"] == 'subalpin')), "nais1"] = '32V'
-#53Bl
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["hs1975"] <= 6)), "tahs"] = 'obermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["hs1975"] == 8)), "tahs"] = 'hochmontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["hs1975"] >= 9)), "tahs"] = 'subalpin'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["hs1975"].isnull()==True)), "tahs"] = 'subalpin'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["tahs"] == 'obermontan')), "nais"] = '53Ta(48)'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["tahs"] == 'obermontan')), "nais1"] = '53Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["tahs"] == 'obermontan')), "nais2"] = '48'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["tahs"] == 'hochmontan')), "nais"] = '53Ta(48)'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["tahs"] == 'hochmontan')), "nais1"] = '53Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["tahs"] == 'hochmontan')), "nais2"] = '48'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["tahs"] == 'subalpin')), "nais"] = '53(57Bl)'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["tahs"] == 'subalpin')), "nais1"] = '53'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53Bl')&(stok_gdf["tahs"] == 'subalpin')), "nais2"] = '57Bl'
-#53w
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53w')&(stok_gdf["hs1975"] <= 8)), "tahs"] = 'hochmontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53w')&(stok_gdf["hs1975"] >= 9)), "tahs"] = 'subalpin'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53w')&(stok_gdf["tahs"] == 'hochmontan')), "nais"] = '53Ta(60*Ta)'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53w')&(stok_gdf["tahs"] == 'hochmontan')), "nais1"] = '53Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53w')&(stok_gdf["tahs"] == 'hochmontan')), "nais2"] = '60*Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53w')&(stok_gdf["tahs"] == 'subalpin')), "nais"] = '53(60*)'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53w')&(stok_gdf["tahs"] == 'subalpin')), "nais1"] = '53'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '53w')&(stok_gdf["tahs"] == 'subalpin')), "nais2"] = '60*'
-#60*
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '60*')&(stok_gdf["hs1975"] <= 6)), "tahs"] = 'obermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '60*')&(stok_gdf["hs1975"] == 8)), "tahs"] = 'hochmontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '60*')&(stok_gdf["hs1975"] >= 9)), "tahs"] = 'subalpin'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '60*')&(stok_gdf["tahs"] == 'obermontan')), "nais"] = '60*Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '60*')&(stok_gdf["tahs"] == 'obermontan')), "nais1"] = '60*Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '60*')&(stok_gdf["tahs"] == 'hochmontan')), "nais"] = '60*Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '60*')&(stok_gdf["tahs"] == 'hochmontan')), "nais1"] = '60*Ta'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '60*')&(stok_gdf["tahs"] == 'subalpin')), "nais"] = '60*'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '60*')&(stok_gdf["tahs"] == 'subalpin')), "nais1"] = '60*'
-#27
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27')&(stok_gdf["hs1975"] <= 4)), "tahs"] = 'submontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27')&(stok_gdf["hs1975"] >= 5)), "tahs"] = 'untermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '27')&(stok_gdf["hs1975"].isnull()==True)), "tahs"] = 'untermontan'
-stok_gdf.loc[(stok_gdf["SZ Einheit"] == '27'), "nais"] = '27f'
-stok_gdf.loc[(stok_gdf["SZ Einheit"] == '27'), "nais1"] = '27f'
-#49(20)
-stok_gdf.loc[((stok_gdf["NaiS_LFI"] == '49(20)')), "tahs"] = 'obermontan'
-stok_gdf.loc[((stok_gdf["NaiS_LFI"] == '49(20)')), "tahsue"] = 'obermontan'
-stok_gdf.loc[((stok_gdf["NaiS_LFI"] == '49(20)')), "nais1"] = '49'
-stok_gdf.loc[((stok_gdf["NaiS_LFI"] == '49(20)')), "nais2"] = '20'
-#49(50)
-stok_gdf.loc[((stok_gdf["NaiS_LFI"] == '49(50)')), "tahs"] = 'hochmontan'
-stok_gdf.loc[((stok_gdf["NaiS_LFI"] == '49(50)')), "tahsue"] = 'hochmontan'
-stok_gdf.loc[((stok_gdf["NaiS_LFI"] == '49(50)')), "nais1"] = '49'
-stok_gdf.loc[((stok_gdf["NaiS_LFI"] == '49(50)')), "nais2"] = '50'
-#73
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '73')&(stok_gdf["hs1975"] <= 8)), "tahs"] = 'hochmontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '73')&(stok_gdf["hs1975"] >= 9)), "tahs"] = 'subalpin'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '73')), "nais1"] = '69'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '73')), "nais2"] = '69'
-#30
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '30')&(stok_gdf["hs1975"] <= 4)), "tahs"] = 'submontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '30')&(stok_gdf["hs1975"] >= 5)), "tahs"] = 'untermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '30')&(stok_gdf["hs1975"].isnull()==True)), "tahs"] = 'untermontan'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '30')), "nais1"] = '30'
-stok_gdf.loc[((stok_gdf["SZ Einheit"] == '30')), "nais"] = '30'
-
-
-#checknohs=stok_gdf[((stok_gdf["tahs"]==""))]
+stok_gdf=stok_gdf[stok_gdf['OW_Einheit'].isnull()==False]
+stok_gdf=stok_gdf[stok_gdf['OW_Einheit']!='']
+checknohs=stok_gdf[((stok_gdf["tahs"]==""))]
+stok_gdf['drainage'].unique().tolist()
+stok_gdf.loc[stok_gdf['drainage'].isnull()==True,'drainage']=0
 stok_gdf.columns
 
 #fill hs of ue
@@ -411,11 +316,14 @@ stok_gdf.loc[((stok_gdf["nais2"] != '') & (stok_gdf["ue"] == 1)&(stok_gdf["tahsu
 #check empty values
 stok_gdf["tahs"].unique().tolist()
 stok_gdf["tahsue"].unique().tolist()
-checknohs=stok_gdf[stok_gdf["tahs"]==""][['SZ Einheit','nais','nais1','nais2',"hs", 'hs1975', 'tahs','tahsue']]
-print('Diese EInheiten haben keine Uebersetzung: '+str(checknohs['SZ Einheit'].unique().tolist()))
+stok_gdf.loc[stok_gdf['tahs']=='obersubalpin', 'tahs']='subalpin'
+
+
+checknohs=stok_gdf[stok_gdf["tahs"]==""][['OW_Einheit','nais','nais1','nais2',"hs", 'hs1975', 'tahs','tahsue']]
+print('Diese EInheiten haben keine Uebersetzung: '+str(checknohs['OW_Einheit'].unique().tolist()))
 #korrigiere mit sheet1
-fehlendeuebersetzungen=checknohs[['SZ Einheit', 'nais','nais1','nais2',"hs"]].drop_duplicates()
-fehlendeuebersetzungen.to_excel(myworkspace+'/SZ/'+'fehlendeHoehenstufen.xlsx')
+fehlendeuebersetzungen=checknohs[['OW_Einheit', 'nais','nais1','nais2',"hs"]].drop_duplicates()
+fehlendeuebersetzungen.to_excel(myworkspace+'/OW/'+'fehlendeHoehenstufen.xlsx')
 len(fehlendeuebersetzungen)
 
 ##fill hoehenstufe for empty values
@@ -443,14 +351,14 @@ print("write output")
 stok_gdf.columns
 #stok_gdf['BedingungHangneigung'].unique().tolist()
 #stok_gdf['BedingungRegion'].unique().tolist()
-#stok_gdf=stok_gdf[['g1','SZ Einheit', 'Einheit_Na', 'joinid', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1','nais2', 'mo', 'ue', 'hs', 'tahs', 'tahsue', 'geometry']]
+#stok_gdf=stok_gdf[['g1','OW_Einheit', 'Einheit_Na', 'joinid', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1','nais2', 'mo', 'ue', 'hs', 'tahs', 'tahsue', 'geometry']]
 #stok_gdf=gpd.read_file(myworkspace+"/ZH/stok_gdf_attributed.gpkg")
-stok_gdf=stok_gdf[['SZ Einheit','joinid', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1','nais2', 'mo', 'ue', 'hs', 'tahs', 'tahsue', 'geometry']]
+stok_gdf=stok_gdf[['OW_Einheit','joinid', 'taheute', 'storeg', 'meanslopeprc','slpprzrec', 'rad', 'radiation', 'hs1975', 'nais', 'nais1','nais2', 'mo', 'ue', 'hs', 'tahs', 'tahsue', 'geometry']]
 stok_gdf['fid']=stok_gdf.index
 stok_gdf['area']=stok_gdf.geometry.area
 len(stok_gdf)
 stok_gdf=stok_gdf[stok_gdf['area']>0]
-stok_gdf.to_file(myworkspace+"/SZ/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
+stok_gdf.to_file(myworkspace+"/OW/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
 print("done")
 
 
@@ -458,8 +366,8 @@ print("done")
 print('Export for Tree-App')
 stok_gdf.columns
 #stok_gdf.loc[((stok_gdf['ue']==1)&(stok_gdf['tahsue']=='')&(stok_gdf['tahs']!='')),'tahsue']=stok_gdf['tahs']
-treeapp=stok_gdf[['SZ Einheit', 'nais','nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
-treeapp.to_file(myworkspace+"/SZ/SZ_treeapp.gpkg", layer='SZ_treeapp', driver="GPKG")
+treeapp=stok_gdf[['OW_Einheit', 'nais','nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
+treeapp.to_file(myworkspace+"/OW/OW_treeapp.gpkg", layer='OW_treeapp', driver="GPKG")
 treeapp.columns
 print("done")
 

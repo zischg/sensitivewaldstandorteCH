@@ -1756,9 +1756,9 @@ for climatescenario in climatescenarios:
                 combinations_df.loc[index, "storegco"] = pathwaysquery["Standortsregionen"].unique().tolist()[0]
             else:
                 combinations_df.loc[index, "storegco"] = storeg
-        else:
-            if nais!="_":
-                print(nais+" not in nais_matrix_standorte_list")
+        #else:
+        #    if nais!="_":
+        #        print(nais+" not in nais_matrix_standorte_list")
     #check empty storegco values
     combinations_df["storegco"].unique().tolist()
     combinations_df.loc[((combinations_df["storegco"]=="")&(combinations_df["storeg"]=="1")),"storegco"]='R, J, M, 1, 2, 3'
@@ -2244,6 +2244,16 @@ for climatescenario in climatescenarios:
     combinations_df.loc[(combinations_df["tahsue"] == combinations_df["hszukcor"]), "naiszuk2"] = combinations_df['nais2']
     combinations_df.loc[((combinations_df["tahs"] == "collin") & (combinations_df["hszukcor"] == "collin mit Buche")), "naiszuk1"] = combinations_df['nais1']
     combinations_df.loc[((combinations_df["tahsue"] == "collin") & (combinations_df['nais2'] != "") & (combinations_df["hszukcor"] == "collin mit Buche")), "naiszuk2"] = combinations_df['nais2']
+
+    # correct VD
+    combinations_df.loc[((combinations_df['storeg'].isin(['M', 'J']) == True) & (combinations_df['nais1'] == "16") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "39"
+    combinations_df.loc[((combinations_df['storeg'].isin([1,'1',2, '2','2a','2b','3']) == True) & (combinations_df['nais1'] == "16") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "40*"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 2, '2', '2a', '2b', '3','J','M']) == True) & (combinations_df['nais1'] == "16") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "16"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M','J']) == True) & (combinations_df['nais1'] == "43") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "43"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 'J']) == True) & (combinations_df['nais1'] == "45") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "45"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 'J','2a']) == True) & (combinations_df['nais1'] == "68") & (combinations_df["tahs"] == "untermontan") & (combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "41* collin"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 'J', '2a']) == True) & (combinations_df['nais1'] == "68") & (combinations_df["tahs"] == "obermontan") & (combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "41* collin"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 'J', '2a']) == True) & (combinations_df['nais1'] == "34*") & (combinations_df["tahs"] == "untermontan") & (combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "34* collin"
 
     # !!!!!!!!correct AR only!!!!!!!!!!!!!
     #combinations_df.loc[((combinations_df['nais1']=="8d")&(combinations_df["tahs"]=="obermontan")&(combinations_df["hszukcor"]=="submontan")), "naiszuk1"]="6"
@@ -3533,3 +3543,4 @@ for climatescenario in climatescenarios:
     combinations_df_baumartenempfehlung.columns
     print(climatescenario+" done")
 print('all done')
+
