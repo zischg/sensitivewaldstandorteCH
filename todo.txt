@@ -9,7 +9,8 @@ Waldstandortsregionen
 4-->4a, 4b
 2a,2b-->2a, 2b, 2c
 
-Von collin zu collin
 
 Lä Einheiten
+
+bei ZH, ZG, VD, TG, SZ, SH, JU, LU ev schauen ob 65-kol in submontan liegt, dann umtauschen in 65
 

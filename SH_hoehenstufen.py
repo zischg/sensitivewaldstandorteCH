@@ -48,7 +48,7 @@ hsmoddictkurz={3:"co",4:"sm",5:"um",6:"om",8:"hm",9:"sa",10:"osa"}
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 
 #read excel files
-naiseinheitenunique=pd.read_excel(codespace+"/SH_nais_einheiten_unique_v3_mf.xlsx", dtype="str", engine='openpyxl')
+naiseinheitenunique=pd.read_excel(codespace+"/SH_nais_einheiten_unique_v3_mf_Juli2025.xlsx", dtype="str", engine='openpyxl')
 len(naiseinheitenunique)
 naiseinheitenunique.dtypes
 naiseinheitenunique.loc[naiseinheitenunique['nais1'].isnull()==True, 'nais1']=''
@@ -290,6 +290,6 @@ print('Export for Tree-App')
 stok_gdf.columns
 #stok_gdf.loc[((stok_gdf['ue']==1)&(stok_gdf['tahsue']=='')&(stok_gdf['tahs']!='')),'tahsue']=stok_gdf['tahs']
 treeapp=stok_gdf[['wg_nr','nais', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
-treeapp.to_file(myworkspace+"/SH/SH_treeapp.gpkg", layer='AR_treeapp', driver="GPKG")
+treeapp.to_file(myworkspace+"/SH/SH_treeapp.gpkg", layer='SH_treeapp', driver="GPKG")
 treeapp.columns
 print("done")

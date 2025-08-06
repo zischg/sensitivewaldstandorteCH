@@ -396,8 +396,16 @@ stok_gdf.to_file(myworkspace+"/NW/stok_gdf_attributed.gpkg")
 #stok_gdf=gpd.read_file(myworkspace+"/NW/stok_gdf_attributed.gpkg")
 print("done")
 
-
-
+#Korrekturen Juli 2025
+stok_gdf=gpd.read_file(myworkspace+"/NW/stok_gdf_attributed.gpkg")
+stok_gdf.loc[((stok_gdf['nais1']=='26h')&(stok_gdf['tahs']=='subalpin')),'tahs']='hochmontan'
+stok_gdf.loc[((stok_gdf['nais2']=='67')&(stok_gdf['tahsue']=='obermontan')),'tahsue']='hochmontan'
+stok_gdf.loc[((stok_gdf['nais']=='53Ta(62)')&(stok_gdf['tahs']=='untermontan')),'tahs']='obermontan'
+stok_gdf.loc[((stok_gdf['nais']=='53Ta(62)')&(stok_gdf['tahsue']=='untermontan')),'tahsue']='obermontan'
+stok_gdf.loc[((stok_gdf['nais']=='53Ta(65)')&(stok_gdf['tahs']=='untermontan')),'tahs']='obermontan'
+stok_gdf.loc[((stok_gdf['nais']=='53Ta(65)')&(stok_gdf['tahsue']=='untermontan')),'tahsue']='obermontan'
+stok_gdf.loc[((stok_gdf['nais2']=='7a')&(stok_gdf['tahsue']=='submontan')),'tahsue']='untermontan'
+stok_gdf.to_file(myworkspace+"/NW/stok_gdf_attributed.gpkg")
 
 #Export for tree-app
 print('Export for Tree-App')

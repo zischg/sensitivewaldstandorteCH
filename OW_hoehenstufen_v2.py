@@ -84,7 +84,8 @@ hoehenstufenraster=myworkspace+"/OW/OW_vegetationshoehenstufen1975.tif"
 
 
 #read shapefile
-stok_gdf=gpd.read_file(myworkspace+'/OW/OW_standortstypen_hs.gpkg', layer='OW_standortstypen')
+stok_gdf=gpd.read_file(myworkspace+'/OW/exportWebGIS20250310.gpkg', layer='exportWebGIS20250310')
+stok_gdf.rename(columns={"NaiS_Einheit": "NaiS_LFI"}, inplace=True)
 stok_gdf['joinid']=stok_gdf.index
 taheute=gpd.read_file(myworkspace+"/Tannenareale2025.gpkg")
 storeg=gpd.read_file(myworkspace+"/Waldstandortregionen_2024_TI4ab_Final_GR.gpkg", layer='waldstandortregionen_2024_ti4ab_final')
@@ -298,6 +299,30 @@ stok_gdf.loc[((stok_gdf['OW_Einheit']=='53w')&(stok_gdf['hs1975'].isnull())),'ta
 stok_gdf.loc[((stok_gdf['OW_Einheit']=='53w')&(stok_gdf['hs1975'].isnull())),'tahsue']='hochmontan'
 stok_gdf.loc[((stok_gdf['OW_Einheit']=='53w')&(stok_gdf['hs1975']>8)),'tahs']='subalpin'
 stok_gdf.loc[((stok_gdf['OW_Einheit']=='53w')&(stok_gdf['hs1975']>8)),'tahsue']='subalpin'
+
+#correctur falsche Zuordnungen
+stok_gdf.loc[stok_gdf['OW_Einheit']=='13a','nais']='13a'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='13a','nais1']='13a'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='13a','hs']='sm um'
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='13a')&(stok_gdf['hs1975']<=4)),'tahs']='submontan'
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='13a')&(stok_gdf['hs1975']>4)),'tahs']='untermontan'
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='13a')&(stok_gdf['hs1975'].isnull()==True)),'tahs']='untermontan'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='53Bl','nais']='53(57Bl)'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='53Bl','nais1']='53'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='53Bl','nais2']='57Bl'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='53Bl','hs']='sa'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='53Bl','tahs']='subalpin'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='53Bl','tahsue']='subalpin'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='29A','nais']='29A'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='29A','nais1']='29A'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='29A','hs']='sm um'
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='29A')&(stok_gdf['hs1975']<=4)),'tahs']='submontan'
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='29A')&(stok_gdf['hs1975']>4)),'tahs']='untermontan'
+stok_gdf.loc[((stok_gdf['OW_Einheit']=='29A')&(stok_gdf['hs1975'].isnull()==True)),'tahs']='untermontan'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='10a','nais']='10a'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='10a','nais1']='10a'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='10a','hs']='sm'
+stok_gdf.loc[stok_gdf['OW_Einheit']=='10a','tahs']='submontan'
 
 #check=stok_gdf[stok_gdf['OW_Einheit']=='49F']
 winsound.Beep(frequency, duration)

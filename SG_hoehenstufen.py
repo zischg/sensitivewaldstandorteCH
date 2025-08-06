@@ -452,7 +452,35 @@ len(stok_gdf)
 stok_gdf=stok_gdf[stok_gdf['area']>0]
 stok_gdf.to_file(myworkspace+"/SG/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
 print("done")
-
+#Korrekturen Juli2025
+stok_gdf=gpd.read_file(myworkspace+"/SG/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='18(27)','hs']='om(um)'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='18(27)','tahs']='obermontan'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='18(27)','tahsue']='untermontan'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='18w(27)','hs']='om(um)'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='18w(27)','tahs']='obermontan'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='18w(27)','tahsue']='untermontan'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='20E(27)','hs']='om(um)'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='20E(27)','tahs']='obermontan'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='20E(27)','tahsue']='untermontan'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='20E(27f)','hs']='om(um)'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='20E(27f)','tahs']='obermontan'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='20E(27f)','tahsue']='untermontan'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='49(32C)','nais']='49(32*)'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='49(32C)','nais2']='32*'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='53(18v)','nais']='53Ta(18v)'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='53(18v)','nais1']='53Ta'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='53(69L)/46R','nais']='53Ta(46M)'
+stok_gdf.loc[stok_gdf['DTWGEINHEI']=='53(69L)/46R','nais1']='53Ta'
+stok_gdf.loc[((stok_gdf['nais1']=='60*Ta')&(stok_gdf['nais2']=='27*')),'tahs']='hochmontan'
+stok_gdf.loc[((stok_gdf['nais1']=='60*Ta')&(stok_gdf['nais2']=='27*')),'tahsue']='hochmontan'
+stok_gdf.loc[((stok_gdf['nais1']=='60*Ta')&(stok_gdf['nais2']=='AV')),'tahs']='hochmontan'
+stok_gdf.loc[((stok_gdf['nais1']=='60*Ta')&(stok_gdf['nais2']=='AV')),'tahsue']='hochmontan'
+stok_gdf.loc[((stok_gdf['nais1']=='69')&(stok_gdf['nais2']=='53Ta')),'tahs']='hochmontan'
+stok_gdf.loc[((stok_gdf['nais1']=='69')&(stok_gdf['nais2']=='53Ta')),'tahsue']='hochmontan'
+len(stok_gdf)
+stok_gdf=stok_gdf[stok_gdf['nais']!='']
+stok_gdf.to_file(myworkspace+"/SG/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
 
 #Export for tree-app
 print('Export for Tree-App')
@@ -462,18 +490,3 @@ treeapp=stok_gdf[['DTWGEINHEI', 'nais','nais1', 'nais2', 'mo', 'ue','tahs', 'tah
 treeapp.to_file(myworkspace+"/SG/SG_treeapp.gpkg", layer='SG_treeapp', driver="GPKG")
 treeapp.columns
 print("done")
-
-#test = stok_gdf[stok_gdf['nais']=='18M(48)']
-#test = stok_gdf[stok_gdf['nais']=='12a(18)']
-#test = stok_gdf[stok_gdf['nais']=='46(8*)']
-#test = stok_gdf[stok_gdf['nais']=='7a(10a)']
-#test = stok_gdf[stok_gdf['nais']=='18v(18*)']
-#test = stok_gdf[stok_gdf['nais']=='53Ta(18v)']
-#test = stok_gdf[stok_gdf['nais1']=='']
-#test = stok_gdf[((stok_gdf['nais2']=='')&(stok_gdf['ue']==1))]
-
-#test2 = naiseinheitenunique[naiseinheitenunique['NaiS']=='60*(53)']
-#test=stok_gdf[((stok_gdf['ue']==1)&(stok_gdf['tahsue']=='')&(stok_gdf['tahs']!=''))]
-
-
-

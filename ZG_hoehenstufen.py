@@ -340,6 +340,18 @@ stok_gdf=stok_gdf[stok_gdf['area']>0]
 stok_gdf.to_file(myworkspace+"/ZG/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
 print("done")
 
+#correctur V3
+stok_gdf=gpd.read_file(myworkspace+"/ZG/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
+stok_gdf.columns
+#correct wrong entries
+stok_gdf.loc[((stok_gdf['NUMMER']=='17')&(stok_gdf['nais1']=='17')&(stok_gdf['nais2']=='26h')),'tahs']='untermontan'
+stok_gdf.loc[((stok_gdf['NUMMER']=='17')&(stok_gdf['nais1']=='17')&(stok_gdf['nais2']=='26h')),'tahsue']='obermontan'
+stok_gdf.loc[((stok_gdf['NUMMER']=='17')&(stok_gdf['nais1']=='17')&(stok_gdf['nais2']=='26h')),'hs']='um(om)'
+stok_gdf.loc[((stok_gdf['NUMMER']=='31')&(stok_gdf['nais1']=='31')),'tahs']='submontan'
+stok_gdf.loc[((stok_gdf['NUMMER']=='31')&(stok_gdf['nais1']=='31')),'hs']='sm'
+stok_gdf.to_file(myworkspace+"/ZG/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
+
+
 
 #Export for tree-app
 print('Export for Tree-App')

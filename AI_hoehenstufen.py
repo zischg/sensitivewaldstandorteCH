@@ -318,7 +318,23 @@ stok_gdf.to_file(myworkspace+"/AI/stok_gdf_attributed.gpkg")
 #stok_gdf=gpd.read_file(myworkspace+"/AI/stok_gdf_attributed.gpkg")
 print("done")
 
-
+#correctur Juli 2025
+stok_gdf=gpd.read_file(myworkspace+"/AI/stok_gdf_attributed.gpkg")
+stok_gdf.loc[(stok_gdf['WSTEinheit']=='18MBl'),'nais1']='18M'
+stok_gdf.loc[(stok_gdf['WSTEinheit']=='18MBl(20g)'),'nais1']='18M'
+stok_gdf.loc[(stok_gdf['WSTEinheit']=='18MBl(20g)'),'nais2']='20'
+stok_gdf.loc[(stok_gdf['WSTEinheit']=='46(57V)'),'hs']='hm(sa)'
+stok_gdf.loc[(stok_gdf['WSTEinheit']=='46(57V)'),'tahs']='hochmontan'
+stok_gdf.loc[(stok_gdf['WSTEinheit']=='46(57V)'),'tahsue']='subalpin'
+stok_gdf.loc[(stok_gdf['WSTEinheit']=='26(12a)'),'nais2']='12a'
+treeapp.loc[((treeapp['WSTEinheit']=='27f')&(treeapp['nais']=='27f')&(treeapp['nais1']=='27')),'nais1']='27f'
+treeapp.loc[((treeapp['WSTEinheit']=='27a')&(treeapp['nais']=='27a')&(treeapp['nais1']=='27')),'nais1']='27a'
+treeapp.loc[((treeapp['WSTEinheit']=='27f(12w)')&(treeapp['nais']=='27f(12w)')&(treeapp['nais1']=='27')),'nais1']='27f'
+treeapp.loc[((treeapp['WSTEinheit']=='27f(17)')&(treeapp['nais']=='27f(17)')&(treeapp['nais1']=='27')),'nais1']='27f'
+len(stok_gdf)
+stok_gdf=stok_gdf[stok_gdf['nais1']!='']
+stok_gdf=stok_gdf[stok_gdf['nais1'].isnull()==False]
+stok_gdf.to_file(myworkspace+"/AI/stok_gdf_attributed.gpkg")
 
 
 #Export for tree-app

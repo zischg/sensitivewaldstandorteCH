@@ -52,7 +52,7 @@ hsmoddictkurz={2:"co",3:"co",4:"sm",5:"um",6:"om",8:"hm",9:"sa",10:"osa"}
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 
 #read excel files
-naiseinheitenunique=pd.read_excel(codespace+"/AG_nais_einheiten_unique_v2_mf.xlsx", sheet_name='Sheet1', dtype="str", engine='openpyxl')
+naiseinheitenunique=pd.read_excel(codespace+"/AG_nais_einheiten_unique_v2_mf_korr.xlsx", sheet_name='Sheet1', dtype="str", engine='openpyxl')
 naiseinheitenunique.columns
 naiseinheitenunique.dtypes
 len(naiseinheitenunique)
@@ -61,6 +61,7 @@ naiseinheitenunique.loc[naiseinheitenunique['nais'].isnull()==True, 'nais']=''
 naiseinheitenunique.loc[naiseinheitenunique['hs'].isnull()==True, 'hs']=''
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['nais']!='']
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['hs']!='']
+
 
 #read the rasters
 #reference tif raster
@@ -179,9 +180,9 @@ stok_gdf.dtypes
 winsound.Beep(frequency, duration)
 
 stok_gdf.to_file(myworkspace+"/AG/stok_gdf_attributed_temp.gpkg")
-#stok_gdf=gpd.read_file(myworkspace+"/NE/stok_gdf_attributed_temp.gpkg")
+#stok_gdf=gpd.read_file(myworkspace+"/AG/stok_gdf_attributed_temp.gpkg")
 winsound.Beep(frequency, duration)
-
+len(stok_gdf)
 
 #uebersetzung von Kantonseinheit in NAIS
 #stok_gdf=gpd.read_file(myworkspace+"/AG/stok_gdf_attributed_temp.gpkg")
@@ -261,7 +262,11 @@ stok_gdf=stok_gdf[['joinid', 'STAO_87', 'STANDORT','taheute', 'storeg', 'meanslo
 stok_gdf["tahs"].unique().tolist()
 stok_gdf["tahsue"].unique().tolist()
 checknohs=stok_gdf[stok_gdf["tahs"]==""][['STAO_87', 'STANDORT',"nais",'hs1975',"hs"]]
+stok_gdf=stok_gdf[stok_gdf['STAO_87']!='99']
+checknonais=stok_gdf[stok_gdf["nais1"]==""][['STAO_87', 'STANDORT',"nais",'hs1975',"hs"]]
 print('Diese EInheiten haben keine Uebersetzung: '+str(checknohs['STANDORT'].unique().tolist()))
+len(stok_gdf)
+
 
 ##fill hoehenstufe for empty values
 #for index, row in stok_gdf.iterrows():
@@ -309,7 +314,7 @@ stok_gdf.columns
 #stok_gdf['BedingungHangneigung'].unique().tolist()
 #stok_gdf['BedingungRegion'].unique().tolist()
 stok_gdf.to_file(myworkspace+"/AG/stok_gdf_attributed.gpkg")
-#stok_gdf=gpd.read_file(myworkspace+"/NE/stok_gdf_attributed.gpkg")
+#stok_gdf=gpd.read_file(myworkspace+"/AG/stok_gdf_attributed.gpkg")
 print("done")
 
 

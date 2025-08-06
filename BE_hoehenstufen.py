@@ -54,7 +54,7 @@ hsmoddictkurz={0:"med",1:"hyp",2:"co", 3:"co",4:"sm",5:"um",6:"om",7:"umom",8:"h
 hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
 
 #read excel files
-naiseinheitenunique=pd.read_excel(codespace+"/BE_nais_einheiten_unique_bh_20241128_bh_mf_bh.xlsx", sheet_name='BE', dtype="str", engine='openpyxl')
+naiseinheitenunique=pd.read_excel(codespace+"/BE_nais_einheiten_unique_bh_20241128_bh_mf_v2.xlsx", sheet_name='BE', dtype="str", engine='openpyxl')
 naiseinheitenunique.columns
 naiseinheitenunique.dtypes
 len(naiseinheitenunique)
@@ -198,6 +198,7 @@ stok_gdf.columns
 stok_gdf.to_file(myworkspace+"/BE/stok_gdf_attributed_temp.gpkg")
 #stok_gdf=gpd.read_file(myworkspace+"/BE/stok_gdf_attributed_temp.gpkg")
 
+
 #uebersetzung von Kantonseinheit in NAIS
 #naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['NaiS'].isnull() == False]
 stok_gdf.columns
@@ -339,6 +340,31 @@ stok_gdf.columns
 #stok_gdf.loc[((stok_gdf['ue']==0)&(stok_gdf['nais1']=='')&(stok_gdf['nais']!='')),'nais1']=stok_gdf['nais']
 
 #checkue=stok_gdf.loc[((stok_gdf['tahs']!=stok_gdf['tahsue'])&(stok_gdf['tahsue']!=''))]
+
+#Korrekturen Juli 2025
+#stok_gdf=gpd.read_file(myworkspace+"/BE/stok_gdf_attributed.gpkg",layer='stok_gdf_attributed', driver="GPKG")
+stok_gdf.columns
+stok_gdf['storeg'].unique().tolist()
+check=stok_gdf[((stok_gdf['BE']=='32')&(stok_gdf['hs1975']==5))]
+
+stok_gdf.dtypes
+stok_gdf.loc[((stok_gdf['BE']=='32')&(stok_gdf['hs1975']<=5)),'hs']='sm um'
+stok_gdf.loc[((stok_gdf['BE']=='32')&(stok_gdf['hs1975']<=5)),'nais']='32C'
+stok_gdf.loc[((stok_gdf['BE']=='32')&(stok_gdf['hs1975']<=5)),'nais1']='32C'
+stok_gdf.loc[((stok_gdf['BE']=='32')&(stok_gdf['hs1975']<=4)),'tahs']='submontan'
+stok_gdf.loc[((stok_gdf['BE']=='32')&(stok_gdf['hs1975']==5)),'tahs']='untermontan'
+
+stok_gdf.loc[((stok_gdf['BE']=='60*')&(stok_gdf['hs1975']==8)),'hs']='hm'
+stok_gdf.loc[((stok_gdf['BE']=='60*')&(stok_gdf['hs1975']==8)),'nais']='60*Ta'
+stok_gdf.loc[((stok_gdf['BE']=='60*')&(stok_gdf['hs1975']==8)),'nais1']='60*Ta'
+stok_gdf.loc[((stok_gdf['BE']=='60*')&(stok_gdf['hs1975']==8)),'tahs']='hochmontan'
+
+stok_gdf.loc[(stok_gdf['BE']=='66'),'hs']='sm um'
+stok_gdf.loc[(stok_gdf['BE']=='66'),'nais']='66L'
+stok_gdf.loc[(stok_gdf['BE']=='66'),'nais1']='66L'
+stok_gdf.loc[((stok_gdf['BE']=='66')&(stok_gdf['hs1975']<=4)),'tahs']='submontan'
+stok_gdf.loc[((stok_gdf['BE']=='66')&(stok_gdf['hs1975']>=5)),'tahs']='untermontan'
+
 
 print("write output")
 stok_gdf.columns
