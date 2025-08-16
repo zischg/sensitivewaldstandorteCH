@@ -19,6 +19,39 @@ climatescenarios=['rcp45','rcp85']
 #climatescenario="rcp85"
 #climatescenario="rcp45"
 #climatescenario="rcp26"
+varname='var1'
+#varname='var2'
+
+#thresholds for claissifying climate-sensitive stocks (klimasensitive Bestaende)
+threshold_nicht_empfohlen_min=0
+threshold_nicht_empfohlen_max=95
+threshold_nicht_bedingt_min=0
+threshold_nicht_bedingt_max=20
+threshold_nicht_gef_min=0
+threshold_nicht_gef_max=10
+
+threshold_schwach_empfohlen_min=95
+threshold_schwach_empfohlen_max=100
+threshold_schwach_bedingt_min=20
+threshold_schwach_bedingt_max=70
+threshold_schwach_gef_min=10
+threshold_schwach_gef_max=20
+
+threshold_mittel_bedingt_min=70
+threshold_mittel_bedingt_max=95
+threshold_mittel_gef_min=20
+threshold_mittel_gef_max=40
+
+threshold_stark_bedingt_min=95
+threshold_stark_bedingt_max=100
+threshold_stark_gef_min=40
+
+##var2
+#varname='var2'
+#threshold_schwach_gef_max=30
+#threshold_mittel_gef_min=30
+#threshold_mittel_gef_max=50
+#threshold_stark_gef_min=50
 
 #read Bestandeskarte shape
 bk_gdf=gpd.read_file(projectspace+"/FR"+"/BestandeskarteFR/BestandeskarteFRv240206.shp")
@@ -31,7 +64,6 @@ bk_gdf['BU']=bk_gdf['HE'] #Buche
 bk_gdf['TEI']=bk_gdf['CH'] #Trauben-Eiche
 bk_gdf['BAH']=bk_gdf['ER'] #Berg-Ahorn --> Feldahorn?
 bk_gdf['ES']=bk_gdf['FR'] #Esche
-
 
 #******************************************************************************************************
 #Sensitive Bestaende
@@ -81,39 +113,37 @@ for climatescenario in climatescenarios:
     #"BUL" in mainlayercolumnslist
     #add columns to main layer
     #senstitive Bestaende pro Baumart:
-    #-999 keine Angabe, 0 nicht sensitiv, 1 schwach sensitiv, 2 mittel sensitiv, 3 stark sensitiv
+    #-999 keine Angabe, 0 nicht klimasensitiv, 1 schwach klimasensitiv, 2 mittel klimasensitiv, 3 stark klimasensitiv, 4 bedingt klimasensitiv
     #Baumartenempfehlung:
     #-999 keine Angabe, 1 empfohlen, 2 bedingt empfohlen, 3 gefaehrdet, 4 in Zukunft empfohlen, 5 in Zukunft bedingt empfohlen
-    #for col in treetypes:#_in_bk_list:
-    #    print(col)
-    #    if col in mainlayercolumnslist:
-    #        rcp_bk_gdf_out["sb" + col] = -999
-    #        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + "CODE"] >95)&(rcp_bk_gdf_out[col].isin([1,4])))].index, "sb"+col]=1
-    #        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + "CODE"] > 0)&(rcp_bk_gdf_out[col + "CODE"] <= 95) & (rcp_bk_gdf_out[col].isin([1, 4])))].index, "sb" + col] = 0
-    #        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + "CODE"] > 95) & (rcp_bk_gdf_out[col].isin([2, 5])))].index, "sb" + col] = 3
-    #        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + "CODE"] >= 70) & (rcp_bk_gdf_out[col + "CODE"] <= 95) & (rcp_bk_gdf_out[col].isin([2, 5])))].index, "sb" + col] = 2
-    #        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + "CODE"] >20) & (rcp_bk_gdf_out[col + "CODE"] <70) & (rcp_bk_gdf_out[col].isin([2, 5])))].index, "sb" + col] = 1
-    #        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + "CODE"] >0) & (rcp_bk_gdf_out[col + "CODE"] <=20) & (rcp_bk_gdf_out[col].isin([2, 5])))].index, "sb" + col] = 0
-    #        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + "CODE"] > 40) & (rcp_bk_gdf_out[col].isin([3])))].index, "sb" + col] = 3
-    #        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + "CODE"] >20) & (rcp_bk_gdf_out[col + "CODE"] <= 40) & (rcp_bk_gdf_out[col].isin([3])))].index, "sb" + col] = 2
-    #        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + "CODE"] >10) & (rcp_bk_gdf_out[col + "CODE"] <=20) & (rcp_bk_gdf_out[col].isin([3])))].index, "sb" + col] = 1
-    #        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + "CODE"] >0) & (rcp_bk_gdf_out[col + "CODE"] <= 10) & (rcp_bk_gdf_out[col].isin([3])))].index, "sb" + col] = 0
 
     print("sb")
     for col in treetypes:#_in_bk_list:
         print(col)
         #if col in mainlayercolumnslist:
         rcp_bk_gdf_out["sb" + col] = -999
-        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] >95)&(rcp_bk_gdf_out[col+'_1'].isin([1,4])))].index, "sb"+col]=1
-        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] > 0)&(rcp_bk_gdf_out[col+'_2'] <= 95) & (rcp_bk_gdf_out[col+'_1'].isin([1, 4])))].index, "sb" + col] = 0
-        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] > 95) & (rcp_bk_gdf_out[col+'_1'].isin([2, 5])))].index, "sb" + col] = 3
-        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] >= 70) & (rcp_bk_gdf_out[col+'_2'] <= 95) & (rcp_bk_gdf_out[col+'_1'].isin([2, 5])))].index, "sb" + col] = 2
-        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] >20) & (rcp_bk_gdf_out[col+'_2'] <70) & (rcp_bk_gdf_out[col+'_1'].isin([2, 5])))].index, "sb" + col] = 1
-        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] >0) & (rcp_bk_gdf_out[col+'_2'] <=20) & (rcp_bk_gdf_out[col+'_1'].isin([2, 5])))].index, "sb" + col] = 0
-        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] > 40) & (rcp_bk_gdf_out[col+'_1'].isin([3])))].index, "sb" + col] = 3
-        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] >20) & (rcp_bk_gdf_out[col+'_2'] <= 40) & (rcp_bk_gdf_out[col+'_1'].isin([3])))].index, "sb" + col] = 2
-        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] >10) & (rcp_bk_gdf_out[col+'_2'] <=20) & (rcp_bk_gdf_out[col+'_1'].isin([3])))].index, "sb" + col] = 1
-        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] >0) & (rcp_bk_gdf_out[col+'_2'] <= 10) & (rcp_bk_gdf_out[col+'_1'].isin([3])))].index, "sb" + col] = 0
+        #nicht klimasensitiv - empfohlen
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + '_2'] >= threshold_nicht_empfohlen_min) & (rcp_bk_gdf_out[col + '_2'] <= threshold_nicht_empfohlen_max) & (rcp_bk_gdf_out[col + '_1'].isin([1, 4])))].index, "sb" + col] = 0
+        #nicht klimasensitiv - bedingt empfohlen
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + '_2'] >= threshold_nicht_bedingt_min) & (rcp_bk_gdf_out[col + '_2'] <= threshold_nicht_bedingt_max) & (rcp_bk_gdf_out[col + '_1'].isin([2, 5])))].index, "sb" + col] = 0
+        #nicht klimasensitiv - gefaehrdet
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + '_2'] >= threshold_nicht_gef_min) & (rcp_bk_gdf_out[col + '_2'] <= threshold_nicht_gef_max) & (rcp_bk_gdf_out[col + '_1'].isin([3])))].index, "sb" + col] = 0
+        #schwach klimasensitiv - empfohlen
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] >threshold_schwach_empfohlen_min)&(rcp_bk_gdf_out[col+'_1'].isin([1,4])))].index, "sb"+col]=1
+        #schwach klimasensitiv - bedingt empfohlen
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + '_2'] > threshold_schwach_bedingt_min) & (rcp_bk_gdf_out[col + '_2'] <= threshold_schwach_bedingt_max) & (rcp_bk_gdf_out[col + '_1'].isin([2, 5])))].index, "sb" + col] = 1
+        #schwach klimasensitiv - gefaehrdet
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + '_2'] > threshold_schwach_gef_min) & (rcp_bk_gdf_out[col + '_2'] <= threshold_schwach_gef_max) & (rcp_bk_gdf_out[col + '_1'].isin([3])))].index, "sb" + col] = 1
+        #mittel klimasensitiv - bedingt empfohlen
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + '_2'] > threshold_mittel_bedingt_min) & (rcp_bk_gdf_out[col + '_2'] <= threshold_mittel_bedingt_max) & (rcp_bk_gdf_out[col + '_1'].isin([2, 5])))].index, "sb" + col] = 2
+        #mittel klimasensitiv - gefaehrdet
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col + '_2'] > threshold_mittel_gef_min) & (rcp_bk_gdf_out[col + '_2'] <= threshold_mittel_gef_max) & (rcp_bk_gdf_out[col + '_1'].isin([3])))].index, "sb" + col] = 2
+        #stark klimasensitiv - bedingt empfohlen
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] > threshold_stark_bedingt_min) & (rcp_bk_gdf_out[col+'_1'].isin([2, 5])))].index, "sb" + col] = 3
+        # stark klimasensitiv - gefaehrdet
+        rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2'] > threshold_stark_gef_min) & (rcp_bk_gdf_out[col+'_1'].isin([3])))].index, "sb" + col] = 3
+
+
     #Arve
     if 'AR_2' in mainlayercolumnslist:
         rcp_bk_gdf_out.loc[rcp_bk_gdf_out[((rcp_bk_gdf_out[col+'_2']> 95) & (
@@ -124,12 +154,18 @@ for climatescenario in climatescenarios:
     #calculate maximum sensitivity over all treetypes
     rcp_bk_gdf_out["maxsens"]=-999
     rcp_bk_gdf_out["maxsens"]=rcp_bk_gdf_out[treetypes_sb].max(axis=1)
+    rcp_bk_gdf_out["area"] = rcp_bk_gdf_out["geometry"].area
 
     #write the output
     print('write output '+climatescenario)
     #rcp_bk_gdf_out.to_file(projectspace+"/FR/"+"FR_"+climatescenario+"_sensitivebestaende.shp")
-    rcp_bk_gdf_out.to_file(projectspace+"/FR/"+"FR_"+climatescenario+"_sensitivebestaende"+".gpkg")
-    #del rcp_bk_gdf_in
+    rcp_bk_gdf_out.to_file(projectspace+"/FR/"+"FR_"+climatescenario+"_sensitivebestaende_"+varname+".gpkg")
+    ##del rcp_bk_gdf_in
+    ##data for analysis
+    #if climatescenario=='rcp45':
+    #    sensi45=rcp_bk_gdf_out.copy()
+    #elif climatescenario=='rcp85':
+    #    sensi85=rcp_bk_gdf_out.copy()
 
 
     #******************************************************************************************************
@@ -225,27 +261,34 @@ for climatescenario in climatescenarios:
     #write the file
     print('write max sensi BK '+climatescenario)
     #bk_gdf.to_file(projectspace+"/FR/"+"FR_"+climatescenario+"_bk_maxsensitivitaet.shp")
-    bk_gdf.to_file(projectspace+"/FR/"+"FR_"+climatescenario+"_bk_maxsensitivitaet"+".gpkg")
+    bk_gdf.to_file(projectspace+"/FR/"+"FR_"+climatescenario+"_bk_maxsensitivitaet_"+varname+".gpkg")
 
 print('all done')
-    ##Auswertungen
-    #sensi45=joblib.load(projectspace+"/FR/FR_rcp45_sensitivestandorte.sav")
-    #sensi45=sensi45[["geometry","sensi3ba","sensi4ba"]]
-    #sensi45=sensi45.set_crs(epsg=2056,allow_override=True)
-    #sensi85=joblib.load(projectspace+"/FR/FR_rcp85_sensitivestandorte.sav")
-    #sensi85=sensi85[["geometry","sensi3ba","sensi4ba"]]
-    #sensi85=sensi85.set_crs(epsg=2056,allow_override=True)
-    #regionen=gpd.read_file(projectspace+"/Regionalisierung20220125.shp")
-    #regionen=regionen[["geometry","Regionen","Reg_Nr"]]
-    #regionen.crs
-    #regionen=regionen.set_crs(epsg=2056,allow_override=True)
-    ##sensi45reg=gpd.overlay(sensi45, regionen, how='intersection', make_valid=True, keep_geom_type=True)
-    ##sensi85reg=gpd.overlay(sensi85, regionen, how='intersection', make_valid=True, keep_geom_type=True)
-    #sensi45reg["area"]=sensi45reg["geometry"].area
-    #sensi85reg["area"]=sensi85reg["geometry"].area
-    #sensi45["area"]=sensi45["geometry"].area/1000000.0
-    #sensi85["area"]=sensi85["geometry"].area/1000000.0
-    #stat45_3ba=sensi45.groupby(["sensi3ba"])["area"].sum()
-    #stat45_4ba=sensi45.groupby(["sensi4ba"])["area"].sum()
-    #stat85_3ba=sensi85.groupby(["sensi3ba"])["area"].sum()
-    #stat85_4ba=sensi85.groupby(["sensi4ba"])["area"].sum()
+
+print('analysis ...')
+#Auswertungen
+sensi45var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_"+"var1"+".gpkg")
+sensi45var1=sensi45var1[sensi45var1["maxsens"]>=0]
+sensi45var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_"+"var2"+".gpkg")
+sensi45var2=sensi45var2[sensi45var2["maxsens"]>=0]
+sensi85var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_"+"var1"+".gpkg")
+sensi85var1=sensi85var1[sensi85var1["maxsens"]>=0]
+sensi85var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_"+"var2"+".gpkg")
+sensi85var2=sensi85var2[sensi85var2["maxsens"]>=0]
+
+outfile = open(projectspace + "/FR/" + "FR_"+"sensitiveBestaende_stat.txt", "w")
+outfile.write("var;totarea;prz_nichtsensitiv;prz_schwachsensitiv;prz_mittelsensitiv;prz_starksensitiv;prz_bedingtsensitiv\n")
+shapes=[sensi45var1,sensi45var2,sensi85var1,sensi85var2]
+varnames=['sensi45var1','sensi45var2','sensi85var1','sensi85var2']
+i=0
+for shape in shapes:
+    areatot=np.sum(shape.area)
+    area0=round(np.sum(shape[shape["maxsens"]==0].area)/areatot*100.0,2)
+    area1 = round(np.sum(shape[shape["maxsens"] == 1].area) / areatot * 100.0, 2)
+    area2 = round(np.sum(shape[shape["maxsens"] == 2].area) / areatot * 100.0, 2)
+    area3 = round(np.sum(shape[shape["maxsens"] == 3].area) / areatot * 100.0, 2)
+    area4 = round(np.sum(shape[shape["maxsens"] == 4].area) / areatot * 100.0, 2)
+    outfile.write(varnames[i] + ";" + str(areatot) + ";" + str(area0) + ";" + str(area1)+ ";" + str(area2)+ ";" + str(area3)+ ";" + str(area4) + "\n")
+    i+=1
+outfile.close()
+print('analysis done')
