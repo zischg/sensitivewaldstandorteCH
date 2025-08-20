@@ -3139,7 +3139,8 @@ for climatescenario in climatescenarios:
             gr_treetypes_LFI.remove(item)
     len(gr_treetypes_LFI)
     joblib.dump(gr_treetypes_LFI, projectspace + "/FR/" + "treetypes_LFI.sav")
-
+    #gr_treetypes_LFI=joblib.load(projectspace + "/FR/" + "treetypes_LFI.sav")
+    len(gr_treetypes_LFI)
     naismatrix_gr_df = naismatrixdf[naismatrixdf["Abkuerzung"].isin(gr_treetypes_LFI)]
     len(naismatrix_gr_df)
     joblib.dump(naismatrix_gr_df, projectspace + "/FR/" + "naismatrix_gr_df.sav")

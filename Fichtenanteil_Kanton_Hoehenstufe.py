@@ -36,6 +36,7 @@ baumartenanteil=gpd.read_file(projectspace+"/kanton_intsct_hs_storeg.gpkg")
 #join
 baumartenanteil['FIanteil']=0
 baumartenanteil['TAanteil']=0
+baumartenanteil['LAEanteil']=0
 LFI_baumartenanteil['HS'].unique().tolist()
 for kanton in kantonelist:
     print(kanton)
@@ -46,6 +47,9 @@ for kanton in kantonelist:
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS']=='obersubalpin')&(LFI_baumartenanteil['Hauptbaumart']=='Tanne'))][kanton].values)>0:
         tannenanteil=LFI_baumartenanteil[((LFI_baumartenanteil['HS']=='obersubalpin')&(LFI_baumartenanteil['Hauptbaumart']=='Tanne'))][kanton].values[0]
         baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 10)), 'TAanteil'] = tannenanteil
+    if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS']=='obersubalpin')&(LFI_baumartenanteil['Hauptbaumart']=='Lärche'))][kanton].values)>0:
+        laerchenanteil=LFI_baumartenanteil[((LFI_baumartenanteil['HS']=='obersubalpin')&(LFI_baumartenanteil['Hauptbaumart']=='Lärche'))][kanton].values[0]
+        baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 10)), 'LAEanteil'] = laerchenanteil
     # sa
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'subalpin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values) > 0:
         fichtenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'subalpin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values[0]
@@ -53,6 +57,9 @@ for kanton in kantonelist:
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'subalpin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values) > 0:
         tannenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'subalpin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values[0]
         baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 9)), 'TAanteil'] = tannenanteil
+    if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'subalpin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values) > 0:
+        laerchenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'subalpin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values[0]
+        baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 9)), 'LAEanteil'] = laerchenanteil
     # hm
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hochmontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values) > 0:
         fichtenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hochmontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values[0]
@@ -60,6 +67,9 @@ for kanton in kantonelist:
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hochmontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values) > 0:
         tannenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hochmontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values[0]
         baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 8)), 'TAanteil'] = tannenanteil
+    if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hochmontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values) > 0:
+        laerchenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hochmontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values[0]
+        baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 8)), 'LAEanteil'] = laerchenanteil
     # om
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values) > 0:
         fichtenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values[0]
@@ -67,6 +77,9 @@ for kanton in kantonelist:
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values) > 0:
         tannenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values[0]
         baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 6)), 'TAanteil'] = tannenanteil
+    if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values) > 0:
+        laerchenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values[0]
+        baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 6)), 'LAEanteil'] = laerchenanteil
     # um
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values) > 0:
         fichtenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values[0]
@@ -74,6 +87,9 @@ for kanton in kantonelist:
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values) > 0:
         tannenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values[0]
         baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 5)), 'TAanteil'] = tannenanteil
+    if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values) > 0:
+        laerchenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values[0]
+        baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 5)), 'LAEanteil'] = laerchenanteil
     # sm
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values) > 0:
         fichtenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values[0]
@@ -81,6 +97,9 @@ for kanton in kantonelist:
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values) > 0:
         tannenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values[0]
         baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 4)), 'TAanteil'] = tannenanteil
+    if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values) > 0:
+        laerchenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values[0]
+        baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 4)), 'LAEanteil'] = laerchenanteil
     # co
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values) > 0:
         fichtenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values[0]
@@ -88,6 +107,9 @@ for kanton in kantonelist:
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values) > 0:
         tannenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values[0]
         baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 2)), 'TAanteil'] = tannenanteil
+    if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values) > 0:
+        laerchenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values[0]
+        baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 2)), 'LAEanteil'] = laerchenanteil
     # cob
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values) > 0:
         fichtenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values[0]
@@ -95,6 +117,9 @@ for kanton in kantonelist:
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values) > 0:
         tannenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values[0]
         baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 3)), 'TAanteil'] = tannenanteil
+    if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values) > 0:
+        laerchenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'submontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values[0]
+        baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 3)), 'LAEanteil'] = laerchenanteil
     # hyp
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values) > 0:
         fichtenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values[0]
@@ -102,6 +127,9 @@ for kanton in kantonelist:
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values) > 0:
         tannenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values[0]
         baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 1)), 'TAanteil'] = tannenanteil
+    if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values) > 0:
+        laerchenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'hyperinsubrisch und kollin') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values[0]
+        baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 1)), 'LAEanteil'] = laerchenanteil
     # um/om
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values) > 0:
         fichtenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Fichte'))][kanton].values[0]
@@ -109,5 +137,9 @@ for kanton in kantonelist:
     if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values) > 0:
         tannenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Tanne'))][kanton].values[0]
         baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 7)), 'TAanteil'] = tannenanteil
+    if len(LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values) > 0:
+        laerchenanteil = LFI_baumartenanteil[((LFI_baumartenanteil['HS'] == 'unter- und obermontan') & (LFI_baumartenanteil['Hauptbaumart'] == 'Lärche'))][kanton].values[0]
+        baumartenanteil.loc[((baumartenanteil['kanton'] == kanton) & (baumartenanteil['Code'] == 7)), 'LAEanteil'] = laerchenanteil
 
 baumartenanteil.to_file(projectspace + "/baumartenanteil.gpkg", driver='GPKG')
+
