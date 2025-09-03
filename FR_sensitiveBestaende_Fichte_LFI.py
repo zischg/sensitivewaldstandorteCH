@@ -57,46 +57,42 @@ varname='var1'
 #varname='var2'
 
 
-##read the rasters
-##reference tif raster
-#print("read reference raster")
-#referenceraster=projectspace+"/landesforstinventar-waldmischungsgrad_2056.tif"
-#referencetifraster=gdal.Open(referenceraster)
-#referencetifrasterband=referencetifraster.GetRasterBand(1)
-#referencerasterProjection=referencetifraster.GetProjection()
-#ncols=referencetifrasterband.XSize
-#nrows=referencetifrasterband.YSize
-#indatatype=referencetifrasterband.DataType
-#NODATA_value=-9999
+#read the rasters
+#reference tif raster
+print("read reference raster")
+referenceraster=projectspace+"/landesforstinventar-waldmischungsgrad_2056.tif"
+referencetifraster=gdal.Open(referenceraster)
+referencetifrasterband=referencetifraster.GetRasterBand(1)
+referencerasterProjection=referencetifraster.GetProjection()
+ncols=referencetifrasterband.XSize
+nrows=referencetifrasterband.YSize
+indatatype=referencetifrasterband.DataType
+NODATA_value=-9999
 
 #read Fichtenanteil
-fi=gpd.read_file(projectspace+"/FR/baumartenanteilFR.gpkg", layer='baumartenanteilFR')
+fi=gpd.read_file(projectspace+"/baumartenanteil.gpkg", layer='baumartenanteil')
 fi=fi[fi['kanton']=='FR']
-len(fi)
-
-#read Nadelholzanteil
-nh=gpd.read_file(projectspace+"/FR/FR_bk_ausNadelholzanteil.gpkg", layer='FR_bk_ausNadelholzanteil')
 
 
-##read Bestandeskarte shape
-#bk_gdf=gpd.read_file(projectspace+"/FR"+"/BestandeskarteFR/BestandeskarteFRv240206.shp")
-#bk_gdf.columns
-#bk_gdf=bk_gdf[['geometry']]
-#bk_gdf['FI']=0
-#bk_gdf['LH']=0
-#
-#
-##attribute raster values to Bestandeskarte
-#bk_gdf['joinid']=bk_gdf.index
-#bk_gdf["LH"]=0
-#zonstat=zonal_stats(bk_gdf, referenceraster,stats="mean")
-#i=0
-#while i < len(bk_gdf):
-#    bk_gdf.loc[i,"LH"]=zonstat[i]["mean"]
-#    i+=1
-#winsound.Beep(frequency, duration)
-#bk_gdf.loc[bk_gdf['LH'].isnull()==True, 'LH'] = 0
-#bk_gdf['NH']=100-bk_gdf['LH']
+#read Bestandeskarte shape
+bk_gdf=gpd.read_file(projectspace+"/FR"+"/BestandeskarteFR/BestandeskarteFRv240206.shp")
+bk_gdf.columns
+bk_gdf=bk_gdf[['geometry']]
+bk_gdf['FI']=0
+bk_gdf['LH']=0
+
+
+#attribute raster values to Bestandeskarte
+bk_gdf['joinid']=bk_gdf.index
+bk_gdf["LH"]=0
+zonstat=zonal_stats(bk_gdf, referenceraster,stats="mean")
+i=0
+while i < len(bk_gdf):
+    bk_gdf.loc[i,"LH"]=zonstat[i]["mean"]
+    i+=1
+winsound.Beep(frequency, duration)
+bk_gdf.loc[bk_gdf['LH'].isnull()==True, 'LH'] = 0
+bk_gdf['NH']=100-bk_gdf['LH']
 
 #thresholds for claissifying climate-sensitive stocks (klimasensitive Bestaende)
 threshold_nicht_empfohlen_min=0
@@ -137,19 +133,19 @@ treetypes_sb=[]
 for item in treetypes:
     treetypes_sb.append("sb"+item)
 
-#bk_gdf.crs
-#len(bk_gdf)
-#bk_gdf.columns
-#bk_gdf["bkid"]=bk_gdf.index
-##bk_gdf.to_file(projectspace+"/FR/"+"FR_bk_ausNadelholzanteil.gpkg")
-##bk_gdf=bk_gdf[['bkid','mischung', 'entwicklun','schlussgra','nhd_anteil', 'hdom', 'hmax', 'gru_strukt','dg_os','dg_ms', 'dg_us','geometry']]#,"TACODE","BUCODE"
-#bk_gdf.dtypes
+bk_gdf.crs
+len(bk_gdf)
+bk_gdf.columns
+bk_gdf["bkid"]=bk_gdf.index
+#bk_gdf.to_file(projectspace+"/FR/"+"FR_bk_ausNadelholzanteil.gpkg")
+#bk_gdf=bk_gdf[['bkid','mischung', 'entwicklun','schlussgra','nhd_anteil', 'hdom', 'hmax', 'gru_strukt','dg_os','dg_ms', 'dg_us','geometry']]#,"TACODE","BUCODE"
+bk_gdf.dtypes
 
 #Intersect with Fichtenanteil
-bk_gdf_fi=nh.overlay(fi, how='intersection', make_valid=True, keep_geom_type=True)
-#bk_gdf_fi=gpd.read_file(projectspace+"/FR/"+"FR_bk_Nadelholzanteil_FichtenanteilLFI.gpkg", layer='FR_bk_Nadelholzanteil_FichtenanteilLFI')
+#bk_gdf_fi=bk_gdf.overlay(fi, how='intersection', make_valid=True, keep_geom_type=True)
+bk_gdf_fi=gpd.read_file(projectspace+"/FR/"+"FR_bk_Fichtenanteil.gpkg", layer='FR_bk_Fichtenanteil')
 #Fichtenanteil
-bk_gdf_fi["FI"]=bk_gdf_fi['NH']*bk_gdf_fi['FIantNHant']#bk_gdf_fi['NH']/100.0*bk_gdf_fi['FIanteil']/100.0*100.0
+bk_gdf_fi["FI"]=bk_gdf_fi['FIanteil']#bk_gdf_fi['NH']/100.0*bk_gdf_fi['FIanteil']/100.0*100.0
 bk_gdf_fi.columns
 
 len(bk_gdf_fi)
@@ -223,22 +219,22 @@ for climatescenario in climatescenarios:
 
     #write the output
     print('write output '+climatescenario)
-    rcp_bk_gdf_out.to_file(projectspace+"/FR/"+"FR_"+climatescenario+"_sensitivebestaende_FI-LFI_NH-WSL"+varname+".gpkg")
+    rcp_bk_gdf_out.to_file(projectspace+"/FR/"+"FR_"+climatescenario+"_sensitivebestaende_FI_"+varname+".gpkg")
 
 print('all done')
 
 print('analysis ...')
 #Auswertungen
-sensi45var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_FI-LFI_NH-WSL"+"var1"+".gpkg")
+sensi45var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_FI_"+"var1"+".gpkg")
 sensi45var1=sensi45var1[sensi45var1["maxsens"]>=0]
-sensi45var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_FI-LFI_NH-WSL"+"var2"+".gpkg")
+sensi45var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_FI_"+"var2"+".gpkg")
 sensi45var2=sensi45var2[sensi45var2["maxsens"]>=0]
-sensi85var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_FI-LFI_NH-WSL"+"var1"+".gpkg")
+sensi85var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_FI_"+"var1"+".gpkg")
 sensi85var1=sensi85var1[sensi85var1["maxsens"]>=0]
-sensi85var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_FI-LFI_NH-WSL"+"var2"+".gpkg")
+sensi85var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_FI_"+"var2"+".gpkg")
 sensi85var2=sensi85var2[sensi85var2["maxsens"]>=0]
 
-outfile = open(projectspace + "/FR/" + "FR_"+"sensitiveBestaende_FI-LFI_NH-WSL_stat.txt", "w")
+outfile = open(projectspace + "/FR/" + "FR_"+"sensitiveBestaende_FI_stat.txt", "w")
 outfile.write("var;totarea;prz_nichtsensitiv;prz_schwachsensitiv;prz_mittelsensitiv;prz_starksensitiv;prz_bedingtsensitiv\n")
 shapes=[sensi45var1,sensi45var2,sensi85var1,sensi85var2]
 varnames=['sensi45var1','sensi45var2','sensi85var1','sensi85var2']
@@ -259,16 +255,16 @@ print('analysis done')
 
 print('analysis original BK nur FI ...')
 #Auswertungen
-sensi45var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_FI-LFI_NH-WSL"+"var1"+".gpkg")
+sensi45var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_"+"var1"+".gpkg")
 sensi45var1=sensi45var1[sensi45var1["maxsens"]>=0]
-sensi45var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_FI-LFI_NH-WSL_"+"var2"+".gpkg")
+sensi45var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_"+"var2"+".gpkg")
 sensi45var2=sensi45var2[sensi45var2["maxsens"]>=0]
-sensi85var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_FI-LFI_NH-WSL_"+"var1"+".gpkg")
+sensi85var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_"+"var1"+".gpkg")
 sensi85var1=sensi85var1[sensi85var1["maxsens"]>=0]
-sensi85var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_FI-LFI_NH-WSL_"+"var2"+".gpkg")
+sensi85var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_"+"var2"+".gpkg")
 sensi85var2=sensi85var2[sensi85var2["maxsens"]>=0]
 
-outfile = open(projectspace + "/FR/" + "FR_"+"sensitiveBestaende_FI-LFI_NH-WSL_stat.txt", "w")
+outfile = open(projectspace + "/FR/" + "FR_"+"sensitiveBestaende_FIausBK_stat.txt", "w")
 outfile.write("var;totarea;prz_nichtsensitiv;prz_schwachsensitiv;prz_mittelsensitiv;prz_starksensitiv;prz_bedingtsensitiv\n")
 shapes=[sensi45var1,sensi45var2,sensi85var1,sensi85var2]
 varnames=['sensi45var1','sensi45var2','sensi85var1','sensi85var2']

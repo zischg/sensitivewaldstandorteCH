@@ -45,11 +45,11 @@ def convertarrtotif(arr, outfile, tifdatatype, referenceraster, nodatavalue):
 #input workspaces
 myworkspace="D:/CCW24sensi"
 codespace="C:/DATA/develops/sensitivewaldstandorteCH"
-hoehenstufendict={"collin":"co","submontan":"sm","untermontan":"um","obermontan":"om","hochmontan":"hm","subalpin":"sa","obersubalpin":"osa"}
-hoehenstufendictabkuerzungen={"co":"collin","sm":"submontan","um":"untermontan","om":"obermontan","hm":"hochmontan","sa":"subalpin","osa":"obersubalpin"}
-hsmoddict={2:"collin",3:"collin",4:"submontan",5:"untermontan",6:"obermontan",8:"hochmontan",9:"subalpin",10:"obersubalpin"}
-hsmoddictkurz={2:"co",3:"co",4:"sm",5:"um",6:"om",8:"hm",9:"sa",10:"osa"}
-hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
+hoehenstufendict={"hyperinsubrisch":"hyp","collin mit Buche":"cob","collin":"co","submontan":"sm","untermontan":"um","obermontan":"om","unter-/obermontan":"um/om","hochmontan":"hm","subalpin":"sa","obersubalpin":"osa"}
+hoehenstufendictabkuerzungen={"hyp":"hyperinsubroisch","co":"collin","cob":"collin mit Buche","sm":"submontan","um":"untermontan","om":"obermontan","um/om":"unter-/obermontan","hm":"hochmontan","sa":"subalpin","osa":"obersubalpin"}
+hsmoddict={1:"hyperinsubrisch",2:"collin",3:"collin",4:"submontan",5:"untermontan",6:"obermontan",7:"unter-/obermontan",8:"hochmontan",9:"subalpin",10:"obersubalpin"}
+hsmoddictkurz={1:"hyp",2:"co",3:"cob",4:"sm",5:"um",6:"om",7:"um/om",8:"hm",9:"sa",10:"osa"}
+hoehenstufenlist=["hyperinsubrisch","collin","collin mit Buche","submontan","untermontan","obermontan","unter-/obermontan","hochmontan","subalpin","obersubalpin"]
 
 #read excel files
 naiseinheitenunique=pd.read_excel(codespace+"/VS_nais_einheiten_unique_mf.xlsx", sheet_name='Sheet1', dtype="str", engine='openpyxl')

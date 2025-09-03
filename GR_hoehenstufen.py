@@ -45,11 +45,12 @@ def convertarrtotif(arr, outfile, tifdatatype, referenceraster, nodatavalue):
 #input workspaces
 myworkspace="D:/CCW24sensi"
 codespace="C:/DATA/develops/sensitivewaldstandorteCH"
-hoehenstufendict={"hyperinsubrisch":"hyp","collin":"co","collin mit Buche":"cob","submontan":"sm","untermontan":"um","obermontan":"om","hochmontan":"hm","subalpin":"sa","obersubalpin":"osa"}
-hoehenstufendictabkuerzungen={"hyp":"hyperinsubrisch","co":"collin","cob":"collin mit Buche","sm":"submontan","um":"untermontan","om":"obermontan","hm":"hochmontan","sa":"subalpin","osa":"obersubalpin"}
-hsmoddict={2:"collin",3:"collin",4:"submontan",5:"untermontan",6:"obermontan",8:"hochmontan",9:"subalpin",10:"obersubalpin"}
-hsmoddictkurz={2:"co",3:"co",4:"sm",5:"um",6:"om",8:"hm",9:"sa",10:"osa"}
-hoehenstufenlist=["collin","submontan","untermontan","obermontan","hochmontan","subalpin","obersubalpin"]
+hoehenstufendict={"hyperinsubrisch":"hyp","collin mit Buche":"cob","collin":"co","submontan":"sm","untermontan":"um","obermontan":"om","unter-/obermontan":"um/om","hochmontan":"hm","subalpin":"sa","obersubalpin":"osa"}
+hoehenstufendictabkuerzungen={"hyp":"hyperinsubroisch","co":"collin","cob":"collin mit Buche","sm":"submontan","um":"untermontan","om":"obermontan","um/om":"unter-/obermontan","hm":"hochmontan","sa":"subalpin","osa":"obersubalpin"}
+hsmoddict={1:"hyperinsubrisch",2:"collin",3:"collin",4:"submontan",5:"untermontan",6:"obermontan",7:"unter-/obermontan",8:"hochmontan",9:"subalpin",10:"obersubalpin"}
+hsmoddictkurz={1:"hyp",2:"co",3:"cob",4:"sm",5:"um",6:"om",7:"um/om",8:"hm",9:"sa",10:"osa"}
+hoehenstufenlist=["hyperinsubrisch","collin","collin mit Buche","submontan","untermontan","obermontan","unter-/obermontan","hochmontan","subalpin","obersubalpin"]
+
 
 #read excel files
 naiseinheitenunique=pd.read_excel(codespace+"/GR_nais_einheiten_unique_v2_bh_mf.xlsx", sheet_name='Sheet1', dtype="str", engine='openpyxl')
@@ -66,8 +67,8 @@ naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['nais']!='']
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['hs']!='']
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['hs'].isnull()==False]
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['hs']!='nan']
-naiseinheitenunique['nais1']==''
-naiseinheitenunique['nais2']==''
+naiseinheitenunique['nais1']=''
+naiseinheitenunique['nais2']=''
 for index, row in naiseinheitenunique.iterrows():
     assgr=row['ASS_GR']
     naisbg=row['NAISbg']
@@ -83,108 +84,64 @@ for index, row in naiseinheitenunique.iterrows():
     else:
         naiseinheitenunique.loc[((naiseinheitenunique['ASS_GR']==assgr)&(naiseinheitenunique['NAISbg']==naisbg)),'nais1']=nais
 
-#read the rasters
-#reference tif raster
-print("read reference raster")
-referenceraster=myworkspace+"/GR/GR_dem10m.tif"
-referencetifraster=gdal.Open(referenceraster)
-referencetifrasterband=referencetifraster.GetRasterBand(1)
-referencerasterProjection=referencetifraster.GetProjection()
-ncols=referencetifrasterband.XSize
-nrows=referencetifrasterband.YSize
-indatatype=referencetifrasterband.DataType
-NODATA_value=-9999
-sloperaster=myworkspace+"/GR/GR_slopeprz.tif"
-radiationraster=myworkspace+"/GR/GR_globradyyw.tif"
-hoehenstufenraster=myworkspace+("/GR/GR_vegetationshoehenstufen1975.tif")
+##read the rasters
+##reference tif raster
+#print("read reference raster")
+#referenceraster=myworkspace+"/GR/GR_dem10m.tif"
+#referencetifraster=gdal.Open(referenceraster)
+#referencetifrasterband=referencetifraster.GetRasterBand(1)
+#referencerasterProjection=referencetifraster.GetProjection()
+#ncols=referencetifrasterband.XSize
+#nrows=referencetifrasterband.YSize
+#indatatype=referencetifrasterband.DataType
+#NODATA_value=-9999
+#sloperaster=myworkspace+"/GR/GR_slopeprz.tif"
+#radiationraster=myworkspace+"/GR/GR_globradyyw.tif"
+#hoehenstufenraster=myworkspace+("/GR/GR_vegetationshoehenstufen1975.tif")
 
 
 #read shapefile
-stok_gdf=gpd.read_file(myworkspace+"/GR/STATIONS_20250430_fixed.gpkg", layer='STATIONS_20250430')
-taheute=gpd.read_file(myworkspace+"/Tannenareale2025.gpkg")
-storeg=gpd.read_file(myworkspace+"/Waldstandortregionen_2024_TI4ab_Final_GR.gpkg", layer='waldstandortregionen_2024_ti4ab_final')
-stok_gdf.dtypes
-len(stok_gdf)
-stok_gdf.crs
-stok_gdf.columns
-stok_gdf['joinid']=stok_gdf.index
-
-#Tannenareale
-taheute.crs
-taheute.columns
-#taheute.plot()
-taheute.rename(columns={"Code_Ta": "taheute"}, inplace=True)
-taheute.drop(columns=['id', 'Region_de', 'Region_fr', 'Region_it', 'Region_en', 'Code','Subcode', 'Code_Bu', 'Code_Fi', 'Flaeche', ], inplace=True)
-#overlay spatial join
-#stok_gdf=gpd.sjoin(stok_gdf,taheute, how='left', op="intersects")
-stok_gdf=gpd.overlay(stok_gdf,taheute, how='intersection')
-
-#Standortregionen
-storeg.crs
-storeg.columns
-#taheute.plot()
-storeg.rename(columns={"Subcode": "storeg"}, inplace=True)
-storeg.drop(columns=[ 'id', 'Region_de', 'Region_fr', 'Region_it', 'Region_en', 'Code','Code_Bu', 'Code_Fi', 'Flaeche'], inplace=True)
-stok_gdf=gpd.overlay(stok_gdf,storeg, how='intersection')
-
-#attribute shapefile
-#mean slope in percent
-stok_gdf['joinid']=stok_gdf.index
-stok_gdf["meanslopeprc"]=0
-#zonstatslope=zonal_stats(stok_gdf, referenceraster,stats="count min mean max median")
-zonstatslope=zonal_stats(stok_gdf, sloperaster,stats="mean")
-i=0
-while i < len(stok_gdf):
-    stok_gdf.loc[i,"meanslopeprc"]=zonstatslope[i]["mean"]
-    i+=1
-stok_gdf["slpprzrec"]=0
-stok_gdf.loc[stok_gdf["meanslopeprc"]>=70.0,"slpprzrec"]=4
-stok_gdf.loc[((stok_gdf["meanslopeprc"]>=60.0)&(stok_gdf["meanslopeprc"]<70.0)),"slpprzrec"]=3
-stok_gdf.loc[((stok_gdf["meanslopeprc"]>=20.0)&(stok_gdf["meanslopeprc"]<60.0)),"slpprzrec"]=2
-stok_gdf.loc[stok_gdf["meanslopeprc"]<20.0,"slpprzrec"]=1
-stok_gdf.columns
-#del zonstatslope
+stok_gdf=gpd.read_file(myworkspace+"/GR/stok_gdf_attributed_temp4_fixed.gpkg", layer='stok_gdf_attributed_temp4_fixed')
 winsound.Beep(frequency, duration)
+stok_gdf.rename(columns={'ass_gr':'ASS_GR', 'naisbg':'NAISbg'}, inplace=True)
+stok_gdf.rename(columns={'meanslopep':'meanslopeprc'}, inplace=True)
+stok_gdf.loc[stok_gdf['ASS_GR']=='747D','ASS_GR']='47D'
+stok_gdf.loc[stok_gdf['ASS_GR']=='358C','ASS_GR']='58C'
+stok_gdf.loc[stok_gdf['ASS_GR']=='257C','ASS_GR']='57C'
+stok_gdf.loc[stok_gdf['ASS_GR']=='259','ASS_GR']='59'
+stok_gdf.loc[stok_gdf['ASS_GR']=='0AV','ASS_GR']='AV'
+stok_gdf.loc[stok_gdf['ASS_GR']=='558L','ASS_GR']='58L'
+stok_gdf.loc[stok_gdf['ASS_GR']=='957V','ASS_GR']='57V'
+stok_gdf.loc[stok_gdf['ASS_GR']=='447M','ASS_GR']='47M'
+stok_gdf.loc[stok_gdf['ASS_GR']=='147V','ASS_GR']='47V'
+stok_gdf.loc[stok_gdf['ASS_GR']=='452','ASS_GR']='52'
+stok_gdf.loc[stok_gdf['ASS_GR']=='160','ASS_GR']='60'
+stok_gdf.loc[stok_gdf['ASS_GR']=='9AV','ASS_GR']='AV'
+stok_gdf.loc[stok_gdf['ASS_GR']=='555*','ASS_GR']='55*'
+stok_gdf.loc[stok_gdf['ASS_GR']=='959*','ASS_GR']='59*'
+stok_gdf.loc[stok_gdf['ASS_GR']=='0AV','ASS_GR']='AV'
+stok_gdf.loc[stok_gdf['ASS_GR']=='060A','ASS_GR']='60A'
+stok_gdf.loc[stok_gdf['ASS_GR']=='247','ASS_GR']='47'
+stok_gdf.loc[stok_gdf['ASS_GR']=='833V','ASS_GR']='33V'
+stok_gdf.loc[stok_gdf['ASS_GR']=='134L','ASS_GR']='34L'
+stok_gdf.loc[stok_gdf['ASS_GR']=='934A','ASS_GR']='34A'
+stok_gdf.loc[stok_gdf['ASS_GR']=='842C','ASS_GR']='42C'
+stok_gdf.loc[stok_gdf['ASS_GR']=='942Q','ASS_GR']='42Q'
+stok_gdf.loc[stok_gdf['ASS_GR']=='034F','ASS_GR']='34F'
+stok_gdf.loc[stok_gdf['ASS_GR']=='858V','ASS_GR']='58V'
+stok_gdf.loc[stok_gdf['ASS_GR']=='540P','ASS_GR']='40P'
+stok_gdf.loc[stok_gdf['ASS_GR']=='947H','ASS_GR']='47H'
+stok_gdf.loc[stok_gdf['ASS_GR']=='159A','ASS_GR']='59A'
+stok_gdf.loc[stok_gdf['ASS_GR']=='253*','ASS_GR']='53*'
+stok_gdf.loc[stok_gdf['ASS_GR']=='132*','ASS_GR']='32*'
+stok_gdf.loc[stok_gdf['ASS_GR']=='632V','ASS_GR']='32V'
+stok_gdf.loc[stok_gdf['ASS_GR']=='524S','ASS_GR']='24S'
+stok_gdf.loc[stok_gdf['ASS_GR']=='547*','ASS_GR']='47*'
+stok_gdf.loc[stok_gdf['ASS_GR']=='157BL','ASS_GR']='57BL'
+stok_gdf.loc[stok_gdf['ASS_GR']=='647BL','ASS_GR']='47BL'
+stok_gdf.loc[stok_gdf['ASS_GR']=='258BL','ASS_GR']='58BL'
 
-#radiation
-stok_gdf["rad"]=0
-#zonstatslope=zonal_stats(stok_gdf, referenceraster,stats="count min mean max median")
-zonstatrad=zonal_stats(stok_gdf, radiationraster,stats="mean")
-i=0
-while i < len(stok_gdf):
-    stok_gdf.loc[i,"rad"]=zonstatrad[i]["mean"]
-    i+=1
-przquant90=stok_gdf['rad'].quantile(q=0.9, interpolation='linear')
-przquant10=stok_gdf['rad'].quantile(q=0.1, interpolation='linear')
-
-stok_gdf["radiation"]=0
-#stok_gdf.loc[stok_gdf["rad"]>=147.0,"radiation"]=1 #90% quantile
-#stok_gdf.loc[stok_gdf["rad"]<=112.0,"radiation"]=-1 #10% quantile
-stok_gdf.loc[stok_gdf["rad"]>=przquant90,"radiation"]=1 #90% quantile
-stok_gdf.loc[stok_gdf["rad"]<=przquant10,"radiation"]=-1 #10% quantile
-stok_gdf.columns
-#del zonstatrad
-winsound.Beep(frequency, duration)
-
-#hoehenstufen heute
-stok_gdf["hs1975"]=0
-#zonstatslope=zonal_stats(stok_gdf, referenceraster,stats="count min mean max median")
-zonstaths=zonal_stats(stok_gdf, hoehenstufenraster,stats="majority")
-i=0
-while i < len(stok_gdf):
-    stok_gdf.loc[i,"hs1975"]=zonstaths[i]["majority"]
-    i+=1
-stok_gdf.columns
-stok_gdf.dtypes
-#stok_gdf=stok_gdf.astype({'hs1975': 'int'})#.dtypes
-#stok_gdf.to_file(myworkspace+"/AR/stok_gdf_attributed.gpkg")
-#del zonstaths
-winsound.Beep(frequency, duration)
-
-stok_gdf.to_file(myworkspace+"/GR/stok_gdf_attributed_temp4.gpkg")
-#stok_gdf=gpd.read_file(myworkspace+"/GR/stok_gdf_attributed_temp4.gpkg")
-winsound.Beep(frequency, duration)
-
+stok_gdf.to_file(myworkspace+"/GR/stok_gdf_attributed_temp4_fixed_corr.gpkg")
 
 #uebersetzung von Kantonseinheit in NAIS
 stok_gdf.columns
@@ -199,18 +156,57 @@ stok_gdf['tahsue']=''
 #transform null values
 stok_gdf.loc[stok_gdf['ASS_GR'].isnull()==True,'ASS_GR']=''
 stok_gdf.loc[stok_gdf['NAISbg'].isnull()==True,'NAISbg']=''
-stok_gdf.loc[stok_gdf['ASS_GR'].isnull()==True,'ASS_GR']=''
+stok_gdf.loc[stok_gdf['ASS_GR']=='<Null>','ASS_GR']=''
 stok_gdf.loc[stok_gdf['NAISbg']=='<Null>','NAISbg']=''
-stok_gdf.loc[stok_gdf['ASS_GR'].isnull()==True,'ASS_GR']=''
-stok_gdf.loc[stok_gdf['NAISbg'].isnull()==True,'NAISbg']=''
+naiseinheitenunique.loc[naiseinheitenunique['ASS_GR'].isnull()==True,'ASS_GR']=''
+naiseinheitenunique.loc[naiseinheitenunique['NAISbg'].isnull()==True,'NAISbg']=''
 naiseinheitenunique.loc[naiseinheitenunique['nais'].isnull()==True,'nais']=''
 naiseinheitenunique.loc[naiseinheitenunique['hs'].isnull()==True,'hs']=''
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['nais']!='']
 naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['hs']!='']
 
+#set nais1 and nais2
+naiseinheitenunique['nais1']=''
+naiseinheitenunique['nais2']=''
+for index, row in naiseinheitenunique.iterrows():
+    kantonseinheit = row['ASS_GR']
+    NAISbg = row["NAISbg"]
+    nais = row["nais"]
+    if "(" in nais and len(nais.replace('(',' ').replace(')','').strip().split())>1:
+        naiseinheitenunique.loc[((naiseinheitenunique["ASS_GR"] == kantonseinheit) & (naiseinheitenunique["NAISbg"] == NAISbg)), "nais1"] = nais.replace('(',' ').replace(')','').strip().split()[0]
+        naiseinheitenunique.loc[((naiseinheitenunique["ASS_GR"] == kantonseinheit) & (naiseinheitenunique["NAISbg"] == NAISbg)), "nais2"] = nais.replace('(', ' ').replace(')', '').strip().split()[1]
+        naiseinheitenunique.loc[((naiseinheitenunique["ASS_GR"] == kantonseinheit) & (naiseinheitenunique["NAISbg"] == NAISbg)), "ue"] = 1
+        naiseinheitenunique.loc[((naiseinheitenunique["ASS_GR"] == kantonseinheit) & (naiseinheitenunique["NAISbg"] == NAISbg)), "mo"] = 0
+    elif "/" in nais and len(nais.replace('(',' ').replace(')','').strip().split())>1:
+        naiseinheitenunique.loc[((naiseinheitenunique["ASS_GR"] == kantonseinheit) & (naiseinheitenunique["NAISbg"] == NAISbg)), "nais1"] = nais.replace('/',' ').strip().split()[0]
+        naiseinheitenunique.loc[((naiseinheitenunique["ASS_GR"] == kantonseinheit) & (naiseinheitenunique["NAISbg"] == NAISbg)), "nais2"] = nais.replace('/', ' ').strip().split()[1]
+        naiseinheitenunique.loc[((naiseinheitenunique["ASS_GR"] == kantonseinheit) & (naiseinheitenunique["NAISbg"] == NAISbg)), "ue"] = 1
+        naiseinheitenunique.loc[((naiseinheitenunique["ASS_GR"] == kantonseinheit) & (naiseinheitenunique["NAISbg"] == NAISbg)), "mo"] = 1
+    else:
+        naiseinheitenunique.loc[((naiseinheitenunique["ASS_GR"] == kantonseinheit) & (naiseinheitenunique["NAISbg"] == NAISbg)), "nais1"] = nais.replace('(', ' ').replace(')', '').strip().split()[0]
+        naiseinheitenunique.loc[((naiseinheitenunique["ASS_GR"] == kantonseinheit) & (naiseinheitenunique["NAISbg"] == NAISbg)), "ue"] = 0
+        naiseinheitenunique.loc[((naiseinheitenunique["ASS_GR"] == kantonseinheit) & (naiseinheitenunique["NAISbg"] == NAISbg)), "mo"] = 0
+
 
 print('iterate for attributing nais and tahs')
 len(naiseinheitenunique)
+naiseinheitenunique['Bedingung'].unique().tolist()
+naiseinheitenunique['ASS_GR'].unique().tolist()
+stok_gdf['ASS_GR'].unique().tolist()
+#check entries
+print('comparison')
+for item in stok_gdf['ASS_GR'].unique().tolist():
+    if item not in naiseinheitenunique['ASS_GR'].unique().tolist():
+        print(item)
+print('correct NAISbg')
+naiseinheitenunique['NAISbg'].unique().tolist()
+stok_gdf['NAISbg'].unique().tolist()
+
+for item in stok_gdf['NAISbg'].unique().tolist():
+    if ' ' in item:
+        stok_gdf.loc[stok_gdf['NAISbg']==item, 'NAISbg']=item.replace(' ','')
+naiseinheitenunique.loc[naiseinheitenunique['Bedingung'].isnull()==True,'Bedingung']=''
+naiseinheitenunique=naiseinheitenunique[naiseinheitenunique['Bedingung']=='']
 for index, row in naiseinheitenunique.iterrows():
     kantonseinheit=row['ASS_GR']
     NAISbg=row["NAISbg"]
@@ -219,17 +215,12 @@ for index, row in naiseinheitenunique.iterrows():
     nais2 = row["nais2"]
     hs=row['hs']
     hslist=row['hs'].replace('/',' ').replace('(',' ').replace(')','').replace('  ',' ').strip().split()
+    bedingung=row['Bedingung']
     #Hoehenstufenzuweisung
     stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg)), "nais"] = nais
     stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg)), "nais1"] = nais1
     stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg)), "nais2"] = nais2
     stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg)), "hs"] = row['hs']
-    #Uebersetzung NaiS
-    if row['nais2']!='':
-        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg)), "ue"] = 1
-        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg)), "nais"] = row['nais1']+'('+row['nais2']+')'
-    else:
-        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg)), "nais"] = row['nais1']
     #Uebergang
     if nais2 !='':
         stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg)), "ue"] = 1
@@ -255,12 +246,85 @@ for index, row in naiseinheitenunique.iterrows():
                             stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(',' ').replace(')','').strip().split()[-1]]
                         else:
                             stok_gdf.loc[index2, 'tahs'] = hoehenstufendictabkuerzungen[row2['hs'].replace('(', ' ').replace(')', '').strip().split()[-1]]
+    # Bedingungen
+    if bedingung=='Region 1':
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg)&(stok_gdf["storeg"] == '1')), "nais"] = nais
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '1')), "nais1"] = nais1
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '1')), "hs"] = hs
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '1')&(stok_gdf["hs1975"] <= 4)), "tahs"] = 'submontan'
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '1') & (stok_gdf["hs1975"] == 5)), "tahs"] = 'untermontan'
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '1') & (stok_gdf["hs1975"] >= 6)), "tahs"] = 'obermontan'
+    if bedingung=='Region 2a':
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg)&(stok_gdf["storeg"] == '2a')), "nais"] = nais
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '2a')), "nais1"] = nais1
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '2a')), "hs"] = hs
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '2a')&(stok_gdf["hs1975"] <= 2)), "tahs"] = 'collin'
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '2a') & (stok_gdf["hs1975"] == 4)), "tahs"] = 'submontan'
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '2a') & (stok_gdf["hs1975"] == 5)), "tahs"] = 'untermontan'
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '2a') & (stok_gdf["hs1975"] == 6)), "tahs"] = 'obermontan'
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"] == '2a') & (stok_gdf["hs1975"] >= 8)), "tahs"] = 'hochmontan'
+    if bedingung=='Region 2b 2c' and nais=='65':
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '65') & (stok_gdf["NAISbg"] == NAISbg)&(stok_gdf["storeg"].isin(['2c','2b']))), "nais"] = nais
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '65') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c','2b']))), "nais1"] = nais1
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '65') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c','2b']))), "hs"] = hs
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '65') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c','2b']))&(stok_gdf["hs1975"] < 8)), "tahs"] = 'collin'
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '65') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c','2b'])) & (stok_gdf["hs1975"] >= 8)), "tahs"] = 'hochmontan'
+    if bedingung=='Region 2b 2c' and nais=='68':
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '68') & (stok_gdf["NAISbg"] == NAISbg)&(stok_gdf["storeg"].isin(['2c','2b']))), "nais"] = nais
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '68') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c','2b']))), "nais1"] = nais1
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '68') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c','2b']))), "hs"] = hs
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '68') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c','2b']))), "tahs"] = 'hochmontan'
+    if bedingung=='Region 1 2a':
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg)&(stok_gdf["storeg"].isin(['1','2a']))), "nais"] = nais
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a']))), "nais1"] = nais1
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a']))), "hs"] = hs
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a']))&(stok_gdf["hs1975"] <= 4)), "tahs"] = 'submontan'
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a']))& (stok_gdf["hs1975"] == 5)), "tahs"] = 'untermontan'
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == kantonseinheit) & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a'])) & (stok_gdf["hs1975"] >= 6)), "tahs"] = 'obermontan'
+    if bedingung=='Region 2c' and nais=='49*':
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*') & (stok_gdf["NAISbg"] == NAISbg)&(stok_gdf["storeg"].isin(['2c']))), "nais"] = nais
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c']))), "nais1"] = nais1
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c']))), "hs"] = hs
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c']))&(stok_gdf["hs1975"] <= 8)), "tahs"] = 'hochmontan'
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c'])) & (stok_gdf["hs1975"] > 8)), "tahs"] = 'subalpin'
+    if bedingung=='Region 2c' and nais=='60*':
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*') & (stok_gdf["NAISbg"] == NAISbg)&(stok_gdf["storeg"].isin(['2c']))), "nais"] = nais
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c']))), "nais1"] = nais1
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c']))), "hs"] = hs
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c']))&(stok_gdf["hs1975"] <= 8)), "tahs"] = 'hochmontan'
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['2c'])) & (stok_gdf["hs1975"] > 8)), "tahs"] = 'subalpin'
+    if bedingung=='Region 1, 2a, 2b und sa' and nais=='49*':
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*') & (stok_gdf["NAISbg"] == NAISbg)&(stok_gdf["storeg"].isin(['1','2a','2b']))), "nais"] = nais
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "nais1"] = nais1
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "hs"] = hs
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "tahs"] = 'subalpin'
+    if bedingung=='Region 1, 2a, 2b und sa' and nais=='60*':
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*') & (stok_gdf["NAISbg"] == NAISbg)&(stok_gdf["storeg"].isin(['1','2a','2b']))), "nais"] = nais
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "nais1"] = nais1
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "hs"] = hs
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "tahs"] = 'subalpin'
+        if bedingung=='Region 1, 2a, 2b und hm' and nais=='49*Ta':
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*Ta') & (stok_gdf["NAISbg"] == NAISbg)&(stok_gdf["storeg"].isin(['1','2a','2b']))), "nais"] = nais
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*Ta') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "nais1"] = nais1
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*Ta') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "hs"] = hs
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '49*Ta') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "tahs"] = 'hochmontan'
+    if bedingung=='Region 1, 2a, 2b und hm' and nais=='60*Ta':
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*Ta') & (stok_gdf["NAISbg"] == NAISbg)&(stok_gdf["storeg"].isin(['1','2a','2b']))), "nais"] = nais
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*Ta') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "nais1"] = nais1
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*Ta') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "hs"] = hs
+        stok_gdf.loc[((stok_gdf["ASS_GR"] == '60*Ta') & (stok_gdf["NAISbg"] == NAISbg) & (stok_gdf["storeg"].isin(['1','2a','2b']))), "tahs"] = 'hochmontan'
 winsound.Beep(frequency, duration)
 
 #check Hohenstufenzuweisung
+#stok_gdf.loc[((stok_gdf["ASS_GR"] == '47D') & (stok_gdf["NAISbg"] == '47DRe')), "hs"] = 'hm'
+#stok_gdf.loc[((stok_gdf["ASS_GR"] == '47D') & (stok_gdf["NAISbg"] == '47D')), "hs"] = 'hm'
 checknohs=stok_gdf[((stok_gdf["tahs"]==""))]
+checknohs['hs'].unique().tolist()
 fehlendeuebersetzungen=checknohs['ASS_GR'].unique().tolist()
-
+check47=checknohs[checknohs['ASS_GR']=='47D']
+check47['ASS_GR'].unique().tolist()
+check47['NAISbg'].unique().tolist()
+stok_gdf.loc[((stok_gdf["ue"] == 0)&(stok_gdf["nais1"] == '')) , "nais1"] = stok_gdf["nais"]
 stok_gdf.loc[((stok_gdf["ue"] == 1)&(stok_gdf["tahsue"] == '')) , "tahsue"] = stok_gdf["tahs"]
 stok_gdf.loc[((stok_gdf["mo"] == 1)&(stok_gdf["tahsue"] == '')) , "tahsue"] = stok_gdf["tahs"]
 stok_gdf['tahsue'].unique().tolist()
@@ -272,14 +336,15 @@ stok_gdf.to_file(myworkspace+"/GR/stok_gdf_attributed.gpkg")
 #stok_gdf=gpd.read_file(myworkspace+"/GR/stok_gdf_attributed.gpkg")
 print("done")
 
-
+stok_gdf.dtypes
 
 
 #Export for tree-app
 print('Export for Tree-App')
 stok_gdf.columns
 #stok_gdf.loc[((stok_gdf['ue']==1)&(NAISbg['tahsue']=='')&(stok_gdf['tahs']!='')),'tahsue']=stok_gdf['tahs']
-treeapp=stok_gdf[['ASS_GR', 'NAISbg''nais', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
+treeapp=stok_gdf[['ASS_GR', 'NAISbg','nais', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
 treeapp.to_file(myworkspace+"/GR/GR_treeapp.gpkg", layer='GR_treeapp', driver="GPKG")
 treeapp.columns
 print("done")
+winsound.Beep(frequency, duration)
