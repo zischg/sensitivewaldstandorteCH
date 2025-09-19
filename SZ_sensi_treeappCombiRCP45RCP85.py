@@ -233,7 +233,8 @@ for column in combi.columns.tolist():
     if '_1' in column:
         combi.rename(columns={column: str(column[0:-2])}, inplace=True)
     if '_2' in column:
-        combi.drop(columns=column, axis=1, inplace=True)
+        if column in combi.columns.tolist():
+            combi.drop(columns=column, axis=1, inplace=True)
 combi.columns
 
 combi.to_file(projectspace+"/SZ"+"/SZ_baumartenempfehlungen_combi.gpkg", layer="SZ_baumartenempfehlungen_combi", driver="GPKG")

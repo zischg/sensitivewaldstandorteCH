@@ -49,7 +49,7 @@ for col in treetypeslist:
         if row['ue_1'] == 0 and row[col + 'heu1_1'] in ['a', 'b','c'] and row[col + 'zuk1_1'] in ['c'] and row[col + 'zuk1_2']  in ['c']:
             combi.loc[index, col]=2
             combi.loc[index, col+"Fall"] = 7
-        if row['ue_1'] == 0 and row[col + 'heu1_1'] in ['a', 'b','c'] and row[col + 'zuk1_1'] in ['c'] and row[col + 'zuk1_2']not in ['a', 'b','c']:
+        if row['ue_1'] == 0 and row[col + 'heu1_1'] in ['a', 'b','c'] and row[col + 'zuk1_1'] in ['c'] and row[col + 'zuk1_2'] not in ['a', 'b','c']:
             combi.loc[index, col]=2
             combi.loc[index, col+"Fall"] = 8
         if row['ue_1'] == 0 and row[col + 'heu1_1'] in ['a', 'b','c'] and row[col + 'zuk1_1'] not in ['a','b','c'] and row[col + 'zuk1_2'] in ['a','b']:
