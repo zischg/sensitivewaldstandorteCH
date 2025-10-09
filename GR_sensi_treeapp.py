@@ -1672,6 +1672,7 @@ for climatescenario in climatescenarios:
     combinations_df.loc[combinations_df['storeg'] == ' 4b', 'storegco'] = 'R 4'
     combinations_df.loc[combinations_df['storeg'] == ' 4b', 'storeg'] = '4b'
     combinations_df.loc[combinations_df['storeg'] == ' 3', 'storeg'] = '3'
+    combinations_df.loc[combinations_df['nais'].isin(['71/71G','67/67G','70/70G']), 'tahsue'] = combinations_df['tahs']
     combinations_df[combinations_df['storegco']=='R 5']['storeg'].unique().tolist()
     combinations_df[combinations_df['storegco'] == 'R 4']['storeg'].unique().tolist()
     combinations_df[combinations_df['storegco'] == 'R, J, M, 1, 2, 3']['storeg'].unique().tolist()
@@ -3427,6 +3428,204 @@ for climatescenario in climatescenarios:
     combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (combinations_df['nais2'] == "46MRe") & (combinations_df["tahsue"] == "hochmontan") & (combinations_df["hszukcor"] == "untermontan")), "naiszuk2"] = "3"
     combinations_df.loc[((combinations_df['storeg'].isin(['3','2a', '2b']) == True) & (combinations_df['nais2'] == "46M") & (combinations_df["tahsue"] == "obersubalpin") & (combinations_df["hszukcor"] == "unter- & obermontan")), "naiszuk2"] = "20"
     combinations_df.loc[((combinations_df['storeg'].isin(['3', '2a', '2b']) == True) & (combinations_df['nais2'] == "60*") & (combinations_df["tahsue"] == "subalpin") & (combinations_df["hszukcor"] == "unter- & obermontan")), "naiszuk2"] = "18w"
+    #correct GR 2
+    combinations_df.loc[combinations_df['nais'].isin(['71/71G', '67/67G', '70/70G']), 'tahsue'] = combinations_df['tahs']
+    #test=combinations_df[((combinations_df['nais2'].isin(['71G', '67G', '70G']))&(combinations_df['naiszuk2'].isin(['no path', '', 'no path c','_'])))]
+    #test2=test[['nais2','tahsue','hszukcor','storeg']]
+    #test3=test2.drop_duplicates()
+    combinations_df.loc[(combinations_df['nais'].isin(['71/71G', '67/67G', '70/70G'])&(combinations_df['tahsue']==combinations_df['hszukcor'])), 'naiszuk2'] = combinations_df['nais2']
+    combinations_df.loc[((combinations_df['nais2']=='67G') & (
+                combinations_df['tahsue'] == 'obersubalpin')&(combinations_df['hszukcor'] == 'subalpin')), 'naiszuk2'] = '67G'
+    combinations_df.loc[((combinations_df['nais2'] == '67G') & (combinations_df['nais2'].isin(['2b','3']))&(
+            combinations_df['tahsue'] == 'obersubalpin') & (combinations_df['hszukcor'] == 'collin')), 'naiszuk2'] = '65 collin'
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (combinations_df['nais1'] == "70") & (combinations_df["tahs"] == "hochmontan") & (combinations_df["hszukcor"] == "collin mit Buche")), "naiszuk1"] = "42r"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+                combinations_df['nais1'] == "59") & (combinations_df["tahs"] == "subalpin") & (
+                                     combinations_df["hszukcor"] == "hochmontan")), "naiszuk1"] = "47"
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "59") & (combinations_df["tahs"] == "subalpin") & (
+                                 combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "25a"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b']) == True) & (
+            combinations_df['nais1'] == "59") & (combinations_df["tahs"] == "subalpin") & (
+                                 combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "42t"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "59") & (combinations_df["tahs"] == "subalpin") & (
+                                 combinations_df["hszukcor"] == "hochmontan")), "naiszuk1"] = "47"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "59") & (combinations_df["tahs"] == "subalpin") & (
+                                 combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "25a"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "47*") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                                 combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "3LV"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "47H") & (combinations_df["tahs"] == "untermontan") & (
+                                 combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "25as"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "47H") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "25as"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "47") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "19a"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "47") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "19a"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "33V") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "33V"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "57C") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "3"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "59*") & (combinations_df["tahs"] == "subalpin") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "4"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "59*") & (combinations_df["tahs"] == "subalpin") & (
+                                 combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "4"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "47DRe") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "19L"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "40P") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "40P"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "40P") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                                 combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "40P"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 2, '2', '2a', '2b', '2c', 3, '3', 'J']) == True) & (
+            combinations_df['nais1'] == "40P") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "40P"
+    combinations_df.loc[((combinations_df['storeg'].isin([1, '1', 'M', 2, '2', '2a', '2b', '2c', 3, '3', 'J']) == True) & (
+            combinations_df['nais1'] == "40P") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                                 combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "40P"
+    combinations_df.loc[
+        ((combinations_df['storeg'].isin([1, '1', 'M', 2, '2', '2a', '2b', '2c', 3, '3', 'J']) == True) & (
+                combinations_df['nais1'] == "40P") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                 combinations_df["hszukcor"] == "submontan")), "naiszuk1"] = "6"
+    combinations_df.loc[
+        ((combinations_df['storeg'].isin(['2b', '3']) == True) & (
+                combinations_df['nais1'] == "40P") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                 combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "40P collin"
+    combinations_df.loc[
+        ((combinations_df['storeg'].isin([1, '1', 'M', 2, '2', '2a', 'J']) == True) & (
+                combinations_df['nais1'] == "40P") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                 combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "6 collin"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "55*") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "3s"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "55*") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "3s"
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "40PBl") & (combinations_df["tahs"] == "untermontan") & (
+                                 combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "40PBlt"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b']) == True) & (
+            combinations_df['nais1'] == "40PBl") & (combinations_df["tahs"] == "untermontan") & (
+                                 combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "25as"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "47D") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "19L"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "47D") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "19L"
+    combinations_df.loc[(
+                (combinations_df['storeg'].isin([1, '1', 'M', 2, '2', '2a', '2b', '2c', 3, '3', 'J']) == True) & (
+                    combinations_df['nais1'] == "32V") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                            combinations_df["hszukcor"] == "collin")), "naiszuk1"] = '32C collin'
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin(['2b', '3']) == True) & (
+            combinations_df['nais1'] == "32V") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                    combinations_df["hszukcor"] == "collin")), "naiszuk1"] = '24 collin'
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M', 2, '2', '2a']) == True) & (
+            combinations_df['nais1'] == "32V") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                    combinations_df["hszukcor"] == "collin")), "naiszuk1"] = '25 collin'
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "32V") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                    combinations_df["hszukcor"] == "collin")), "naiszuk1"] = '32C'
+
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin(['2b', '3']) == True) & (
+            combinations_df['nais1'] == "47H") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                    combinations_df["hszukcor"] == "collin")), "naiszuk1"] = '47H collin'
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M', 2, '2', '2a']) == True) & (
+            combinations_df['nais1'] == "47H") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                    combinations_df["hszukcor"] == "collin")), "naiszuk1"] = '34* collin'
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([4, '4', '4a', '4b',5,'5', '5a', '5b']) == True) & (
+            combinations_df['nais1'] == "47H") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                    combinations_df["hszukcor"] == "collin")), "naiszuk1"] = '25as'
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([4, '4', '4a', '4b', 5, '5', '5a', '5b']) == True) & (
+            combinations_df['nais1'] == "47H") & (combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "unter- & obermontan")), "naiszuk1"] = '47H'
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M', 2, '2', '2a', 3, '3','4a','4b','4','5','5a','5b']) == True) & (
+            combinations_df['nais1'] == "14") & (combinations_df["tahs"] == "obermontan") & (
+                    combinations_df["hszukcor"] == "hochmontan")), "naiszuk1"] = '14'
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([4, '4', '4a', '4b', 5, '5', '5a', '5b']) == True) & (
+            combinations_df['nais1'] == "47H") & (combinations_df["tahs"] == "untermontan") & (
+                    combinations_df["hszukcor"] == "collin")), "naiszuk1"] = '25as'
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin(
+                [1, '1', 'M', 2, '2', '2a', 3, '3', '4a', '4b', '4', '5', '5a', '5b']) == True) & (
+                    combinations_df['nais1'] == "58C") & (combinations_df["tahs"] == "subalpin") & (
+                    combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = '3s'
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "53*") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "14*"
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "58L") & (combinations_df["tahs"] == "subalpin") & (
+                                 combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "3s"
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "25a") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "25a"
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "25a") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "25a"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin(
+                [1, '1', 'M', 2, '2', '2a', 3, '3', '4a', '4b', '4', '5', '5a', '5b']) == True) & (
+                    combinations_df['nais1'] == "AV") & (combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = 'AV'
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "47D") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "19L"
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "59A") & (combinations_df["tahs"] == "obersubalpin") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "19L"
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "57C") & (combinations_df["tahs"] == "subalpin") & (
+                                 combinations_df["hszukcor"] == "untermontan")), "naiszuk1"] = "3"
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "32*") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "32*"
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "60A") & (combinations_df["tahs"] == "subalpin") & (
+                                 combinations_df["hszukcor"] == "obermontan")), "naiszuk1"] = "19L"
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin([1, '1', 'M', 2, '2', '2a', '2b', '2c', 3, '3', 'J']) == True) & (
+            combinations_df['nais1'] == "40P") & (combinations_df["tahs"] == "unter- & obermontan") & (
+                    combinations_df["hszukcor"] == "collin")), "naiszuk1"] = '40P collin'
+    combinations_df.loc[(
+            (combinations_df['storeg'].isin(['2b', '2c', 3, '3']) == True) & (
+            combinations_df['nais1'] == "46M") & (combinations_df["tahs"] == "hochmontan") & (
+                    combinations_df["hszukcor"] == "collin")), "naiszuk1"] = '46M collin'
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b']) == True) & (
+            combinations_df['nais1'] == "47*Lä") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "3LV"
+    combinations_df.loc[((combinations_df['storeg'].isin([4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "47*Lä") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "collin")), "naiszuk1"] = "3LV"
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b',4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais1'] == "47*Lä") & (combinations_df["tahs"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "unter- & obermontan")), "naiszuk1"] = "4"
+    #nais 2
+    combinations_df.loc[((combinations_df['storeg'].isin([5, '5', '5a', '5b', 4, '4', '4a', '4b']) == True) & (
+            combinations_df['nais2'] == "70G") & (combinations_df["tahsue"] == "hochmontan") & (
+                                 combinations_df["hszukcor"] == "unter- & obermontan")), "naiszuk2"] = "68"
+
 
     # correct collin-->collin
     # nais1
@@ -3558,6 +3757,7 @@ for climatescenario in climatescenarios:
         nopathoutfile.write(str(item[0]) + ";" + str(item[1]) + ";" + str(item[2]) + ";" + str(item[3])+ ";" + str(item[4])+ "\n")
     nopathoutfile.close()
     joblib.dump(combinations_df, projectspace + "/GR" + "GR_" + climatescenario + "_combinations_df_futureSTO.sav")
+    #combinations_df=joblib.load(projectspace + "/GR" + "GR_" + climatescenario + "_combinations_df_futureSTO.sav")
     combinations_df.to_file(projectspace + "/GR/" + "GR_" + climatescenario + "_zukuenftigestandorte.gpkg")
 
     # ******************************************************************************************************
