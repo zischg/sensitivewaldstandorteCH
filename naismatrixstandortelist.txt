@@ -1,0 +1,490 @@
+standortstyp	foehrenstandort
+1	
+2	
+3	
+4	
+6	
+11	
+14	
+15	
+16	
+17	
+18	
+19	
+20	
+21	
+22	
+23	
+24	
+25	
+26	
+27	
+28	
+29	
+30	
+31	
+35	
+36	
+37	
+38	
+39	
+41	
+43	
+44	
+45	
+46	
+47	
+48	
+49	
+50	
+51	
+52	
+53	
+54	
+55	
+56	
+58	
+59	
+60	
+61	
+62	
+65	
+66	
+67	
+68	
+69	
+70	
+71	
+72	
+91	
+93	
+1 collin	
+10a	
+10a collin	
+10w	
+10w collin	
+11 collin	
+11Fe	
+12*	
+12*h	
+12a	
+12aFe	
+12aG	
+12e	
+12S	
+12SFe	
+12w	
+13*	
+13* hyp	
+13* med	
+13a	
+13a collin	
+13aFe	
+13e	
+13e collin	
+13eh	
+13h	
+13hFe	
+13hG	
+14 collin	
+14*	
+14G	
+15 collin	
+16*	
+17 collin	
+17G	
+18*	
+18*G	
+18Fe	
+18G	
+18M	
+18MG	
+18v	
+18vG	
+18w	
+18wG	
+19a	
+19aG	
+19f	
+19Fe	
+19G	
+19L	
+19LC	
+19LP	
+1h	
+2 collin	
+20E	
+20EG	
+20Fe	
+20G	
+21*	
+21*G	
+21G	
+21L	
+22 collin	
+22*	
+22* hyp	
+22* med	
+22A	
+22C	
+22C collin	
+22Fe	
+23 collin	
+23*	
+23Fe	
+23G	
+23H	
+23H collin	
+24 collin	
+24*	
+24* collin	
+24*Fe	
+24*G	
+24G	
+25 collin	
+25*	
+25* collin	
+25A	
+25a	
+25a hyp	
+25a med	
+25as	
+25as hyp	
+25as med	
+25au	
+25au hyp	
+25au med	
+25b	
+25b hyp	
+25b med	
+25e	
+25e collin	
+25F	
+25f	
+25F collin	
+25f hyp	
+25f med	
+25Fe	
+25FFe	
+25G	
+25O	
+25O hyp	
+25O med	
+25Q	
+26 collin	
+26Fe	
+26h	
+26hG	
+26w	
+26w collin	
+27 collin	
+27 hyp	
+27 med	
+27*	
+27* collin	
+27h	
+27hG	
+27O	
+27O hyp	
+27Omed	
+28 collin	
+28 hyp	
+28 med	
+29 collin	
+29A	
+29A collin	
+29C	
+29C collin	
+29h	
+3*/4*	
+30 collin	
+30 hyp	
+30 med	
+31 collin	
+31 hyp	
+31 med	
+32*	
+32* collin	
+32C	
+32C collin	
+32C hyp	
+32C med	
+32S	
+32V	
+32VG	
+33a	
+33a hyp	
+33a med	
+33b	
+33b hyp	
+33b med	
+33m	
+33m hyp	
+33m med	
+33V	
+33V collin	
+34*	
+34* collin	
+34a	
+34a hyp	
+34a med	
+34b	
+34b hyp	
+34b med	
+35A	
+35M	
+35Q	
+35Q hyp	
+35Q med	
+35S	
+35S hyp	
+35S med	
+36 hyp	
+36 med	
+37 hyp	
+37 med	
+38 collin	
+38*	
+38* hyp	
+38* med	
+38S	
+39 collin	
+39*	
+39* collin	
+3G	
+3L/4L	
+3L/4L hyp	
+3L/4L med	
+3LV	
+3LV hyp	
+3LV med	
+3s	
+3sG	
+40*	
+40* collin	
+40P	
+40P collin	
+40P hyp	
+40P med	
+40PBl	
+40PBl collin	
+40PBl hyp	
+40PBl med	
+40PBlG	
+40PBlt	
+40PG	
+40Pt	
+41 collin	
+41*	
+41* collin	
+42B	
+42B hyp	
+42B med	
+42C	
+42C hyp	
+42C med	
+42Q	
+42Q hyp	
+42Q med	
+42r	
+42r hyp	
+42r med	
+42t	
+42t hyp	
+42t med	
+42V	
+42V hyp	
+42V med	
+43 collin	
+43 hyp	
+43 med	
+43*	
+43* hyp	
+43* med	
+43S	
+43S collin	
+43S hyp	
+43S med	
+44 collin	
+44 hyp	
+44 med	
+45 collin	
+46 collin	
+46*	
+46* collin	
+46*Re	
+46M	
+46M collin	
+46MRe	
+46Re	
+46t	
+47*	
+47*G	
+47*Lä	
+47D	
+47DG	
+47DRe	
+47H	
+47H collin	
+47HG	
+47M	
+47MG	
+47Re	
+48 collin	
+48G	
+49 collin	
+49*	
+49* collin	
+49*Ta	
+4G	
+50 collin	
+50*	
+50* collin	
+50*G	
+50*Re	
+50Fe	
+50G	
+50P	
+50P collin	
+50Re	
+51 collin	
+51C	
+51Fe	
+51G	
+51Re	
+52 collin	
+52Re	
+52T	
+53 collin	
+53*	
+53* collin	
+53*G	
+53*s	
+53*sLä	
+53*Ta	
+53A	
+53ATa	
+53G	
+53Lä	
+53Ta	
+54 collin	
+54A	
+54A collin	
+55 collin	
+55*	
+55* collin	
+55*G	
+55*Lä	
+55*Ta	
+55Lä	
+57Bl	
+57BlG	
+57BlTa	
+57C	
+57CG	
+57CLä	
+57CTa	
+57M	
+57S	
+57STa	
+57V	
+57VG	
+57VLä	
+57VM	
+57VTa	
+58Bl	
+58C	
+58Fe	
+58G	
+58L	
+58Lä	
+58LG	
+58LLä	
+59*	
+59*G	
+59A	
+59AG	
+59C	
+59E	
+59EG	
+59ELä	
+59G	
+59H	
+59J	
+59L	
+59Lä	
+59LLä	
+59R	
+59S	
+59V	
+59VG	
+59VLä	
+6 collin	
+60*	
+60* collin	
+60*G	
+60*Lä	
+60*Ta	
+60A	
+60AG	
+60ALä	
+60ATa	
+60E	
+60Lä	
+60Ta	
+61 collin	
+62 collin	
+65 collin	
+65*	
+65* collin	
+66 collin	
+66 hyp	
+66 med	
+66PM	
+67*	
+67G	
+68 collin	
+68*	
+68* collin	
+69G	
+6Fe	
+7*	
+7* collin	
+70G	
+71G	
+72G	
+72Lä	
+7a	
+7a collin	
+7a hyp	
+7a med	
+7aFe	
+7b	
+7b collin	
+7S	
+7S collin	
+7SFe	
+8*	
+8a	
+8aFe	
+8b	
+8d	
+8dFe	
+8S	
+8SFe	
+91 hyp	
+91 med	
+92a	
+92a hyp	
+92a med	
+92z	
+92z hyp	
+92z med	
+93 hyp	
+93 med	
+9a	
+9a collin	
+9aFe	
+9w	
+9w collin	
+AV	
