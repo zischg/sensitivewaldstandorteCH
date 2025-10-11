@@ -16,9 +16,17 @@ warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 codeworkspace="C:/DATA/develops/sensitivewaldstandorteCH"
 projectspace="D:/CCW24sensi"
 
-baumartenempfehlungenrcp45=gpd.read_file(projectspace+"/GR"+"/GR_rcp45_baumartenempfehlungen.gpkg", layer="GR_rcp45_baumartenempfehlungen", driver="GPKG")
-baumartenbedeutungenrcp45=gpd.read_file(projectspace+"/GR"+"/GR_rcp45_baumartenbedeutungen.gpkg", layer="GR_rcp45_baumartenbedeutungen", driver="GPKG")
-baumartenbedeutungenrcp85=gpd.read_file(projectspace+"/GR"+"/GR_rcp85_baumartenbedeutungen.gpkg", layer="GR_rcp85_baumartenbedeutungen", driver="GPKG")
+#baumartenempfehlungenrcp45=gpd.read_file(projectspace+"/GR"+"/GR_rcp45_baumartenempfehlungen.gpkg", layer="GR_rcp45_baumartenempfehlungen", driver="GPKG")
+#baumartenbedeutungenrcp45=gpd.read_file(projectspace+"/GR"+"/GR_rcp45_baumartenbedeutungen.gpkg", layer="GR_rcp45_baumartenbedeutungen", driver="GPKG")
+#baumartenbedeutungenrcp85=gpd.read_file(projectspace+"/GR"+"/GR_rcp85_baumartenbedeutungen.gpkg", layer="GR_rcp85_baumartenbedeutungen", driver="GPKG")
+
+baumartenempfehlungenrcp45=joblib.load(projectspace+"/GR"+"/GR_rcp45_baumartenempfehlungen.sav")
+treetypeslist=baumartenempfehlungenrcp45.columns.tolist()[25:-2]
+del baumartenempfehlungenrcp45
+
+baumartenbedeutungenrcp45=joblib.load(projectspace+"/GR"+"/GR_rcp45_baumartenempfehlungen.sav")
+baumartenbedeutungenrcp85=joblib.load(projectspace+"/GR"+"/GR_rcp85_baumartenempfehlungen.sav")
+
 combi=gpd.overlay(baumartenbedeutungenrcp45, baumartenbedeutungenrcp85, how='intersection', make_valid=True, keep_geom_type=True)
 
 arvenundlaerchen=['59','59A','59C','59E','59J','59L','59S','59V','59H','59R','72,' '59*','59G','59AG','59EG','59VG','72G','57CLä','57VLä','58Lä', '59Lä', '59ELä', '59LLä', '59VLä','59LLä']
