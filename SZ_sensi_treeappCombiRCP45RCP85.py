@@ -14,7 +14,8 @@ warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 #input data
 codeworkspace="C:/DATA/develops/sensitivewaldstandorteCH"
-projectspace="D:/CCW24sensi"
+#projectspace="D:/CCW24sensi"
+projectspace="C:/DATA"
 
 #baumartenempfehlungenrcp45=gpd.read_file(projectspace+"/SZ"+"/SZ_rcp45_baumartenempfehlungen.gpkg", layer="SZ_rcp45_baumartenempfehlungen", driver="GPKG")
 #baumartenbedeutungenrcp45=gpd.read_file(projectspace+"/SZ"+"/SZ_rcp45_baumartenbedeutungen.gpkg", layer="SZ_rcp45_baumartenbedeutungen", driver="GPKG")
