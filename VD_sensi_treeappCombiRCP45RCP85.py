@@ -14,7 +14,8 @@ warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 #input data
 codeworkspace="C:/DATA/develops/sensitivewaldstandorteCH"
-projectspace="D:/CCW24sensi"
+#projectspace="D:/CCW24sensi"
+projectspace="C:/DATA"
 arvenundlaerchen = ['59', '59A', '59C', '59E', '59J', '59L', '59S', '59V', '59H', '59R', '72,' '59*', '59G', '59AG', '59EG', '59VG', '72G', '57CLä', '57VLä', '58Lä', '59Lä', '59ELä', '59LLä', '59VLä', '59LLä']
 
 #baumartenempfehlungenrcp45=gpd.read_file(projectspace+"/VD"+"/VD_rcp45_baumartenempfehlungen.gpkg", layer="VD_rcp45_baumartenempfehlungen", driver="GPKG")
@@ -22,8 +23,9 @@ arvenundlaerchen = ['59', '59A', '59C', '59E', '59J', '59L', '59S', '59V', '59H'
 #baumartenbedeutungenrcp85=gpd.read_file(projectspace+"/VD"+"/VD_rcp85_baumartenbedeutungen.gpkg", layer="VD_rcp85_baumartenbedeutungen", driver="GPKG")
 
 baumartenempfehlungenrcp45=joblib.load(projectspace+"/VD"+"/VD_rcp45_baumartenempfehlungen.sav")
-treetypeslist=baumartenempfehlungenrcp45.columns.tolist()[25:-2]
+treetypeslist=baumartenempfehlungenrcp45.columns.tolist()[25:-1]
 del baumartenempfehlungenrcp45
+len(treetypeslist)
 
 baumartenbedeutungenrcp45=joblib.load(projectspace+"/VD"+"/VD_rcp45_combinations_df_baumartenbedeutungen.sav")
 baumartenbedeutungenrcp85=joblib.load(projectspace+"/VD"+"/VD_rcp85_combinations_df_baumartenbedeutungen.sav")
