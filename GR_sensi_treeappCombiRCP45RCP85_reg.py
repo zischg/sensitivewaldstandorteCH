@@ -29,8 +29,9 @@ del baumartenempfehlungenrcp45
 baumartenbedeutungenrcp45=joblib.load(projectspace+"/GR"+"/GR_rcp45_combinations_df_baumartenbedeutungen.sav")
 baumartenbedeutungenrcp85=joblib.load(projectspace+"/GR"+"/GR_rcp85_combinations_df_baumartenbedeutungen.sav")
 
+baumartenbedeutungenrcp45['storeg'].unique().tolist()
 #iterate per region
-for region in baumartenbedeutungenrcp45['storeg'].unique().tolist():
+for region in ['3', '2b', '2a', '1']:#baumartenbedeutungenrcp45['storeg'].unique().tolist():
     print(region)
     bed45=baumartenbedeutungenrcp45[baumartenbedeutungenrcp45['storeg']==region]
     bed85=baumartenbedeutungenrcp85[baumartenbedeutungenrcp85['storeg']==region]
