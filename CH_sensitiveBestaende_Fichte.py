@@ -57,7 +57,8 @@ varname='var1'
 #varname='var2'
 #kantons=['AG','AI','AR','BE','BLBS','FR','GE','GL','GR','JU','LU','NE','NW','OW','SG','SH','SO','SZ','TG','UR','VD','VS','ZG','ZH']#'TI',
 #kantons=['AG','AR','BE','BLBS','FR','GE','GL','GR','JU','LU','NE','NW','OW','SG','SH','SO','SZ','TG','UR','VD','VS','ZG','ZH']#'TI','AI'
-kantons=['SG','SH','SO','SZ','TG','UR','VD','VS','ZG','ZH']#'TI','AI'
+#kantons=['SG','SH','SO','SZ','TG','UR','VD','VS','ZG','ZH']#'TI','AI'
+kantons=['GR']
 #thresholds for claissifying climate-sensitive stocks (klimasensitive Bestaende)
 threshold_nicht_empfohlen_min=0
 threshold_nicht_empfohlen_max=95
@@ -133,16 +134,19 @@ for kanton in kantons:
     bk_gdf.loc[bk_gdf['LH'].isnull() == True, 'LH'] = 0
     bk_gdf['NH'] = 100 - bk_gdf['LH']
     #bk_gdf['FI'] = 0
+    joblib.dump(bk_gdf, projectspace + '/' + kanton + '/stok_gdf_attributed_NH.sav')
     #******************************************************************************************************
     #Sensitive Bestaende
     #******************************************************************************************************
 
     #Intersect with Fichtenanteil
     bk_gdf_fi=bk_gdf.overlay(baumartenanteil, how='intersection', make_valid=True, keep_geom_type=True)
+
     #Fichtenanteil
     bk_gdf_fi["FI"]=bk_gdf_fi['NH']*bk_gdf_fi['FIantNHant']#bk_gdf_fi['NH']/100.0*bk_gdf_fi['FIanteil']/100.0*100.0
     bk_gdf_fi.columns
     len(bk_gdf_fi)
+    joblib.dump(bk_gdf, projectspace + '/' + kanton + '/bk_gdf_fi.sav')
     #climate scenarios
     #climatescenario='rcp85'
     for climatescenario in climatescenarios:
@@ -159,6 +163,7 @@ for kanton in kantons:
         mainlayercolumnslist=rcp_bk_gdf_in.columns.tolist()
         if 'index' in mainlayercolumnslist:
             rcp_bk_gdf_in.drop('index', axis=1, inplace=True)
+        joblib.dump(rcp_bk_gdf_in, projectspace + '/' + kanton + '/'+climatescenario+'_rcp_bk_gdf_in.sav')
         rcp_bk_gdf_out=rcp_bk_gdf_in.copy()
         mainlayercolumnslist=rcp_bk_gdf_out.columns.tolist()
         len(rcp_bk_gdf_out)

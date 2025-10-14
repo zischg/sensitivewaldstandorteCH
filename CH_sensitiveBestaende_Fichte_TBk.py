@@ -8,10 +8,14 @@ import shapely
 from osgeo import ogr
 import xlrd
 import openpyxl
+import psycopg2
 import warnings
-from rasterstats import zonal_stats
-from rasterstats import zonal_stats
 from osgeo import osr, gdal
+from sqlalchemy import create_engine
+mypassword=input("Enter database password: ").replace("'","")
+db_connection_url = "postgresql://azischg:mypassword@mobidb02.giub.unibe.ch:5432/ccwdb";
+engine = create_engine(db_connection_url)
+#con=engine.connect()
 drv = gdal.GetDriverByName('GTiff')
 srs = osr.SpatialReference()
 srs.ImportFromEPSG(2056) #LV95
@@ -23,29 +27,6 @@ winsound.Beep(frequency, duration)
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 
-#functions
-def convert_tif_to_array(intifraster):
-    inras = gdal.Open(intifraster)
-    inband = inras.GetRasterBand(1)
-    outarr = inband.ReadAsArray()
-    return outarr
-def convertarrtotif(arr, outfile, tifdatatype, referenceraster, nodatavalue):
-    ds_in=gdal.Open(referenceraster)
-    inband=ds_in.GetRasterBand(1)
-    gtiff_driver=gdal.GetDriverByName("GTiff")
-    ds_out = gtiff_driver.Create(outfile, inband.XSize, inband.YSize, 1, tifdatatype)
-    ds_out.SetProjection(ds_in.GetProjection())
-    ds_out.SetGeoTransform(ds_in.GetGeoTransform())
-    outband=ds_out.GetRasterBand(1)
-    outband.WriteArray(arr)
-    outband.SetNoDataValue(nodatavalue)
-    ds_out.FlushCache()
-    del ds_in
-    del ds_out
-    del inband
-    del outband
-
-
 #input data
 codeworkspace="C:/DATA/develops/sensitivewaldstandorteCH"
 projectspace="D:/CCW24sensi"
@@ -55,44 +36,6 @@ climatescenarios=['rcp45','rcp85']
 #climatescenario="rcp26"
 varname='var1'
 #varname='var2'
-
-
-#read the rasters
-#reference tif raster
-print("read reference raster")
-referenceraster=projectspace+"/landesforstinventar-waldmischungsgrad_2056.tif"
-referencetifraster=gdal.Open(referenceraster)
-referencetifrasterband=referencetifraster.GetRasterBand(1)
-referencerasterProjection=referencetifraster.GetProjection()
-ncols=referencetifrasterband.XSize
-nrows=referencetifrasterband.YSize
-indatatype=referencetifrasterband.DataType
-NODATA_value=-9999
-
-#read Fichtenanteil
-fi=gpd.read_file(projectspace+"/baumartenanteil.gpkg", layer='baumartenanteil')
-fi=fi[fi['kanton']=='FR']
-
-
-#read Bestandeskarte shape
-bk_gdf=gpd.read_file(projectspace+"/FR"+"/BestandeskarteFR/BestandeskarteFRv240206.shp")
-bk_gdf.columns
-bk_gdf=bk_gdf[['geometry']]
-bk_gdf['FI']=0
-bk_gdf['LH']=0
-
-
-#attribute raster values to Bestandeskarte
-bk_gdf['joinid']=bk_gdf.index
-bk_gdf["LH"]=0
-zonstat=zonal_stats(bk_gdf, referenceraster,stats="mean")
-i=0
-while i < len(bk_gdf):
-    bk_gdf.loc[i,"LH"]=zonstat[i]["mean"]
-    i+=1
-winsound.Beep(frequency, duration)
-bk_gdf.loc[bk_gdf['LH'].isnull()==True, 'LH'] = 0
-bk_gdf['NH']=100-bk_gdf['LH']
 
 #thresholds for claissifying climate-sensitive stocks (klimasensitive Bestaende)
 threshold_nicht_empfohlen_min=0
@@ -122,6 +65,21 @@ threshold_stark_gef_min=40
 #threshold_mittel_gef_max=50
 #threshold_stark_gef_min=50
 
+
+#read Fichtenanteil
+#fi=gpd.read_file(projectspace+"/baumartenanteil.gpkg", layer='baumartenanteil')
+
+#read Bestandeskarte shape
+#bk_gdf=gpd.read_file(projectspace+"/TBk_CH/"+"TBk_Bestandeskarte.gpkg", layer='TBk_Bestandeskarte.gpkg')
+#bk_gdf.columns
+#bk_gdf=bk_gdf[['geometry']]
+#bk_gdf['FI']=0
+#bk_gdf['LH']=0
+
+#intersect baumartenanteil and Bestandeskarte is done in PostGIS and saved as gpkg
+#bk_gdf_fi=gpd.overlay(bk_gdf, fi, how='intersection)
+#bk_gdf_fi=gpd.read_file(projectspace+"/TBk_CH/"+"TBk_Bestandeskarte.gpkg", layer='TBk_Bestandeskarte.gpkg')
+
 #******************************************************************************************************
 #Sensitive Bestaende
 #******************************************************************************************************
@@ -133,32 +91,35 @@ treetypes_sb=[]
 for item in treetypes:
     treetypes_sb.append("sb"+item)
 
-bk_gdf.crs
-len(bk_gdf)
-bk_gdf.columns
-bk_gdf["bkid"]=bk_gdf.index
-#bk_gdf.to_file(projectspace+"/FR/"+"FR_bk_ausNadelholzanteil.gpkg")
-#bk_gdf=bk_gdf[['bkid','mischung', 'entwicklun','schlussgra','nhd_anteil', 'hdom', 'hmax', 'gru_strukt','dg_os','dg_ms', 'dg_us','geometry']]#,"TACODE","BUCODE"
-bk_gdf.dtypes
+#bk_gdf.crs
+#len(bk_gdf)
+#bk_gdf.columns
+#bk_gdf["bkid"]=bk_gdf.index
+##bk_gdf.to_file(projectspace+"/FR/"+"FR_bk_ausNadelholzanteil.gpkg")
+##bk_gdf=bk_gdf[['bkid','mischung', 'entwicklun','schlussgra','nhd_anteil', 'hdom', 'hmax', 'gru_strukt','dg_os','dg_ms', 'dg_us','geometry']]#,"TACODE","BUCODE"
+#bk_gdf.dtypes
 
-#Intersect with Fichtenanteil
-#bk_gdf_fi=bk_gdf.overlay(fi, how='intersection', make_valid=True, keep_geom_type=True)
-bk_gdf_fi=gpd.read_file(projectspace+"/FR/"+"FR_bk_Fichtenanteil.gpkg", layer='FR_bk_Fichtenanteil')
-#Fichtenanteil
-bk_gdf_fi["FI"]=bk_gdf_fi['FIanteil']#bk_gdf_fi['NH']/100.0*bk_gdf_fi['FIanteil']/100.0*100.0
-bk_gdf_fi.columns
+##Intersect with Fichtenanteil
+##bk_gdf_fi=bk_gdf.overlay(fi, how='intersection', make_valid=True, keep_geom_type=True)
+#bk_gdf_fi=gpd.read_file(projectspace+"/FR/"+"FR_bk_Fichtenanteil.gpkg", layer='FR_bk_Fichtenanteil')
+##Fichtenanteil
+#bk_gdf_fi["FI"]=bk_gdf_fi['FIanteil']#bk_gdf_fi['NH']/100.0*bk_gdf_fi['FIanteil']/100.0*100.0
+#bk_gdf_fi.columns
 
 len(bk_gdf_fi)
 for climatescenario in climatescenarios:
     print(climatescenario)
-    rcp_baumartenempfehlungen_gdf_in=joblib.load(projectspace+"/FR/FR_"+climatescenario+"_baumartenempfehlungen.sav")
-    len(rcp_baumartenempfehlungen_gdf_in)
-    rcp_baumartenempfehlungen_gdf_in.columns
-    rcp_baumartenempfehlungen_gdf_in=rcp_baumartenempfehlungen_gdf_in[treetypesplusgeometry]#"TA_1", #,"BU","TA",,"WFO","BAH"
-    rcp_baumartenempfehlungen_gdf_in.columns
+    #rcp_baumartenempfehlungen_gdf_in=joblib.load(projectspace+"/FR/FR_"+climatescenario+"_baumartenempfehlungen.sav")
+    #len(rcp_baumartenempfehlungen_gdf_in)
+    #rcp_baumartenempfehlungen_gdf_in.columns
+    #rcp_baumartenempfehlungen_gdf_in=rcp_baumartenempfehlungen_gdf_in[treetypesplusgeometry]#"TA_1", #,"BU","TA",,"WFO","BAH"
+    #rcp_baumartenempfehlungen_gdf_in.columns
     ##intersect Baumartenempfehlungen layer with Bestandeskarte layer
     print('intersect')
-    rcp_bk_gdf_in=gpd.overlay(rcp_baumartenempfehlungen_gdf_in, bk_gdf_fi, how='intersection', make_valid=True, keep_geom_type=True)
+    #rcp_bk_gdf_in=gpd.overlay(rcp_baumartenempfehlungen_gdf_in, bk_gdf_fi, how='intersection', make_valid=True, keep_geom_type=True)
+    #rcp_bk_gdf_in=gpd.read_file(projectspace+"/"+"FR_"+climatescenario+"_baumartenempfehlungen_intsct_bk.gpkg", layer='FR_'+climatescenario+'_baumartenempfehlungen_intsct_bk')
+    sql='SELECT * FROM "'+climatescenario+'_TBk_Bestandeskarte_Baumartenanteil_Baumartenempfehlungen"'
+    rcp_bk_gdf_in=gpd.read_postgis(sql, con=engine, geom_col='geom')
     rcp_bk_gdf_in["area"] = rcp_bk_gdf_in['geometry'].area
     mainlayercolumnslist=rcp_bk_gdf_in.columns.tolist()
     if 'index' in mainlayercolumnslist:
