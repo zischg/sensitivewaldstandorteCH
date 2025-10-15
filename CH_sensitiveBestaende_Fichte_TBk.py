@@ -164,19 +164,15 @@ print('all done')
 
 print('analysis ...')
 #Auswertungen
-sensi45var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_FI_"+"var1"+".gpkg")
+sensi45var1=gpd.read_file(projectspace+"/rcp45_sensitivebestaende_FI_TBk_var1.gpkg")
 sensi45var1=sensi45var1[sensi45var1["maxsens"]>=0]
-sensi45var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_FI_"+"var2"+".gpkg")
-sensi45var2=sensi45var2[sensi45var2["maxsens"]>=0]
-sensi85var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_FI_"+"var1"+".gpkg")
+sensi85var1=gpd.read_file(projectspace+"/rcp85_sensitivebestaende_FI_TBk_var1.gpkg")
 sensi85var1=sensi85var1[sensi85var1["maxsens"]>=0]
-sensi85var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_FI_"+"var2"+".gpkg")
-sensi85var2=sensi85var2[sensi85var2["maxsens"]>=0]
 
-outfile = open(projectspace + "/FR/" + "FR_"+"sensitiveBestaende_FI_stat.txt", "w")
+outfile = open(projectspace + "/sensitiveBestaende_FI_TBk_stat.txt", "w")
 outfile.write("var;totarea;prz_nichtsensitiv;prz_schwachsensitiv;prz_mittelsensitiv;prz_starksensitiv;prz_bedingtsensitiv\n")
-shapes=[sensi45var1,sensi45var2,sensi85var1,sensi85var2]
-varnames=['sensi45var1','sensi45var2','sensi85var1','sensi85var2']
+shapes=[sensi45var1,sensi85var1]
+varnames=['sensi45var1','sensi85var1']
 i=0
 for shape in shapes:
     areatot=np.sum(shape.area)
@@ -190,34 +186,3 @@ for shape in shapes:
 outfile.close()
 print('analysis done')
 
-
-
-print('analysis original BK nur FI ...')
-#Auswertungen
-sensi45var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_"+"var1"+".gpkg")
-sensi45var1=sensi45var1[sensi45var1["maxsens"]>=0]
-sensi45var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp45"+"_sensitivebestaende_"+"var2"+".gpkg")
-sensi45var2=sensi45var2[sensi45var2["maxsens"]>=0]
-sensi85var1=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_"+"var1"+".gpkg")
-sensi85var1=sensi85var1[sensi85var1["maxsens"]>=0]
-sensi85var2=gpd.read_file(projectspace+"/FR/"+"FR_"+"rcp85"+"_sensitivebestaende_"+"var2"+".gpkg")
-sensi85var2=sensi85var2[sensi85var2["maxsens"]>=0]
-
-outfile = open(projectspace + "/FR/" + "FR_"+"sensitiveBestaende_FIausBK_stat.txt", "w")
-outfile.write("var;totarea;prz_nichtsensitiv;prz_schwachsensitiv;prz_mittelsensitiv;prz_starksensitiv;prz_bedingtsensitiv\n")
-shapes=[sensi45var1,sensi45var2,sensi85var1,sensi85var2]
-varnames=['sensi45var1','sensi45var2','sensi85var1','sensi85var2']
-i=0
-for shape in shapes:
-    areatot=np.sum(shape.area)
-    area0=round(np.sum(shape[shape["sbFI"]==0].area)/areatot*100.0,2)
-    area1 = round(np.sum(shape[shape["sbFI"] == 1].area) / areatot * 100.0, 2)
-    area2 = round(np.sum(shape[shape["sbFI"] == 2].area) / areatot * 100.0, 2)
-    area3 = round(np.sum(shape[shape["sbFI"] == 3].area) / areatot * 100.0, 2)
-    area4 = round(np.sum(shape[shape["sbFI"] == 4].area) / areatot * 100.0, 2)
-    outfile.write(varnames[i] + ";" + str(areatot) + ";" + str(area0) + ";" + str(area1)+ ";" + str(area2)+ ";" + str(area3)+ ";" + str(area4) + "\n")
-    i+=1
-outfile.close()
-print('analysis done')
-
-shape.columns
