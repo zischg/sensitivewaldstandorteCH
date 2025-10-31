@@ -1,5 +1,5 @@
 # sensitivewaldstandorteCH
-## Sensitive Waldstandorte und Bestände Schweiz
+## **Sensitive Waldstandorte und Bestände Schweiz**
 
 Dieses Code Repository dokumentiert die Arbeiten zur Entwicklung einer Karte der Baumartenempfehlungen im Klimawandel, einer Karte zu den klimasensitiven Waldstandorten und einer Karte zu den klimasensitiven Bestände.
 Die Methode folgt der Prozedur von Tree-App (https://www.tree-app.ch) und wird mit folgenden Schritten umgesetzt:
