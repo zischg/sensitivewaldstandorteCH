@@ -13,7 +13,7 @@ import warnings
 from osgeo import osr, gdal
 from sqlalchemy import create_engine
 mypassword=input("Enter database password: ").replace("'","")
-db_connection_url = "postgresql://azischg:"+mypassword+"@mobidb02.giub.unibe.ch:5432/ccwdb";
+db_connection_url = "postgresql://";
 engine = create_engine(db_connection_url)
 #con=engine.connect()
 drv = gdal.GetDriverByName('GTiff')
