@@ -21,7 +21,7 @@ baumartenbedeutungenrcp45=gpd.read_file(projectspace+"/AI"+"/AI_rcp45_baumartenb
 baumartenbedeutungenrcp85=gpd.read_file(projectspace+"/AI"+"/AI_rcp85_baumartenbedeutungen.gpkg", layer="AI_rcp85_baumartenbedeutungen", driver="GPKG")
 combi=gpd.overlay(baumartenbedeutungenrcp45, baumartenbedeutungenrcp85, how='intersection', make_valid=True, keep_geom_type=True)
 
-arvenundlaerchen=['59','59A','59C','59E','59J','59L','59S','59V','59H','59R','72,' '59*','59G','59AG','59EG','59VG','72G','57CLä','57VLä','58Lä', '59Lä', '59ELä', '59LLä', '59VLä','59LLä']
+arvenundlaerchen=['59','59A','59C','59E','59J','59L','59S','59V','59H','59R','72', '59*','59G','59AG','59EG','59VG','72G','57CLä','57VLä','58Lä', '59Lä', '59ELä', '59LLä', '59VLä','59LLä']
 
 for item in combi.columns.tolist():
     if "FI" in item:
