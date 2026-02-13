@@ -27,6 +27,10 @@ winsound.Beep(frequency, duration)
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 import matplotlib.pyplot as plt
 
+def my_autopct(pct):
+    return ('%1.1f%%' % pct) if pct >= 2 else ''   # only show ≥ 4%
+
+
 
 #color dictionaries
 # Define specific RGB colors for each class combination (normalized to [0,1])
@@ -81,22 +85,24 @@ sizes= areastatistics_ch['area_tot_pct'].tolist()
 
 
 # Create pie chart for CH RCP4.5 Sensitive Standorte
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plt.subplots(figsize=(6, 4))
 #ax.pie(sizes, labels=sensisto_labels, autopct='%1.1f%%', colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()], startangle=90, textprops={'size': 'smaller'}, counterclock=False)
 # Create pie chart
 wedges, texts, autotexts = ax.pie(
     sizes,
     labels=None,  # Remove labels from pie slices
     colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()],
-    autopct='%1.1f%%',
+    #autopct='%1.1f%%',
     startangle=90,
-    textprops={'fontsize': 12},
+    textprops={'fontsize': 10},
+    autopct=my_autopct,
     pctdistance=0.85,
     counterclock=False)
 # Equal aspect ratio
 ax.axis('equal')
 # Set title
-ax.set_title('Klimasensitive Bestände FI RCP4.5 CH', fontsize=14, fontweight='bold',pad=20)
+#ax.set_title('Klimasensitive Bestände FI RCP4.5 CH', fontsize=14, fontweight='bold',pad=20)
+fig.suptitle('Klimasensitive Bestände FI RCP4.5 CH ', fontsize=12, fontweight='bold', ha='center')
 # CREATE CUSTOM LEGEND WITH LABELS
 legend_labels = sensisto_labels
 ax.legend(
@@ -132,22 +138,24 @@ for region in storeg_list:
         else:
             sizes.append(0)
     print(sizes)
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(6, 4))
     #ax.pie(sizes, labels=sensisto_labels, autopct='%1.1f%%', colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()], startangle=90, textprops={'size': 'smaller'}, counterclock=False)
     # Create pie chart
     wedges, texts, autotexts = ax.pie(
         sizes,
         labels=None,  # Remove labels from pie slices
         colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()],
-        autopct='%1.1f%%',
+        #autopct='%1.1f%%',
         startangle=90,
-        textprops={'fontsize': 12},
+        textprops={'fontsize': 10},
+        autopct=my_autopct,
         pctdistance=0.85,
         counterclock=False)
     # Equal aspect ratio
     ax.axis('equal')
     # Set title
-    ax.set_title('Klimasensitive Bestände FI RCP4.5 Region '+region, fontsize=14, fontweight='bold',pad=20)
+    #ax.set_title('Klimasensitive Bestände FI RCP4.5 Region '+region, fontsize=14, fontweight='bold',pad=20)
+    fig.suptitle('Klimasensitive Bestände FI RCP4.5 Region '+region, fontsize=12, fontweight='bold', ha='center')
     # CREATE CUSTOM LEGEND WITH LABELS
     legend_labels = sensisto_labels
     ax.legend(
@@ -166,7 +174,7 @@ for region in storeg_list:
     plt.savefig(projectspace+'/areastatistics_rcp45_sensitivebestaende_piechart_'+region+'.png', dpi=300)
     plt.show()
 #delete data
-del(sensisto_rcp45)
+#del(sensisto_rcp45)
 
 #**********************************************************************************
 #rcp85
@@ -197,22 +205,24 @@ sizes= areastatistics_ch['area_tot_pct'].tolist()
 
 
 # Create pie chart for CH RCP8.5 Sensitive Standorte
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plt.subplots(figsize=(6, 4))
 #ax.pie(sizes, labels=sensisto_labels, autopct='%1.1f%%', colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()], startangle=90, textprops={'size': 'smaller'}, counterclock=False)
 # Create pie chart
 wedges, texts, autotexts = ax.pie(
     sizes,
     labels=None,  # Remove labels from pie slices
     colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()],
-    autopct='%1.1f%%',
+    #autopct='%1.1f%%',
     startangle=90,
-    textprops={'fontsize': 12},
+    textprops={'fontsize': 10},
+    autopct=my_autopct,
     pctdistance=0.85,
     counterclock=False)
 # Equal aspect ratio
 ax.axis('equal')
 # Set title
-ax.set_title('Klimasensitive Bestände FI RCP8.5 CH', fontsize=14, fontweight='bold',pad=20)
+#ax.set_title('Klimasensitive Bestände FI RCP8.5 CH', fontsize=14, fontweight='bold',pad=20)
+fig.suptitle('Klimasensitive Bestände FI RCP8.5 CH ', fontsize=12, fontweight='bold', ha='center')
 # CREATE CUSTOM LEGEND WITH LABELS
 legend_labels = sensisto_labels
 ax.legend(
@@ -250,22 +260,24 @@ for region in storeg_list:
         else:
             sizes.append(0)
     print(sizes)
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(6, 4))
     #ax.pie(sizes, labels=sensisto_labels, autopct='%1.1f%%', colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()], startangle=90, textprops={'size': 'smaller'}, counterclock=False)
     # Create pie chart
     wedges, texts, autotexts = ax.pie(
         sizes,
         labels=None,  # Remove labels from pie slices
         colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()],
-        autopct='%1.1f%%',
+        #autopct='%1.1f%%',
         startangle=90,
-        textprops={'fontsize': 12},
+        textprops={'fontsize': 10},
+        autopct=my_autopct,
         pctdistance=0.85,
         counterclock=False)
     # Equal aspect ratio
     ax.axis('equal')
     # Set title
-    ax.set_title('Klimasensitive Bestände FI RCP8.5 Region '+region, fontsize=14, fontweight='bold',pad=20)
+    #ax.set_title('Klimasensitive Bestände FI RCP8.5 Region '+region, fontsize=14, fontweight='bold',pad=20)
+    fig.suptitle('Klimasensitive Bestände FI RCP8.5 Region ' + region, fontsize=12, fontweight='bold', ha='center')
     # CREATE CUSTOM LEGEND WITH LABELS
     legend_labels = sensisto_labels
     ax.legend(
@@ -284,4 +296,4 @@ for region in storeg_list:
     plt.savefig(projectspace+'/areastatistics_rcp85_sensitivebestaende_piechart_'+region+'.png', dpi=300)
     plt.show()
 #delete data
-del(sensisto_rcp85)
+#del(sensisto_rcp85)

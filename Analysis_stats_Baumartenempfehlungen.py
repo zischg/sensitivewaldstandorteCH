@@ -27,6 +27,8 @@ winsound.Beep(frequency, duration)
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 import matplotlib.pyplot as plt
 
+def my_autopct(pct):
+    return ('%1.1f%%' % pct) if pct >= 2 else ''   # only show ≥ 4%
 
 #color dictionaries
 # Define specific RGB colors for each class combination (normalized to [0,1])
@@ -69,6 +71,7 @@ for climatescenario in climatescenarios:
     ba = ba[ba['inanalysis'] == 1]
     len(ba)
     tot_area = ba.geometry.area.sum()
+    #tot_area/1000000
     # Area statistics CH
     for baumart in baumarten_list:
         print(baumart)
@@ -93,31 +96,46 @@ for climatescenario in climatescenarios:
                 sizes.append(0)
         #sizes = areastatistics_ch['area_tot_pct'].tolist()
         # Create pie chart for CH Baumartenempfehlung
-        fig, ax = plt.subplots(figsize=(8, 6))
+        fig, ax = plt.subplots(figsize=(6, 4))
         #ax.pie(sizes, labels=sensisto_labels, autopct='%1.1f%%', colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()], startangle=90, textprops={'size': 'smaller'}, counterclock=False)
         # Create pie chart
         wedges, texts, autotexts = ax.pie(
             sizes,
             labels=None,  # Remove labels from pie slices
             colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()],
-            autopct='%1.1f%%',
+            #autopct='%1.1f%%',
             startangle=90,
-            textprops={'fontsize': 12},
+            textprops={'fontsize': 10},
+            #autopct=lambda pct: f'{pct:.1f}%' if pct >= 3 else '',
+            autopct=my_autopct,
             pctdistance=0.85,
             counterclock=False)
         # Equal aspect ratio
         ax.axis('equal')
         # Set title
-        ax.set_title('Baumartenempfehlung '+baumart+' '+climatescenario.replace('45','4.5').replace('85','8.5').replace('rcp','RCP')+' CH', fontsize=14, fontweight='bold',pad=20)
+        #ax.set_title('Baumartenempfehlung '+baumart+' '+climatescenario.replace('45','4.5').replace('85','8.5').replace('rcp','RCP')+' CH', fontsize=12, fontweight='bold',loc='center',pad=20)
+
+        # === CENTERED TITLE ===
+        fig.suptitle(
+            'Baumartenempfehlung ' + baumart + ' ' +
+            climatescenario.replace('45', '4.5').replace('85', '8.5').replace('rcp', 'RCP') + ' CH',
+            fontsize=12,
+            fontweight='bold',
+            # y=1.02,  # adjust if needed (1.0–1.05 usually perfect)
+            ha='center'
+        )
+
         # CREATE CUSTOM LEGEND WITH LABELS
+        # Add labels outside the pie with leader lines
         legend_labels = sensisto_labels
         ax.legend(
             wedges,
             legend_labels,
             #title="Sensitive Standorte",
-            loc="lower right",
+            #loc="lower right",
+            loc="center left",
             #bbox_to_anchor=(1, 0, 0.5, 1),  # Position outside plot
-            bbox_to_anchor=(1.2, 0),
+            bbox_to_anchor=(1.0, 0.5),
             fontsize=9,
             title_fontsize=12,
             frameon=False,
@@ -148,31 +166,43 @@ for climatescenario in climatescenarios:
                     sizes.append(0)
             # sizes = areastatistics_region['area_tot_pct'].tolist()
             # Create pie chart for CH Baumartenempfehlung
-            fig, ax = plt.subplots(figsize=(8, 6))
+            fig, ax = plt.subplots(figsize=(6, 4))
             # ax.pie(sizes, labels=sensisto_labels, autopct='%1.1f%%', colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()], startangle=90, textprops={'size': 'smaller'}, counterclock=False)
             # Create pie chart
             wedges, texts, autotexts = ax.pie(
                 sizes,
                 labels=None,  # Remove labels from pie slices
                 colors=[sensisto_colors_dict[key] for key in sensisto_colors_dict.keys()],
-                autopct='%1.1f%%',
+                #autopct='%1.1f%%',
                 startangle=90,
-                textprops={'fontsize': 12},
+                textprops={'fontsize': 10},
+                autopct=my_autopct,
                 pctdistance=0.85,
                 counterclock=False)
             # Equal aspect ratio
             ax.axis('equal')
             # Set title
-            ax.set_title('Baumartenempfehlung ' + baumart + ' ' + climatescenario.replace('45', '4.5').replace('85', '8.5').replace('rcp', 'RCP') + ' Region '+region, fontsize=14, fontweight='bold', pad=20)
+            #ax.set_title('Baumartenempfehlung ' + baumart + ' ' + climatescenario.replace('45', '4.5').replace('85', '8.5').replace('rcp', 'RCP') + ' Region '+region, fontsize=12, fontweight='bold', loc='center',pad=20)
+
+            # === CENTERED TITLE ===
+            fig.suptitle(
+                'Baumartenempfehlung ' + baumart + ' ' +
+                climatescenario.replace('45', '4.5').replace('85', '8.5').replace('rcp', 'RCP') + ' Region '+region,
+                fontsize=12,
+                fontweight='bold',
+                #y=1.02,  # adjust if needed (1.0–1.05 usually perfect)
+                ha='center'
+            )
+
             # CREATE CUSTOM LEGEND WITH LABELS
             legend_labels = sensisto_labels
             ax.legend(
                 wedges,
                 legend_labels,
                 # title="Sensitive Standorte",
-                loc="lower right",
+                loc="center left",
                 # bbox_to_anchor=(1, 0, 0.5, 1),  # Position outside plot
-                bbox_to_anchor=(1.2, 0),
+                bbox_to_anchor=(1.0, 0.5),
                 fontsize=9,
                 title_fontsize=12,
                 frameon=False,
