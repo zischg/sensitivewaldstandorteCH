@@ -58,6 +58,7 @@ sensisto_rcp45=gpd.read_postgis(sql, con=engine, geom_col='geom')
 sensisto_rcp45.columns
 storeg_list=sensisto_rcp45['storeg'].unique().tolist()
 storeg_list.sort()
+kantonslist=sensisto_rcp45['kanton'].unique().tolist()
 print(storeg_list)
 len(sensisto_rcp45)
 sensisto_rcp45=sensisto_rcp45[sensisto_rcp45['inanalysis']==1]
@@ -66,13 +67,17 @@ tot_area=  sensisto_rcp45.geometry.area.sum()
 tot_areakm2=tot_area/1000000  #convert to km2
 # Area statistics CH
 areastatistics_ch=sensisto_rcp45.groupby(['sensisto']).agg({'area_m2': 'sum'})
+areastatistics_ch['area_tot_km2']=areastatistics_ch['area_m2']/1000000
 areastatistics_ch['area_tot_pct']=areastatistics_ch['area_m2']/tot_area*100
 #areastatistics_ch['area_tot_ant']=areastatistics_ch['area_m2']/tot_area
 areastatistics_ch.to_excel(projectspace+'/areastatistics_rcp45_sensitivestandorte_CH.xlsx')
 #area statistics Standortregionen
 areastatistics=sensisto_rcp45.groupby(['storeg','sensisto']).agg({'area_m2': 'sum'})
+areastatistics['area_tot_km2']=areastatistics['area_m2']/1000000.0
 areastatistics['area_tot_pct']=areastatistics['area_m2']/tot_area*100
 areastatistics.to_excel(projectspace+'/areastatistics_rcp45_sensitivestandorte_regionen.xlsx')
+areaperstoreg=sensisto_rcp45.groupby(['storeg']).agg({'area_m2': 'sum'})
+areaperstoreg['area_tot_km2']=areaperstoreg['area_m2']/1000000.0
 #create a pie chart for CH
 labels_zahlen = areastatistics_ch.index.get_level_values('sensisto').tolist()
 print(labels_zahlen)
@@ -203,6 +208,7 @@ areastatistics_ch85['area_tot_pct']=areastatistics_ch85['area_m2']/tot_area*100
 areastatistics_ch85.to_excel(projectspace+'/areastatistics_rcp85_sensitivestandorte_CH.xlsx')
 #area statistics Standortregionen
 areastatistics85=sensisto_rcp85.groupby(['storeg','sensisto']).agg({'area_m2': 'sum'})
+areastatistics85['area_tot_km2']=areastatistics85['area_m2']/1000000.0
 areastatistics85['area_tot_pct']=areastatistics85['area_m2']/tot_area*100
 areastatistics85.to_excel(projectspace+'/areastatistics_rcp85_sensitivestandorte_regionen.xlsx')
 #create a pie chart for CH
@@ -308,17 +314,6 @@ del(sensisto_rcp85)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 # Create a 3x3 grid of pie charts
 fig, axes = plt.subplots(3, 3, figsize=(15, 15))
 # Plot each pie chart
@@ -392,6 +387,6 @@ print('all done')
 
 
 
-for climatescenario in climatescenarios:
+for storeg in storeg_list:
     print(climatescenario)
 

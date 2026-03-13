@@ -202,7 +202,9 @@ labels_zahlen = areastatistics_ch.index.get_level_values('maxsens').tolist()
 print(labels_zahlen)
 print(sensisto_labels)
 sizes= areastatistics_ch['area_tot_pct'].tolist()
-
+stat=sensisto_rcp85.groupby(['storeg']).agg({'area_m2': 'sum'})
+stat['km2']=stat['area_m2']/1000000
+stat.to_excel(projectspace+'/areastatistics_rcp85_sensitivebestaende_regionen_km2.xlsx')
 
 # Create pie chart for CH RCP8.5 Sensitive Standorte
 fig, ax = plt.subplots(figsize=(6, 4))
