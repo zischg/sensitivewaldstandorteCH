@@ -53,6 +53,8 @@ hoehenstufenlist=["hyperinsubrisch","collin","collin mit Buche","submontan","unt
 
 #read SHK2026
 stok_gdf=gpd.read_file(myworkspace+'/export/WSHK_GR_20260713_attributed.gpkg', layer='WSHK_GR_20260713_attributed')
+stok_gdf['area']=stok_gdf.geometry.area
+#stok_gdf=gpd.read_file(myworkspace+"/sensi/stok_gdf_allattributes.gpkg")
 #stok_gdf.rename(columns={'ass_gr':'ASS_GR', 'naisbg':'NAISbg'}, inplace=True)
 #stok_gdf.rename(columns={'meanslopep':'meanslopeprc'}, inplace=True)
 
@@ -159,12 +161,11 @@ stok_gdf.loc[((stok_gdf["tahs"] == 4)) , "tahs"] = 'submontan'
 stok_gdf.loc[((stok_gdf["tahs"] == 5)) , "tahs"] = 'untermontan'
 stok_gdf.loc[((stok_gdf["tahs"] == 6)) , "tahs"] = 'obermontan'
 stok_gdf.loc[((stok_gdf["tahs"] == 7)) , "tahs"] = 'unter-/obermontan'
-stok_gdf.loc[((stok_gdf["tahs"] == 1)&(stok_gdf["taheute"] == 1)) , "tahs"] = 'hochmontan im Tannen-Hauptareal'
-stok_gdf.loc[((stok_gdf["tahs"] == 1)&(stok_gdf["taheute"] == 2)) , "tahs"] = 'hochmontan im Tannen-Nebenareal'
-stok_gdf.loc[((stok_gdf["tahs"] == 1)&(stok_gdf["taheute"] == 3)) , "tahs"] = 'hochmontan im Tannen-Reliktareal'
+stok_gdf.loc[((stok_gdf["tahs"] == 8)&(stok_gdf["taheute"] == 1)) , "tahs"] = 'hochmontan im Tannen-Hauptareal'
+stok_gdf.loc[((stok_gdf["tahs"] == 8)&(stok_gdf["taheute"] == 2)) , "tahs"] = 'hochmontan im Tannen-Nebenareal'
+stok_gdf.loc[((stok_gdf["tahs"] == 8)&(stok_gdf["taheute"] == 3)) , "tahs"] = 'hochmontan im Tannen-Reliktareal'
 stok_gdf.loc[((stok_gdf["tahs"] == 9)) , "tahs"] = 'subalpin'
 stok_gdf.loc[((stok_gdf["tahs"] == 10)) , "tahs"] = 'obersubalpin'
-
 
 #add ue and mo
 stok_gdf['ue']=0
@@ -181,24 +182,54 @@ stok_gdf.loc[((stok_gdf["ue"] == 1)&(stok_gdf["tahsue"] == '')) , "tahsue"] = st
 stok_gdf.loc[((stok_gdf["mo"] == 1)&(stok_gdf["tahsue"] == '')) , "tahsue"] = stok_gdf["tahs"]
 winsound.Beep(frequency, duration)
 
+#check for Relikt-Tannenareal
+projectionswegedf=pd.read_excel(codespace+"/"+"L_Projektionswege_im_Klimawandel_18022020_export.xlsx", dtype="str", engine='openpyxl')
+tannenarealnaislist=[]
+tannenarealnaislistohnere=[]
+for item in projectionswegedf['Standortstyp_heute'].unique().tolist():
+    if 'Re' in item:
+        print(item)
+        tannenarealnaislist.append(item)
+        tannenarealnaislistohnere.append(item.replace('Re',''))
+#add 'Re' to all units in Tannen-Reliktareal
+for item in tannenarealnaislistohnere:
+    print(item)
+    stok_gdf.loc[((stok_gdf['nais']== item)&(stok_gdf['ue']== 0)&(stok_gdf['taheute']==3)),'nais'] = stok_gdf['nais'].replace(item, item+'Re')
+    stok_gdf.loc[((stok_gdf['nais'] == item) & (stok_gdf['mo'] == 0)&(stok_gdf['taheute']==3)),'nais'] = stok_gdf['nais'].replace(item, item + 'Re')
+    stok_gdf.loc[((stok_gdf['nais1'] == item) & (stok_gdf['ue'] == 0)&(stok_gdf['taheute']==3)),'nais1'] = stok_gdf['nais1'].replace(item, item + 'Re')
+    stok_gdf.loc[((stok_gdf['nais1'] == item) & (stok_gdf['mo'] == 0)&(stok_gdf['taheute']==3)),'nais1'] = stok_gdf['nais1'].replace(item, item + 'Re')
+    stok_gdf.loc[((stok_gdf['nais'] == item) & (stok_gdf['ue'] == 1)&(stok_gdf['taheute']==3)),'nais'] = stok_gdf['nais'].replace(item, item + 'Re')
+    stok_gdf.loc[((stok_gdf['nais'] == item) & (stok_gdf['mo'] == 1)&(stok_gdf['taheute']==3)),'nais'] = stok_gdf['nais'].replace(item, item + 'Re')
+    stok_gdf.loc[((stok_gdf['nais1'] == item) & (stok_gdf['ue'] == 1)&(stok_gdf['taheute']==3)),'nais1'] = stok_gdf['nais1'].replace(item, item + 'Re')
+    stok_gdf.loc[((stok_gdf['nais1'] == item) & (stok_gdf['mo'] == 1)&(stok_gdf['taheute']==3)),'nais1'] = stok_gdf['nais1'].replace(item, item + 'Re')
+    stok_gdf.loc[((stok_gdf['naisue'] == item) & (stok_gdf['ue'] == 1)&(stok_gdf['taheute']==3)),'naisue'] = stok_gdf['naisue'].replace(item, item + 'Re')
+    stok_gdf.loc[((stok_gdf['naisue'] == item) & (stok_gdf['mo'] == 1)&(stok_gdf['taheute']==3)),'naisue'] = stok_gdf['naisue'].replace(item, item + 'Re')
+
+stok_gdf['nais'].unique().tolist()
+stok_gdf['nais1'].unique().tolist()
+stok_gdf['naisue'].unique().tolist()
+
 #write data
 print("write output")
 stok_gdf.columns
-stok_gdf=stok_gdf[['joinid','GR_Einheit', 'nais', 'taheute','storeg', 'meanslopeprc', 'slpprzrec', 'rad', 'radiation','nais1', 'nais2', 'ue',  'mo', 'tahs', 'tahsue', 'geometry']]
+stok_gdf.to_file(myworkspace+"/sensi/stok_gdf_allattributes.gpkg")
+stok_gdf=stok_gdf[['joinid','GR_Einheit', 'nais', 'taheute','storeg', 'meanslopeprc', 'slpprzrec', 'rad', 'radiation','nais1', 'naisue', 'ue',  'mo', 'tahs', 'tahsue', 'geometry']]
 stok_gdf.to_file(myworkspace+"/sensi/stok_gdf_attributed.gpkg")
 #stok_gdf=gpd.read_file(myworkspace+"/GR/stok_gdf_attributed.gpkg")
 print("done")
+
+
 
 #Export for tree-app
 print('Export for Tree-App')
 stok_gdf.columns
 #stok_gdf.loc[((stok_gdf['ue']==1)&(NAISbg['tahsue']=='')&(stok_gdf['tahs']!='')),'tahsue']=stok_gdf['tahs']
-treeapp=stok_gdf[['GR_Einheit', 'nais', 'nais1', 'nais2', 'mo', 'ue','tahs', 'tahsue','geometry']]
+treeapp=stok_gdf[['GR_Einheit', 'nais', 'nais1', 'naisue', 'mo', 'ue','tahs', 'tahsue','geometry']]
 treeapp.to_file(myworkspace+"/sensi/GR_treeapp.gpkg", layer='GR_treeapp', driver="GPKG")
 treeapp.columns
 print("done")
 winsound.Beep(frequency, duration)
-winsound.Beep(frequency, duration)
+
 
 
 
